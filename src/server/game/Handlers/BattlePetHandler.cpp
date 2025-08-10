@@ -186,11 +186,11 @@ void WorldSession::HandleBattlePetSetSlot(WorldPackets::BattlePet::SetBattleSlot
 void WorldSession::HandlePetBattleRequestWild(WorldPackets::BattlePet::RequestWild& packet)
 {
 
-    if (m_IsPetBattleJournalLocked)
-    {
-        SendPetBattleRequestFailed(PETBATTLE_REQUEST_NO_ACCOUNT_LOCK);
-        return;
-    }
+    //if (m_IsPetBattleJournalLocked)
+    //{
+    //    SendPetBattleRequestFailed(PETBATTLE_REQUEST_NO_ACCOUNT_LOCK);
+    //    return;
+    //}
 
     auto battleRequest = sPetBattleSystem->CreateRequest(_player->GetGUID());
     battleRequest->LocationResult = packet.Battle.Location.LocationResult;
@@ -294,6 +294,9 @@ void WorldSession::HandlePetBattleRequestWild(WorldPackets::BattlePet::RequestWi
 
         ++playerPetCount;
     }
+
+    wildBattlePetCreature->ForcedDespawn(1);
+    wildBattlePetCreature->SetRespawnTime(600000);
 
     _player->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_IMMUNE_TO_NPC); ///< Immuned only to NPC
     _player->SetTarget(wildBattlePetCreature->GetGUID());

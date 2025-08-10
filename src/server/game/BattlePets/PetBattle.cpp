@@ -367,7 +367,8 @@ uint32 BattlePetInstance::GetMaxXPForCurrentLevel()
     if (auto xpTable = sBattlePetXPTable.GetRow(Level))
         return xpTable->Xp * xpTable->Wins;
 
-    return 0;
+    else
+        return 0;
 }
 
 uint32 BattlePetInstance::GetXPEarn(uint32 targetPetID)
@@ -1249,7 +1250,10 @@ void PetBattle::Finish(uint32 winnerTeamID, bool aborted, bool ignoreAbandonPena
                 if (winnerTeamID == currentTeamID && availablePetCount && BattleType == PETBATTLE_TYPE_PVE && currentPet->IsAlive() && currentPet->Level < BATTLEPET_MAX_LEVEL && FightedPets.find(currentPet->ID) != FightedPets.end())
                 {
                     uint32 xpEarn = 0;
-                    float xpMod[] = {1.0f, 1.0f, 0.5f};
+                    uint32 child = 0;
+                    float xpMod[] = { 1.0f, 1.0f, 0.5f };
+                    uint32 xpvalue = 0;
+                    uint32 xpbasewin = 75;
 
                     for (uint32 opponentTeamCurrentPet = 0; opponentTeamCurrentPet < Teams[PETBATTLE_PVE_TEAM_ID]->TeamPetCount; opponentTeamCurrentPet++)
                     {
@@ -1280,8 +1284,17 @@ void PetBattle::Finish(uint32 winnerTeamID, bool aborted, bool ignoreAbandonPena
 
                         if (currentPet->Level >= 3)
                         {
+                            player->CompletedAchievement(7433);
+
                             /// Quest progress for 12 x Level Up!
                             player->KilledMonsterCredit(65876);
+                            player->GetSession()->SendPetBattleSlotUpdates();
+                        }
+
+                        if (currentPet->Level >= 5)
+                        {
+                            player->CompletedAchievement(6566);
+                            player->GetSession()->SendPetBattleSlotUpdates();
                         }
                     }
                     else

@@ -3573,6 +3573,30 @@ bool InstanceMap::AddPlayerToMap(Player* player, bool initPlayer /*= true*/)
     return true;
 }
 
+void Map::PopulateBattlePet()
+{
+
+    for (auto& zone : m_wildBattlePetPool)
+    {
+        uint16 zoneId = zone.first;
+        for (auto& iter : zone.second)
+        {
+            uint32 entry = iter.first;
+            WildPetPoolTemplate* petTemplate = sWildBattlePetMgr->GetWildPetTemplate(GetId(), zoneId, entry);
+            if (!petTemplate)
+                continue;
+            sWildBattlePetMgr->Populate(petTemplate, &iter.second);
+        }
+    }
+}
+
+void Map::DepopulateBattlePet()
+{
+    for (auto& zone : m_wildBattlePetPool)
+        for (auto& iter : zone.second)
+            sWildBattlePetMgr->Depopulate(&iter.second);
+}
+
 void InstanceMap::Update(const uint32 t_diff)
 {
     Map::Update(t_diff);

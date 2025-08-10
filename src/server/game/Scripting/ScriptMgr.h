@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -780,6 +779,8 @@ class TC_GAME_API PlayerScript : public UnitScript
         // Called when a player changes to a new map (after moving to new map)
         virtual void OnMapChanged(Player* /*player*/) { }
 
+        virtual void OnMovementInform(Player* /*player*/, uint32 /*moveType*/, uint32 /*ID*/) { }
+
         // Called when player accepts some quest
         virtual void OnQuestAccept(Player* /*player*/, Quest const* /*quest*/) { }
 
@@ -1264,6 +1265,7 @@ class TC_GAME_API ScriptMgr
         void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent, uint8 extendState);
         void OnPlayerUpdateZone(Player* player, Area* newArea, Area* oldArea);
         void OnPlayerUpdateArea(Player* player, Area* newArea, Area* oldArea);
+        void OnMovementInform(Player* player, uint32 moveType, uint32 ID);
         void OnPlayerUpdateAreaAlternate(Player* player, uint32 newArea, uint32 oldArea);
         void OnQuestAccept(Player* player, const Quest* quest);
         void OnQuestReward(Player* player, const Quest* quest);

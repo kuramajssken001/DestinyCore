@@ -21235,6 +21235,8 @@ void Player::SaveToDB(bool create /*=false*/)
     if (m_session->isLogingOut() || !sWorld->getBoolConfig(CONFIG_STATS_SAVE_ONLY_ON_LOGOUT))
         _SaveStats(trans);
 
+    SaveBattlePets(trans);
+
     CharacterDatabase.CommitTransaction(trans);
 
     // TODO: Move this out

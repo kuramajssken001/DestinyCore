@@ -587,6 +587,8 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         void AddBattlePet(Creature* creature);
         void RemoveBattlePet(Creature* creature);
         WildBattlePetPool* GetWildBattlePetPool(Creature* creature);
+        void PopulateBattlePet();
+        void DepopulateBattlePet();
 
     private:
         void LoadMapAndVMap(int gx, int gy);
@@ -599,8 +601,6 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         GridMap* GetGrid(float x, float y);
         GridMap* GetGrid(uint32 mapId, float x, float y);
 
-        void PopulateBattlePet(uint32 diff);
-        void DepopulateBattlePet();
         std::map<uint16, std::map<uint32, WildBattlePetPool>> m_wildBattlePetPool;
 
         void SetTimer(uint32 t) { i_gridExpiry = t < MIN_GRID_DELAY ? MIN_GRID_DELAY : t; }

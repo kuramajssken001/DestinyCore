@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -26,6 +25,7 @@
 #include "Player.h"
 #include "CreatureGroups.h"
 #include "ObjectAccessor.h"
+#include "ScriptMgr.h"
 
 //----- Point Movement Generator
 template<class T>
@@ -113,6 +113,12 @@ template <> void PointMovementGenerator<Creature>::MovementInform(Creature* unit
 {
     if (unit->AI())
         unit->AI()->MovementInform(POINT_MOTION_TYPE, id);
+}
+
+template <>
+void PointMovementGenerator<Player>::MovementInform(Player* unit)
+{
+    sScriptMgr->OnMovementInform(unit, POINT_MOTION_TYPE, id);
 }
 
 template void PointMovementGenerator<Player>::DoInitialize(Player*);
