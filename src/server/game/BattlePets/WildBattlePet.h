@@ -46,14 +46,14 @@ struct WildPetPoolTemplate
     uint32 MaxLevel{};
 };
 
-class WildBattlePetZonePools
+class TC_GAME_API WildBattlePetZonePools
 {
 public:
     void LoadPoolTemplate(Field* fields);
     std::map<uint32, WildPetPoolTemplate> m_Templates;
 };
 
-class WildBattlePetMgr
+class TC_GAME_API WildBattlePetMgr
 {
 public:
     static WildBattlePetMgr* instance();

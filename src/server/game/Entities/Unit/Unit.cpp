@@ -8748,7 +8748,7 @@ void Unit::SetSpeedRate(UnitMoveType mtype, float rate)
             if (Pet* pet = ToPlayer()->GetPet())
                 pet->SetSpeedRate(mtype, m_speed_rate[mtype]);
             if (Creature* battlePet = ToPlayer()->GetSummonedBattlePet())
-                battlePet->SetSpeed(mtype, CalculatePct(m_speed_rate[mtype], 114.0f));
+                battlePet->SetSpeed(mtype, m_speed_rate[mtype]);
         }
     }
 

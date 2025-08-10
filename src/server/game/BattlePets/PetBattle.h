@@ -19,7 +19,7 @@
 
 #include "Common.h"
 
-class Field;
+class TC_GAME_API Field;
 
 #define MAX_PETBATTLE_SLOTS 3
 #define MAX_PETBATTLE_TEAM 2
@@ -278,7 +278,7 @@ enum ePetBattleAbilities
     PETBATTLE_ABILITY_TURN0_PROC_ON_NONE = 0xFF      /// Custom value
 };
 
-class BattlePet
+class TC_GAME_API BattlePet
 {
 public:
     virtual ~BattlePet() = default;
@@ -318,7 +318,7 @@ public:
 
 class PetBattle;
 
-class BattlePetInstance : public BattlePet
+class TC_GAME_API BattlePetInstance : public BattlePet
 {
 public:
     BattlePetInstance();
@@ -473,7 +473,7 @@ struct PetBattleRequest
     bool IsPvPReady[MAX_PETBATTLE_TEAM] = { };
 };
 
-class PetBattleAura
+class TC_GAME_API PetBattleAura
 {
 public:
     void Apply(PetBattle* petBattle);
@@ -511,7 +511,7 @@ enum PetBattleTeamCatchFlags
     PETBATTLE_TEAM_CATCH_FLAG_ONE_CATCH_PER_FIGHT   = 0x08,
 };
 
-class PetBattleTeam
+class TC_GAME_API PetBattleTeam
 {
 public:
     bool Update();
@@ -552,7 +552,7 @@ public:
     bool isRun;                                             ///< Team is ready to run
 };
 
-class PetBattle
+class TC_GAME_API PetBattle
 {
 public:
     PetBattle();

@@ -534,6 +534,7 @@ void WorldSession::LogoutPlayer(bool save)
         //drop a flag if player is carrying it
         if (Battleground* bg = _player->GetBattleground())
             bg->EventPlayerLoggedOut(_player);
+        _player->UnsummonCurrentBattlePetIfAny(true);
 
         ///- Teleport to home if the player is in an invalid instance
         if (!_player->m_InstanceValid && !_player->IsGameMaster())

@@ -20,8 +20,8 @@
 #include "Common.h"
 
 struct BattlePetAbilityEffectEntry;
-class PetBattle;
-class PetBattleAura;
+class TC_GAME_API PetBattle;
+class TC_GAME_API PetBattleAura;
 
 enum BattlePetAbilityFlags
 {

@@ -18,7 +18,7 @@
 #ifndef _BATTLE_PET_DATA_STORE_H
 #define _BATTLE_PET_DATA_STORE_H
 
-struct BattlePetTemplate
+struct TC_GAME_API BattlePetTemplate
 {
     uint32 CreatureID;
     uint32 BreedMask;
@@ -29,7 +29,7 @@ struct BattlePetTemplate
     std::set<uint32> BreedIDs;
 };
 
-struct BattlePetNpcTeamMember
+struct TC_GAME_API BattlePetNpcTeamMember
 {
     uint32 Specie;
     uint32 maxlevel;
@@ -44,7 +44,7 @@ typedef std::map<uint32, BattlePetTemplate> BattlePetTemplateContainer;
 typedef std::map<uint32, BattlePetTemplate*> BattlePetTemplateMap;
 typedef std::map<uint32, std::vector<BattlePetNpcTeamMember>> BattlePetNpcTeamMembers;
 
-class BattlePetDataStoreMgr
+class TC_GAME_API BattlePetDataStoreMgr
 {
     BattlePetDataStoreMgr();
     ~BattlePetDataStoreMgr();
