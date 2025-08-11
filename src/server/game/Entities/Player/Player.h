@@ -2617,6 +2617,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         void ScheduleDelayedOperation(uint32 operation) { if (operation < DELAYED_END) m_DelayedOperations |= operation; }
         WorldLocation m_recall_location;
         void QuestObjectiveSatisfy(uint32 objectId, uint32 amount, QuestObjectiveType type = QUEST_OBJECTIVE_MONSTER, ObjectGuid guid = ObjectGuid::Empty);
+        bool QuestObjectiveActiveInPlayerByObject(uint32 objectId);
 
 		/* delay teleport */
         void AddDelayedTeleport(uint32 delay, uint32 mapID, float x, float y, float z, float o)

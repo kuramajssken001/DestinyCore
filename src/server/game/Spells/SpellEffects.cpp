@@ -4343,9 +4343,6 @@ void Spell::EffectForceDeselect(SpellEffIndex /*effIndex*/)
 
 void Spell::EffectUncageBattlePet(SpellEffIndex /*effIndex*/)
 {
-    if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
-        return;
-
     if (!m_CastItem || m_CastItem->GetEntry() != BATTLE_PET_CAGE_ITEM_ID)
         return;
 
@@ -4458,9 +4455,6 @@ void Spell::EffectGrantBattlePetLevel(SpellEffIndex effIndex)
 
 void Spell::EffectUpgradeBattlePet(SpellEffIndex effIndex)
 {
-    if (effectHandleMode != SPELL_EFFECT_HANDLE_LAUNCH_TARGET)
-        return;
-
     if (!m_CastItem)
         return;
 

@@ -7490,59 +7490,17 @@ bool SpellEvent::Execute(uint64 e_time, uint32 p_time)
             // first, check, if we have just started
             if (m_Spell->GetDelayStart() != 0)
             {
-                // no, we aren't, do the typical update
-                // check, if we have channeled spell on our hands
-                /*
-                if (m_Spell->m_spellInfo->IsChanneled())
+                if (uint64 n_offset = m_Spell->handle_delayed(e_time - m_Spell->GetDelayStart()))
                 {
-                    // evented channeled spell is processed separately, cast once after delay, and not destroyed till finish
-                    // check, if we have casting anything else except this channeled spell and autorepeat
-                    if (m_Spell->GetCaster()->IsNonMeleeSpellCast(false, true, true))
-                    {
-                        // another non-melee non-delayed spell is cast now, abort
-                        m_Spell->cancel();
-                    }
-                    else
-                    {
-                        // Set last not triggered spell for apply spellmods
-                        ((Player*)m_Spell->GetCaster())->SetSpellModTakingSpell(m_Spell, true);
-                        // do the action (pass spell to channeling state)
-                        m_Spell->handle_immediate();
-
-                        // And remove after effect handling
-                        ((Player*)m_Spell->GetCaster())->SetSpellModTakingSpell(m_Spell, false);
-                    }
-                    // event will be re-added automatically at the end of routine)
-                }
-                else
-                */
-                {
-                    // run the spell handler and think about what we can do next
-                    uint64 t_offset = e_time - m_Spell->GetDelayStart();
-                    uint64 n_offset = m_Spell->handle_delayed(t_offset);
-                    if (n_offset)
-                    {
-                        // re-add us to the queue
-                        m_Spell->GetCaster()->m_Events.AddEvent(this, m_Spell->GetDelayStart() + n_offset, false);
-                        return false;                       // event not complete
-                    }
-                    // event complete
-                    // finish update event will be re-added automatically at the end of routine)
+                    m_Spell->GetCaster()->m_Events.AddEvent(this, m_Spell->GetDelayStart() + n_offset, false);
+                    return false;
                 }
             }
             else
             {
-                // delaying had just started, record the moment
                 m_Spell->SetDelayStart(e_time);
-                // handle effects on caster if the spell has travel time but also affects the caster in some way
-                if (!m_Spell->m_targets.HasDst())
-                {
-                    uint64 n_offset = m_Spell->handle_delayed(0);
-                    ASSERT(n_offset == m_Spell->GetDelayMoment());
-                }
-                // re-plan the event for the delay moment
                 m_Spell->GetCaster()->m_Events.AddEvent(this, e_time + m_Spell->GetDelayMoment(), false);
-                return false;                               // event not complete
+                return false;
             }
             break;
         }

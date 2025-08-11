@@ -10818,6 +10818,17 @@ void ObjectMgr::LoadPlayerChoices()
         _playerChoices.size(), responseCount, rewardCount, itemRewardCount, currencyRewardCount, factionRewardCount, GetMSTimeDiffToNow(oldMSTime));
 }
 
+std::vector<QuestObjective> ObjectMgr::GetQuestObjectivesByType(QuestObjectiveType type)
+{
+    auto itr = _questObjectiveByType.find(type);
+    if (itr != _questObjectiveByType.end())
+        return itr->second;
+
+    return std::vector<QuestObjective>();
+
+    //return _questObjectiveByType[type];
+}
+
 void ObjectMgr::LoadPlayerChoicesLocale()
 {
     uint32 oldMSTime = getMSTime();

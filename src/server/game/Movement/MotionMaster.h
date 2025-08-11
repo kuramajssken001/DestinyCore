@@ -150,6 +150,7 @@ class TC_GAME_API MotionMaster
             MovePoint(id, pos.m_positionX, pos.m_positionY, pos.m_positionZ, generatePath);
         }
         void MovePoint(uint32 id, float x, float y, float z, bool generatePath = true);
+        void MovePointWithRot(uint32 id, float x, float y, float z, float orientation = -1000.0f, bool generatePath = true);
 
         /*  Makes the unit move toward the target until it is at a certain distance from it. The unit then stops.
             Only works in 2D.

@@ -19836,6 +19836,34 @@ void Player::LoadPetsFromDB(PreparedQueryResult result)
     } while (result->NextRow());
 }
 
+bool Player::QuestObjectiveActiveInPlayerByObject(uint32 objectId)
+{
+    for (uint8 q = 0; q < MAX_QUEST_LOG_SIZE; ++q)
+    {
+        uint32 questID = GetQuestSlotQuestId(q);
+        if (!questID)
+            continue;
+
+        QuestStatus queststatus = GetQuestStatus(questID);
+
+        if (queststatus != QUEST_STATUS_INCOMPLETE)
+            continue;
+
+        Quest const* quest = sObjectMgr->GetQuestTemplate(questID);
+        if (!quest)
+            continue;
+
+        for (QuestObjective const& obj : quest->GetObjectives())
+        {
+            if ((uint32)obj.ObjectID == objectId)
+            {
+                return true;
+                break;
+            }
+        }
+    }
+}
+
 PlayerPetData* Player::GetPlayerPetDataById(uint32 petId)
 {
     for (PlayerPetData* p : PlayerPetDataStore)
@@ -19928,8 +19956,8 @@ void Player::QuestObjectiveSatisfy(uint32 objectId, uint32 amount, QuestObjectiv
 
                 SendQuestUpdateAddCredit(quest, guid, obj, amount);
 
-                if (CanCompleteQuest(questID))
-                    CompleteQuest(questID);
+                CompleteQuest(questID);
+
                 break;
             }
         }

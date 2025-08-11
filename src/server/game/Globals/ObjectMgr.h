@@ -973,6 +973,8 @@ class TC_GAME_API ObjectMgr
         void LoadGameObjectTemplate();
         void LoadGameObjectTemplateAddons();
 
+        std::vector<QuestObjective> GetQuestObjectivesByType(QuestObjectiveType type);
+
         CreatureTemplate const* GetCreatureTemplate(uint32 entry) const;
         uint32 GetCreatureTemplateJournalId(uint32 entry) const;
         CreatureTemplateContainer const* GetCreatureTemplates() const { return &_creatureTemplateStore; }
@@ -1807,6 +1809,7 @@ class TC_GAME_API ObjectMgr
         PageTextLocaleContainer _pageTextLocaleStore;
         GossipMenuItemsLocaleContainer _gossipMenuItemsLocaleStore;
         PointOfInterestLocaleContainer _pointOfInterestLocaleStore;
+        std::map<QuestObjectiveType, std::vector<QuestObjective>> _questObjectiveByType;
 
         std::unordered_map<int32, PlayerChoiceLocale> _playerChoiceLocales;
 

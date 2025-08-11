@@ -330,6 +330,20 @@ void MotionMaster::MovePoint(uint32 id, float x, float y, float z, bool generate
     }
 }
 
+void MotionMaster::MovePointWithRot(uint32 id, float x, float y, float z, float orientation, bool generatePath)
+{
+    if (!_owner)
+        return;
+
+    if (_owner->IsFlying())
+        generatePath = false;
+
+    if (_owner->IsPlayer())
+        Mutate(new PointMovementGenerator<Player>(id, x, y, z, generatePath), MOTION_SLOT_ACTIVE);
+    else
+        Mutate(new PointMovementGenerator<Creature>(id, x, y, z, generatePath), MOTION_SLOT_ACTIVE);
+}
+
 void MotionMaster::MoveCloserAndStop(uint32 id, Unit* target, float distance)
 {
     float distanceToTravel = _owner->GetExactDist2d(target) - distance;
