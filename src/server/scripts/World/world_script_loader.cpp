@@ -36,6 +36,7 @@ void AddSC_rest_scripts();
 // player
 void AddSC_chat_log();
 void AddSC_duel_reset();
+void AddSC_npc_PetBattleTrainer();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -61,4 +62,5 @@ void AddWorldScripts()
     if (sWorld->getBoolConfig(CONFIG_IP_BASED_ACTION_LOGGING))
         AddSC_action_ip_logger(); // location: scripts\World\action_ip_logger.cpp
     AddSC_duel_reset();
+    AddSC_npc_PetBattleTrainer();
 }
