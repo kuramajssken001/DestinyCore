@@ -824,9 +824,11 @@ void WorldSession::SendPetBattleInitialUpdate(PetBattle* petBattle)
     uint8 curPetBattleState = 1;
     bool isPVP = petBattle->BattleType != PETBATTLE_TYPE_PVE;
 
+    auto plr = ObjectAccessor::FindConnectedPlayer(petBattle->Teams[PETBATTLE_TEAM_1]->PlayerGuid);
+
     if (petBattle->BattleType == PETBATTLE_TYPE_PVE && petBattle->PveBattleType == PVE_PETBATTLE_TRAINER)
     {
-        if (auto trainer = ObjectAccessor::FindCreature(petBattle->InitialWildPetGUID))
+        if (auto trainer = ObjectAccessor::GetCreature(*plr, petBattle->InitialWildPetGUID))
         {
             update.MsgData.NpcCreatureID = trainer->GetEntry();
             update.MsgData.NpcDisplayID = trainer->GetDisplayId();

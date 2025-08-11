@@ -212,6 +212,8 @@ public:
                 }
 
                 player->GetMotionMaster()->MovePointWithRot(PETBATTLE_ENTER_MOVE_SPLINE_ID, playerPosition.m_positionX, playerPosition.m_positionY, playerPosition.m_positionZ, playerPosition.m_orientation);
+                creature->ForcedDespawn(1);
+                creature->SetRespawnTime(3000000000000000);
             }
             else
                 CloseGossipMenuFor(player);

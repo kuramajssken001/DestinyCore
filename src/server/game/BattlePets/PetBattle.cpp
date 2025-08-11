@@ -1347,8 +1347,21 @@ void PetBattle::Finish(uint32 winnerTeamID, bool aborted, bool ignoreAbandonPena
             }
 
             if (BattleType == PETBATTLE_TYPE_PVE && PveBattleType == PVE_PETBATTLE_TRAINER && currentTeamID == winnerTeamID)
+            {
                 if (auto trainer = ObjectAccessor::GetCreature(*player, Teams[PETBATTLE_PVE_TEAM_ID]->OwnerGuid))
+                {
+                    trainer->Respawn(true);
                     player->QuestObjectiveSatisfy(trainer->GetEntry(), 1, QUEST_OBJECTIVE_PET_TRAINER_DEFEAT, trainer->GetGUID());
+                }
+            }
+            else if (BattleType == PETBATTLE_TYPE_PVE && PveBattleType == PVE_PETBATTLE_TRAINER)
+            {
+                if (auto trainer = ObjectAccessor::GetCreature(*player, Teams[PETBATTLE_PVE_TEAM_ID]->OwnerGuid))
+                {
+                    trainer->Respawn(true);
+
+                }
+            }
         }
     }
 
