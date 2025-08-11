@@ -427,6 +427,7 @@ int32 PetBattleAbilityEffect::CalculateDamage(int32 damage)
     /// Modifiers
     damage += GetState(Caster, BATTLEPET_STATE_Add_FlatDamageDealt);
     damage += GetState(Target, BATTLEPET_STATE_Add_FlatDamageTaken);
+    damage += GetState(Caster, BATTLEPET_STATE_Stat_Power);
 
     /// Power
     int32 modPct = CalculatePct(GetState(Caster, BATTLEPET_STATE_Stat_Power), 5);
