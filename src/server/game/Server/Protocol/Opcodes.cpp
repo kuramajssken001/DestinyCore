@@ -213,7 +213,7 @@ void OpcodeTable::Initialize()
     DEFINE_HANDLER(CMSG_BATTLE_PAY_PURCHASE_DETAILS_RESPONSE,               STATUS_AUTHED,    PROCESS_THREADUNSAFE, &WorldSession::HandleBattlePayPurchaseDetailsResponse);
     DEFINE_HANDLER(CMSG_BATTLE_PAY_PURCHASE_UNK_RESPONSE,                   STATUS_AUTHED,    PROCESS_THREADUNSAFE, &WorldSession::HandleBattlePayPurchaseUnkResponse);
     DEFINE_HANDLER(CMSG_BATTLE_PAY_VALIDATE_BNET_VAS_TRANSFER,              STATUS_UNHANDLED, PROCESS_THREADUNSAFE, &WorldSession::Handle_NULL);
-    DEFINE_HANDLER(CMSG_BATTLE_PET_CLEAR_FANFARE,                           STATUS_UNHANDLED,  PROCESS_THREADUNSAFE, &WorldSession::Handle_NULL);
+    DEFINE_HANDLER(CMSG_BATTLE_PET_CLEAR_FANFARE,                           STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleBattlePetClearFanfare);
     DEFINE_HANDLER(CMSG_BATTLE_PET_DELETE_PET,                              STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleBattlePetDelete);
     DEFINE_HANDLER(CMSG_BATTLE_PET_DELETE_PET_CHEAT,                        STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleBattlePetDeletePetCheat);
     DEFINE_HANDLER(CMSG_BATTLE_PET_MODIFY_NAME,                             STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleModifyName);
