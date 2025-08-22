@@ -124,7 +124,6 @@ void BattlePet::Save(CharacterDatabaseTransaction& trans)
     if (!needSave || needDelete)
         return;
 
-    TC_LOG_ERROR("entities.unit", "Send Send SAVE.");
     CharacterDatabasePreparedStatement* statement = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PETBATTLE);
     statement->setInt32(0, Slot);
     statement->setString(1, Name);
@@ -1231,7 +1230,7 @@ void PetBattle::Finish(uint32 winnerTeamID, bool aborted, bool ignoreAbandonPena
             if (!player)
                 continue;
 
-            //sScriptMgr->OnPetBattleFinish(player);
+            sScriptMgr->OnPetBattleFinish(player);
 
             uint32 availablePetCount = Teams[currentTeamID]->GetAvailablesPets().size();
 

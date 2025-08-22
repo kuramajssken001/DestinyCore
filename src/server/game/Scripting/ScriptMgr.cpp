@@ -2398,6 +2398,11 @@ void ScriptMgr::OnPlayerUpdateAreaAlternate(Player* player, uint32 newArea, uint
     FOREACH_SCRIPT(PlayerScript)->OnUpdateAreaAlternate(player, newArea, oldArea);
 }
 
+void ScriptMgr::OnPetBattleFinish(Player* player)
+{
+    FOREACH_SCRIPT(PlayerScript)->OnPetBattleFinish(player);
+}
+
 void ScriptMgr::OnQuestAccept(Player* player, const Quest* quest)
 {
     FOREACH_SCRIPT(PlayerScript)->OnQuestAccept(player, quest);

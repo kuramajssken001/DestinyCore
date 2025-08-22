@@ -776,6 +776,8 @@ class TC_GAME_API PlayerScript : public UnitScript
         // Called when a player switches to a new area
         virtual void OnUpdateAreaAlternate(Player* /*player*/, uint32 /*newArea*/, uint32 /*oldArea*/) { }
 
+        virtual void OnPetBattleFinish(Player* /*player*/) {}
+
         // Called when a player changes to a new map (after moving to new map)
         virtual void OnMapChanged(Player* /*player*/) { }
 
@@ -1265,6 +1267,7 @@ class TC_GAME_API ScriptMgr
         void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent, uint8 extendState);
         void OnPlayerUpdateZone(Player* player, Area* newArea, Area* oldArea);
         void OnPlayerUpdateArea(Player* player, Area* newArea, Area* oldArea);
+        void OnPetBattleFinish(Player* player);
         void OnMovementInform(Player* player, uint32 moveType, uint32 ID);
         void OnPlayerUpdateAreaAlternate(Player* player, uint32 newArea, uint32 oldArea);
         void OnQuestAccept(Player* player, const Quest* quest);

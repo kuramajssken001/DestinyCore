@@ -6990,6 +6990,10 @@ void ObjectMgr::SetHighestGuids()
     if (result)
         GetGuidSequenceGenerator<HighGuid::Item>().Set((*result)[0].GetUInt64() + 1);
 
+    result = CharacterDatabase.Query("SELECT MAX(id) FROM account_battlepet");
+    if (result)
+        GetGuidSequenceGenerator<HighGuid::BattlePet>().Set((*result)[0].GetUInt64() + 1);
+
     // Cleanup other tables from nonexistent guids ( >= _hiItemGuid)
     CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE item >= '%u'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());    // One-time query
     CharacterDatabase.PExecute("DELETE FROM mail_items WHERE item_guid >= '%u'", GetGuidSequenceGenerator<HighGuid::Item>().GetNextAfterMaxUsed());        // One-time query
@@ -7031,6 +7035,8 @@ void ObjectMgr::SetHighestGuids()
     result = WorldDatabase.Query("SELECT MAX(`guid`) FROM gameobject");
     if (result)
         _gameObjectSpawnId = (*result)[0].GetUInt64() + 1;
+
+    GetGuidSequenceGenerator<HighGuid::PetBattle>().GetNextAfterMaxUsed();
 }
 
 uint32 ObjectMgr::GenerateAuctionID()

@@ -166,9 +166,10 @@ WorldPacket const* WorldPackets::BattlePet::Updates::Write()
 ByteBuffer& operator<<(ByteBuffer& data, WorldPackets::BattlePet::PetBattleEffectTarget const& effectTarget)
 {
     data.FlushBits();
-    data.WriteBits(effectTarget.Type, 3);
 
+    data.WriteBits(effectTarget.Type, 3);
     data << effectTarget.Petx;
+
     switch (effectTarget.Type)
     {
     case PET_BATTLE_EFFECT_TARGET_EX_NPC_EMOTE:

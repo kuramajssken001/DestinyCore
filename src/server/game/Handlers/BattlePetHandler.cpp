@@ -155,9 +155,6 @@ void WorldSession::HandleBattlePetSetSlot(WorldPackets::BattlePet::SetBattleSlot
 {
     // TC_LOG_DEBUG(LOG_FILTER_BATTLEPET, "HandleBattlePetSetSlot m_IsPetBattleJournalLocked %u", m_IsPetBattleJournalLocked);
 
-    if (m_IsPetBattleJournalLocked)
-        return;
-
     if (packet.SlotIndex >= MAX_PETBATTLE_SLOTS)
         return;
 
