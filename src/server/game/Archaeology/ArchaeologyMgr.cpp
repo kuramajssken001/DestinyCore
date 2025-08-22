@@ -235,11 +235,11 @@ bool ArchaeologyMgr::IsActiveBranch(Player* player, uint32 currencyId)
         if (player->GetUInt16Value(PLAYER_FIELD_RESEARCHING_1 + i / 2, i % 2))
         {
             uint16 projectId = player->GetUInt16Value(PLAYER_FIELD_RESEARCHING_1 + i / 2, i % 2);
-            ResearchProjectEntry const* rs = sResearchProjectStore.LookupEntry(projectId);
-            ResearchBranchEntry const* ab = sResearchBranchStore.LookupEntry(rs->ResearchBranchId);
 
-            if (ab->CurrencyId == currencyId)
-                return true;
+            if (ResearchProjectEntry const* rs = sResearchProjectStore.LookupEntry(projectId))
+                if (ResearchBranchEntry const* ab = sResearchBranchStore.LookupEntry(rs->ResearchBranchId))
+                    if (ab->CurrencyId == currencyId)
+                        return true;
         }
     }
     return false;
