@@ -86,6 +86,8 @@ namespace ObjectAccessor
     TC_GAME_API Creature* FindCreature(ObjectGuid const&);
     TC_GAME_API Player* FindPlayer(ObjectGuid const&);
     TC_GAME_API Player* FindPlayerByName(std::string const& name);
+    TC_GAME_API GameObject* FindGameObject(ObjectGuid const& guid);
+    TC_GAME_API Pet* FindPet(ObjectGuid const& g);
 
     // this returns Player even if he is not in world, for example teleporting
     TC_GAME_API Player* FindConnectedPlayer(ObjectGuid const&);

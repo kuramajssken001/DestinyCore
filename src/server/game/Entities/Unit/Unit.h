@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __UNIT_H
-#define __UNIT_H
+#ifndef UNIT_H
+#define UNIT_H
 
 #include "Object.h"
 #include "EventProcessor.h"
@@ -196,6 +196,7 @@ struct SpellValue;
 class Aura;
 class AuraApplication;
 class AuraEffect;
+class BrawlersGuild;
 class Creature;
 class DynamicObject;
 class GameObject;
@@ -1414,6 +1415,7 @@ class TC_GAME_API Unit : public WorldObject
         bool IsCharmedOwnedByPlayerOrPlayer() const { return GetCharmerOrOwnerOrOwnGUID().IsPlayer(); }
 
         Player* GetSpellModOwner() const;
+        BrawlersGuild* GetBrawlerGuild();
 
         Unit* GetOwner() const;
         Guardian* GetGuardianPet() const;
@@ -1678,6 +1680,26 @@ class TC_GAME_API Unit : public WorldObject
 
         // Event handler
         EventProcessor m_Events;
+
+        void AddDelayedEvent(uint64 timeOffset, std::function<void()>&& function)
+        {
+            m_Functions.AddDelayedEvent(timeOffset, std::move(function));
+        }
+
+        void KillAllDelayedEvents()
+        {
+            m_Functions.KillAllFunctions();
+        }
+
+        void AddDelayedCombat(uint64 timeOffset, std::function<void()>&& function)
+        {
+            m_CombatFunctions.AddDelayedEvent(timeOffset, std::move(function));
+        }
+
+        void KillAllDelayedCombats()
+        {
+            m_CombatFunctions.KillAllFunctions();
+        }
 
         // stat system
         bool HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, float amount, bool apply);
@@ -2033,6 +2055,9 @@ class TC_GAME_API Unit : public WorldObject
 
         typedef std::vector<AreaTrigger*> AreaTriggerList;
         std::unordered_map<ObjectGuid, uint32/*spellId*/> m_areaTriggers;
+
+        EventProcessor m_Functions;
+        EventProcessor m_CombatFunctions;
 
         uint32 m_transform;
 

@@ -286,6 +286,16 @@ Player* ObjectAccessor::FindPlayerByName(std::string const& name)
     return player;
 }
 
+GameObject* ObjectAccessor::FindGameObject(ObjectGuid const& guid)
+{
+    return HashMapHolder<GameObject>::Find(guid);
+}
+
+Pet* ObjectAccessor::FindPet(ObjectGuid const& guid)
+{
+    return HashMapHolder<Pet>::Find(guid);
+}
+
 Player* ObjectAccessor::FindConnectedPlayerByName(std::string const& name)
 {
     return PlayerNameMapHolder::Find(name);

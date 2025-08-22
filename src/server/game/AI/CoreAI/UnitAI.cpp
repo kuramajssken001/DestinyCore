@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -266,6 +265,21 @@ void UnitAI::FillAISpellInfo()
         AIInfo->realCooldown = spellInfo->RecoveryTime + spellInfo->StartRecoveryTime;
         AIInfo->maxRange = spellInfo->GetMaxRange(false) * 3 / 4;
     }
+}
+
+void UnitAI::AddDelayedEvent(Minutes delayTime, std::function<void()>&& function)
+{
+    AddDelayedEvent(std::chrono::duration_cast<Seconds>(delayTime), std::move(function));
+}
+
+void UnitAI::AddDelayedEvent(Seconds delayTime, std::function<void()>&& function)
+{
+    me->AddDelayedEvent(delayTime.count(), std::move(function));
+}
+
+void UnitAI::KillAllDelayedEvents()
+{
+    me->KillAllDelayedEvents();
 }
 
 ThreatManager& UnitAI::GetThreatManager()

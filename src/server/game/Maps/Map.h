@@ -38,6 +38,7 @@
 
 class Battleground;
 class BattlegroundMap;
+class BrawlersGuild;
 class CreatureGroup;
 class GameObjectModel;
 class Group;
@@ -469,6 +470,10 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         GameObject* GetGameObject(ObjectGuid const& guid);
         Pet* GetPet(ObjectGuid const& guid);
         Transport* GetTransport(ObjectGuid const& guid);
+
+        BrawlersGuild* m_brawlerGuild;
+        uint32 m_activeEntry;
+        uint32 m_activeEncounter;
 
         MapStoredObjectTypesContainer& GetObjectsStore() { return _objectsStore; }
 

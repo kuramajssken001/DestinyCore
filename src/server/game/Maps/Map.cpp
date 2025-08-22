@@ -17,6 +17,7 @@
 
 #include "Map.h"
 #include "Battleground.h"
+#include "BrawlersGuild.h"
 #include "CellImpl.h"
 #include "Conversation.h"
 #include "DatabaseEnv.h"
@@ -312,6 +313,15 @@ i_scriptLock(false), _defaultLight(DB2Manager::GetDefaultMapLight(id))
     GetGuidSequenceGenerator<HighGuid::Transport>().Set(sObjectMgr->GetGenerator<HighGuid::Transport>().GetNextAfterMaxUsed());
 
     MMAP::MMapFactory::createOrGetMMapManager()->loadMapInstance(sWorld->GetDataPath(), GetId(), i_InstanceId);
+
+    // Create brawler guild only for this map
+    if (id == 369 || id == 1043)
+        m_brawlerGuild = new BrawlersGuild(id == 369 ? ALLIANCE_GUILD : HORDE_GUILD, this);
+    else
+        m_brawlerGuild = nullptr;
+
+    m_activeEntry = 0;
+    m_activeEncounter = 0;
 
     sScriptMgr->OnCreateMap(this);
 }

@@ -269,6 +269,10 @@ class TC_GAME_API UnitAI
             m_TimedDelayedOperations.push_back(std::pair<uint32, std::function<void()>>(p_Timeout, p_Function));
         }
 
+        void AddDelayedEvent(Minutes delayTime, std::function<void()>&& function);
+        void AddDelayedEvent(Seconds delayTime, std::function<void()>&& function);
+        void KillAllDelayedEvents();
+
         /// Called after last delayed operation was deleted
         /// Do whatever you want
         virtual void LastOperationCalled() { }

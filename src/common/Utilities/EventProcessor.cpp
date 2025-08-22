@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -111,6 +110,11 @@ void EventProcessor::KillAllEvents(bool force)
         m_events.clear();
 }
 
+void EventProcessor::KillAllFunctions()
+{
+    clean = true;
+}
+
 void EventProcessor::AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime)
 {
     if (set_addtime)
@@ -119,7 +123,18 @@ void EventProcessor::AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime
     m_events.insert(std::pair<uint64, BasicEvent*>(e_time, Event));
 }
 
+void EventProcessor::AddFunction(std::function<void()>&& Function, uint64 e_time)
+{
+    std::lock_guard<std::recursive_mutex> _queue_lock(m_queue_lock);
+    m_functions_queue.insert(std::make_pair(e_time, Function));
+}
+
 uint64 EventProcessor::CalculateTime(uint64 t_offset) const
 {
     return(m_time + t_offset);
+}
+
+void EventProcessor::AddDelayedEvent(uint64 t_offset, std::function<void()>&& function)
+{
+    AddFunction(std::move(function), m_time + t_offset);
 }

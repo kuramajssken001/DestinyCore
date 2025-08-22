@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,11 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EVENTPROCESSOR_H
-#define __EVENTPROCESSOR_H
+#ifndef EVENTPROCESSOR_H
+#define EVENTPROCESSOR_H
 
 #include "Define.h"
 #include <map>
+#include <functional>
+
+typedef std::multimap<uint64, std::function<void()>> FunctionList;
 
 class EventProcessor;
 
@@ -76,12 +78,19 @@ class TC_COMMON_API EventProcessor
 
         void Update(uint32 p_time);
         void KillAllEvents(bool force);
+        void KillAllFunctions();
         void AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime = true);
+        void AddFunction(std::function<void()>&& Function, uint64 e_time);
         uint64 CalculateTime(uint64 t_offset) const;
+        void AddDelayedEvent(uint64 t_offset, std::function<void()>&& function);
 
     protected:
         uint64 m_time;
         std::multimap<uint64, BasicEvent*> m_events;
+        FunctionList m_functions;
+        FunctionList m_functions_queue;
+        std::recursive_mutex m_queue_lock;
+        bool clean;
 };
 
 #endif

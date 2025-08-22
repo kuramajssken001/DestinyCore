@@ -21,6 +21,7 @@
 #include "Battleground.h"
 #include "BattlegroundPackets.h"
 #include "BattlegroundScore.h"
+#include "BrawlersGuild.h"
 #include "CellImpl.h"
 #include "ChallengeModeMgr.h"
 #include "ChatPackets.h"
@@ -14736,6 +14737,14 @@ bool CombatLogSender::IsInRangeHelper(WorldObject const* object) const
         return false;
 
     return object->GetExactDist2dSq(i_source) <= i_distSq;
+}
+
+BrawlersGuild* Unit::GetBrawlerGuild()
+{
+    if (Map* map = GetMap())
+        return map->m_brawlerGuild;
+
+    return nullptr;
 }
 
 void CombatLogSender::Visit(PlayerMapType& m)

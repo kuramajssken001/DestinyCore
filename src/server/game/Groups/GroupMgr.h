@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _GROUPMGR_H
-#define _GROUPMGR_H
+#ifndef GROUPMGR_H
+#define GROUPMGR_H
 
+#include "EventProcessor.h"
 #include "Group.h"
 
 class TC_GAME_API GroupMgr
@@ -48,12 +49,18 @@ public:
 
     void   Update(uint32 diff);
 
+    void AddDelayedEvent(uint64 timeOffset, std::function<void()>&& function)
+    {
+        m_Functions.AddDelayedEvent(timeOffset, std::move(function));
+    }
+
 
 protected:
     ObjectGuid::LowType           NextGroupId;
     uint32           NextGroupDbStoreId;
     GroupContainer   GroupStore;
     GroupDbContainer GroupDbStore;
+    EventProcessor m_Functions;
 };
 
 #define sGroupMgr GroupMgr::instance()

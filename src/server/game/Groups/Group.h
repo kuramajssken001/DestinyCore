@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,11 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYCORE_GROUP_H
-#define TRINITYCORE_GROUP_H
+#ifndef GROUP_H
+#define GROUP_H
 
 #include "DBCEnums.h"
 #include "DatabaseEnvFwd.h"
+#include "EventProcessor.h"
 #include "GroupRefManager.h"
 #include "Loot.h"
 #include "Object.h"
@@ -427,6 +427,11 @@ class TC_GAME_API Group
         // FG: evil hacks
         void BroadcastGroupUpdate(void);
 
+        void AddDelayedEvent(uint64 timeOffset, std::function<void()>&& function)
+        {
+            m_Functions.AddDelayedEvent(timeOffset, std::move(function));
+        }
+
     protected:
         bool _setMembersGroup(ObjectGuid guid, uint8 group);
         void _homebindIfInstance(Player* player);
@@ -469,5 +474,7 @@ class TC_GAME_API Group
         // Raid markers
         std::array<std::unique_ptr<RaidMarker>, RAID_MARKERS_COUNT> m_markers;
         uint32              m_activeMarkers;
+
+        EventProcessor m_Functions;
 };
 #endif

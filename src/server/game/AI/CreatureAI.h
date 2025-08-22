@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_CREATUREAI_H
-#define TRINITY_CREATUREAI_H
+#ifndef CREATUREAI_H
+#define CREATUREAI_H
 
 #include "UnitAI.h"
 #include "Common.h"
@@ -102,6 +101,11 @@ class TC_GAME_API CreatureAI : public UnitAI
 
         void Talk(uint8 id, WorldObject const* whisperTarget = nullptr);
 
+        void AddDelayedEvent(uint64 timeOffset, std::function<void()>&& function);
+        void KillAllDelayedEvents();
+        void AddDelayedCombat(uint64 timeOffset, std::function<void()>&& function);
+        void KillAllDelayedCombats();
+
         /// == Reactions At =================================
 
         // Called if IsVisible(Unit* who) is true at each who move, reaction at visibility zone enter
@@ -181,6 +185,8 @@ class TC_GAME_API CreatureAI : public UnitAI
         virtual void MovementInform(uint32 /*type*/, uint32 /*id*/) { }
 
         void OnCharmed(bool apply) override;
+
+        void SetFlyMode(bool /*fly*/);
 
         // Called when a spell cast gets interrupted
         virtual void OnSpellCastInterrupt(SpellInfo const* /*spell*/) { }

@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -56,6 +55,26 @@ CreatureAI::~CreatureAI()
 void CreatureAI::Talk(uint8 id, WorldObject const* whisperTarget /*= nullptr*/)
 {
     sCreatureTextMgr->SendChat(me, id, whisperTarget);
+}
+
+void CreatureAI::AddDelayedEvent(uint64 timeOffset, std::function<void()>&& function)
+{
+    me->AddDelayedEvent(timeOffset, std::move(function));
+}
+
+void CreatureAI::KillAllDelayedEvents()
+{
+    me->KillAllDelayedEvents();
+}
+
+void CreatureAI::AddDelayedCombat(uint64 timeOffset, std::function<void()>&& function)
+{
+    me->AddDelayedCombat(timeOffset, std::move(function));
+}
+
+void CreatureAI::KillAllDelayedCombats()
+{
+    me->KillAllDelayedCombats();
 }
 
 void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRangeToNearestTarget /* = 250.0f*/)
@@ -409,4 +428,14 @@ Creature* CreatureAI::DoSummonFlyer(uint32 entry, WorldObject* obj, float flight
     Position pos = obj->GetRandomNearPosition(radius);
     pos.m_positionZ += flightZ;
     return me->SummonCreature(entry, pos, summonType, despawnTime);
+}
+
+void CreatureAI::SetFlyMode(bool fly)
+{
+    me->SetCanFly(fly);
+    me->SetDisableGravity(fly);
+    if (fly)
+        me->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
+    else
+        me->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_HOVER);
 }
