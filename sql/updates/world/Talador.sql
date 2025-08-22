@@ -2243,7 +2243,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY,0,1,0,2,0,100,1,0,40,0,0,11,174956,2,0,0,0,0,1,0,0,0,0,0,0,0,'Cast Nether Protection at 40% HP'),
 (@ENTRY,0,2,0,2,0,100,0,0,20,22000,25000,11,174978,2,0,0,0,0,2,0,0,0,0,0,0,0,'Cast Wrath of Socrethar at 20% HP');
 
---Soul Guardian <Shadow Council> 
+-- Soul Guardian <Shadow Council> 
 SET @ENTRY := 86600;
 UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=@ENTRY;
 DELETE FROM `smart_scripts` WHERE `source_type`=0 AND `entryorguid`=@ENTRY;
