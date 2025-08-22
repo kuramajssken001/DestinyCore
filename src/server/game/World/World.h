@@ -194,6 +194,7 @@ enum WorldBoolConfigs
     CONFIG_FEATURE_SYSTEM_BATTLE_PAY_ENABLED,
     CONFIG_FEATURE_SYSTEM_BATTLE_PAY_AVAILABLE,
     CONFIG_BATTLE_PAY_ENABLED,
+    CONFIG_CHALLENGE_ENABLED,
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -407,6 +408,7 @@ enum WorldIntConfigs
     CONFIG_BLACKMARKET_MAXAUCTIONS,
     CONFIG_BLACKMARKET_UPDATE_PERIOD,
     CONFIG_BATTLE_PAY_CURRENCY,
+    CONFIG_CHALLENGE_KEY_RESET,
     INT_CONFIG_VALUE_COUNT
 };
 
@@ -541,8 +543,20 @@ enum WorldStates
     WS_CLEANING_FLAGS           = 20004,                     // Cleaning Flags
     WS_GUILD_DAILY_RESET_TIME   = 20006,                     // Next guild cap reset time
     WS_MONTHLY_QUEST_RESET_TIME = 20007,                     // Next monthly reset time
+
+    WS_CHALLENGE_KEY_RESET_TIME = 20015,                      // Reset time for Challenge key
+    WS_CHALLENGE_AFFIXE1_RESET_TIME = 20016,                  // Challenge Affixe 1
+    WS_CHALLENGE_AFFIXE2_RESET_TIME = 20017,                  // Challenge Affixe 2
+    WS_CHALLENGE_AFFIXE3_RESET_TIME = 20018,                  // Challenge Affixe 3
+    WS_WORLDQUEST_HOURLY_RESET_TIME = 20019,                  // World quest every 6 hours reset time
+    WS_WORLDQUEST_DAILY_RESET_TIME = 20020,                   // World quest every day reset time
+    WS_CHALLENGE_LAST_RESET_TIME = 20021,                     // Last reset time for Challenge key
+    WS_BAN_WAVE_TIME = 20022,                                 // Next banwave time
+    WS_CURRENT_ARTIFACT_KNOWLEDGE = 20023,                    // Current Artifact Knowledge
+    WS_INVASION_POINT_RESET_TIME = 20024,                     // World quest every 2 hours reset time
+
     // Cata specific custom worldstates
-    WS_GUILD_WEEKLY_RESET_TIME  = 20050,                     // Next guild week reset time
+    WS_GUILD_WEEKLY_RESET_TIME  = 20050,                      // Next guild week reset time
 };
 
 /// Storage class for commands issued for delayed execution
@@ -672,6 +686,7 @@ class TC_GAME_API World
         time_t GetNextDailyQuestsResetTime() const { return m_NextDailyQuestReset; }
         time_t GetNextWeeklyQuestsResetTime() const { return m_NextWeeklyQuestReset; }
         time_t GetNextRandomBGResetTime() const { return m_NextRandomBGReset; }
+        time_t getNextChallengeKeyReset() { return m_NextChallengeKeyReset; }
 
         /// Get the maximum skill level a player can reach
         uint16 GetConfigMaxSkillValue() const
@@ -822,12 +837,14 @@ class TC_GAME_API World
         void InitRandomBGResetTime();
         void InitGuildResetTime();
         void InitCurrencyResetTime();
+        void InitChallengeKeyResetTime();
         void DailyReset();
         void ResetWeeklyQuests();
         void ResetMonthlyQuests();
         void ResetRandomBG();
         void ResetGuildCap();
         void ResetCurrencyWeekCap();
+        void ChallengeKeyResetTime();
     private:
         World();
         ~World();
@@ -894,6 +911,7 @@ class TC_GAME_API World
         time_t m_NextRandomBGReset;
         time_t m_NextGuildReset;
         time_t m_NextCurrencyReset;
+        time_t m_NextChallengeKeyReset;
 
         //Player Queue
         Queue m_QueuedPlayer;
