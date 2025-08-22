@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 AshamaneProject <https://github.com/AshamaneProject>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -265,6 +265,9 @@ void ArchaeologyMgr::GenerateRandomPosition(Player* player, uint8 count)
 int ArchaeologyMgr::GetCurrencyId(uint16 digsiteId)
 {
     DigsitesMap::iterator itr = mResearchDigsitesMap.find(digsiteId);
+    if (itr == mResearchDigsitesMap.end())
+        return 0;
+
     return uint16(itr->second.currencyId);
 }
 
