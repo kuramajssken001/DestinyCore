@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018+ MagicStormProject <https://github.com/MagicStormTeam>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -42,6 +42,7 @@ enum AntorusDataTypes
     DATA_NOURA_MOTHER_OF_FLAMES = 13,
     DATA_FHARG                  = 14,
     DATA_SHATUG                 = 15,
+    DATA_SHIWAR                 = 16,
 
     // Encounter related data
     DATA_DECIMATOR,
@@ -100,7 +101,9 @@ enum Gameobjects
     GO_BOSS9_2                              = 272486,
     GO_BOSS10                               = 273686,
     GO_BOSS_VARIMATHRAS                     = 277180,
-    GO_DOOR_PORTAL_KEEPER_HASABEL           = 277521
+    GO_DOOR_PORTAL_KEEPER_HASABEL           = 277521,
+
+    GO_DOOR_ROOM_GOROTH_ES                  = 269973
 };
 
 

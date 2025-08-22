@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2017-2018 AshamaneProject <https://github.com/AshamaneProject>
- * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -28,9 +27,6 @@ void AddSC_highmountain();
 void AddSC_stormheim();
 void AddSC_suramar();
 void AddSC_valsharah();
-void AddSC_zone_argus_krokuun();
-void AddSC_zone_argus_antoran_wastes();
-void AddSC_zone_argus_macaree();
 void AddSC_broken_shore();
 
 // Demon Hunter start zone
@@ -235,9 +231,6 @@ void AddBrokenIslesScripts()
     AddSC_stormheim();
     AddSC_suramar();
     AddSC_valsharah();
-    AddSC_zone_argus_krokuun();
-    AddSC_zone_argus_antoran_wastes();
-    AddSC_zone_argus_macaree();
     AddSC_broken_shore();
 
     // Demon Hunter start zone

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018+ MagicStormProject <https://github.com/MagicStormTeam>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "antorus_the_burning_throne.h"
 #include "AreaTrigger.h"
 #include "AreaTriggerAI.h"
 #include "GameObject.h"
-#include "anthorus.h"
 
 struct boss_shiwar : public BossAI
 {
