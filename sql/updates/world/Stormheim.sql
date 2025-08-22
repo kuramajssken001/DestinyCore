@@ -853,7 +853,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (@ENTRY,0,0,0,0,0,100,0,10000,10000,20000,22000,11,220163,0,0,0,0,0,2,0,0,0,0,0,0,0,'Cast Shrieking Leap'),
 (@ENTRY,0,1,0,0,0,100,0,3000,5000,12000,15000,11,220150,0,0,0,0,0,1,0,0,0,0,0,0,0,'Cast Sonic Pulse');
 
---Dread-Rider Malwick
+-- Dread-Rider Malwick
 SET @ENTRY := 90902;
 UPDATE `creature_template` SET `AIName`='SmartAI' WHERE `entry`=@ENTRY;
 DELETE FROM `smart_scripts` WHERE `source_type`=0 AND `entryorguid`=@ENTRY;

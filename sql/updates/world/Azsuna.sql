@@ -308,7 +308,7 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 
 
 
-https://www.wowhead.com/azsuna#npcs:100+1
+-- https://www.wowhead.com/azsuna#npcs:100+1
 
 
 
