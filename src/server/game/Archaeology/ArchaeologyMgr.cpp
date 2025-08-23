@@ -212,6 +212,9 @@ void ArchaeologyMgr::AddDigsitesToMap(Player* player, uint32 mapId)
         case 1:   count = 4; break;
         case 530: count = 8; break;
         case 571: count = 12; break;
+        case 870: count = 16; break;
+        case 1116: count = 20; break;
+        case 1220: count = 24; break;
         default:  return;
     }
 
