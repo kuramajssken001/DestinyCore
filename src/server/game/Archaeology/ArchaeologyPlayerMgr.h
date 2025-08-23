@@ -18,6 +18,8 @@
 #ifndef ARCHAEOLOGY_PLAYER_MGR_H
 #define ARCHAEOLOGY_PLAYER_MGR_H
 
+#define MAX_DIGSITE_FINDS 6
+
 class Player;
 
 struct Digsite
@@ -72,6 +74,7 @@ public:
     void CompleteArtifact(uint32 spellId);
     bool IsFirstProjectComplete(uint32 artifactId);
     ArchaeologyArtifactCost* _artifactCost;
+    void SendSurveyCast(Player* player, uint32 count, uint32 max, uint32 branchId, bool completed);
 
 private:
     Player* m_player;

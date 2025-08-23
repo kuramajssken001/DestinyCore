@@ -287,3 +287,23 @@ int ArchaeologyMgr::GetArtifactSkillReqLevel(uint32 spellId)
 
     return reqSkillLevel;
 }
+
+uint8 ArchaeologyMgr::GetMaxFindsForDigsite(uint16 digsiteId)
+{
+    switch (digsiteId)
+    {
+    case DIGSITE_TROLL:
+    case DIGSITE_FOSSIL:
+    case DIGSITE_DRAENEI:
+    case DIGSITE_NERUBIAN:
+        return 3;
+    case DIGSITE_MOGU:
+        return 6;
+    case DIGSITE_ORC:
+        return 6;
+    case DIGSITE_DWARF:
+        return 9;
+    default:
+        return 3;
+    }
+}

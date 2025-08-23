@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -750,6 +750,17 @@ WorldPacket const* WorldPackets::Misc::OpenAlliedRaceDetailsGiver::Write()
 {
     _worldPacket << Guid;
     _worldPacket << RaceId;
+
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Misc::ArchaeologySurveryCast::Write()
+{
+    _worldPacket << int32(ResearchBranchID);
+    _worldPacket << uint32(TotalFinds);
+    _worldPacket << uint32(NumFindsCompleted);
+    _worldPacket.WriteBit(SuccessfulFind);
+    _worldPacket.FlushBits();
 
     return &_worldPacket;
 }

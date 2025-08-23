@@ -78,6 +78,8 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
+class ArchaeologyPlayerMgr;
+
 pEffect SpellEffects[TOTAL_SPELL_EFFECTS]=
 {
     &Spell::EffectNULL,                                     //  0
@@ -4082,132 +4084,152 @@ void Spell::EffectSummonSurveyTools(SpellEffIndex /*effIndex*/)
 
     if (Player* player = m_caster->ToPlayer())
     {
-        if (player->HasSkill(SKILL_ARCHAEOLOGY))
+        if (!player->HasSkill(SKILL_ARCHAEOLOGY))
+            return;
+
+        ObjectGuid guid = m_caster->m_ObjectSlot[1];
+        uint32 SurveyGoEntry = 0, FindGoEntry = 0;
+        GameObject* obj = nullptr;
+
+        if (m_caster)
+            obj = m_caster->GetMap()->GetGameObject(guid);
+
+        if (obj)
         {
-            ObjectGuid guid = m_caster->m_ObjectSlot[1];
-            uint32 SurveyGoEntry, FindGoEntry = 0;
-            GameObject* obj = NULL;
+            // Recast case - null spell id to make auras not be removed on object remove from world
+            if (m_spellInfo->Id == obj->GetSpellId())
+                obj->SetSpellId(0);
 
-            if (m_caster)
-                obj = m_caster->GetMap()->GetGameObject(guid);
-
-            if (obj)
-            {
-                // Recast case - null spell id to make auras not be removed on object remove from world
-                if (m_spellInfo->Id == obj->GetSpellId())
-                    obj->SetSpellId(0);
-                m_caster->RemoveGameObject(obj, true);
-            }
-
-            m_caster->m_ObjectSlot[1] = ObjectGuid::Empty;
-
-            // Read digsite info
-            int memId = player->GetArchaeologyMgr().GetDigsite(player->GetPositionX(), player->GetPositionY());
-            uint32 digsiteId = 0;
-
-            std::vector<uint32> const& digsites = player->GetDynamicValues(PLAYER_DYNAMIC_FIELD_RESEARCH_SITE);
-
-            for (auto const& digSite : digsites)
-                digsiteId = digSite;
-
-            if (memId < 0 || memId > 16)
-                return;
-
-            Digsite digsite = player->GetArchaeologyMgr().GetDigsitePosition(memId);
-
-            // If digsite info is empty, generate new position and read data
-            if (digsite.x == 0 && digsite.y == 0)
-            {
-                sArchaeologyMgr->GenerateRandomPosition(player, digsite.digCount);
-                digsite = player->GetArchaeologyMgr().GetDigsitePosition(memId); // Refresh the digsite now that we have coordinates
-            }
-
-            // Spawn Find GameObject
-            if (player->GetDistance2d(digsite.x, digsite.y) < 15.0f) // Hack fix should be 5.0f
-            {
-                // Set FindGoEntry for treasure
-                auto currencyId = sArchaeologyMgr->GetCurrencyId(digsiteId);
-                switch (currencyId)
-                {
-                    case 384: FindGoEntry = 204282; break; // Dwarf
-                    case 398: FindGoEntry = 207188; break; // Draenei
-                    case 393: FindGoEntry = 206836; break; // Fossil
-                    case 394: FindGoEntry = 203071; break; // Night Elf
-                    case 400: FindGoEntry = 203078; break; // Nerubian
-                    case 397: FindGoEntry = 207187; break; // Orc
-                    case 401: FindGoEntry = 207190; break; // Tol'vir
-                    case 385: FindGoEntry = 202655; break; // Troll
-                    case 399: FindGoEntry = 207189; break; // Vrykul
-                    case 754: FindGoEntry = 218950; break; // Mantid
-                    case 676: FindGoEntry = 211163; break; // Pandaren
-                    case 677: FindGoEntry = 211174; break; // Mogu
-                    case 829: FindGoEntry = 234105; break; // Arakkoa
-                    case 821: FindGoEntry = 226521; break; // Draenor Clans
-                    case 828: FindGoEntry = 234106; break; // Ogre
-                    case 1172: FindGoEntry = 268440; break; // Highborne
-                    case 1173: FindGoEntry = 246804; break; // Highmountain Tauren
-                    case 1174: FindGoEntry = 268451; break; // Demonic
-                    default:
-                        TC_LOG_ERROR("spells", "EffectSummonSurveyTools: unknown currency ID %u for digsite %u, defaulting to Night Elf", currencyId, digsiteId);
-                        currencyId = 394;
-                        FindGoEntry = 203071;
-                        break;
-                }
-
-                player->SummonGameObject(FindGoEntry, *player, QuaternionData(), 0);
-
-                if (player->getRace() == RACE_DWARF)
-                    player->ModifyCurrency(currencyId, urand(6, 10));
-                else
-                    player->ModifyCurrency(currencyId, urand(5, 9));
-
-                // Count search or change digsite
-                if (digsite.digCount + 1 < 3)
-                {
-                    player->GetArchaeologyMgr().SetDigsitePosition(memId, 0, 0, digsite.digCount + 1);
-                    player->AddDynamicValue(PLAYER_DYNAMIC_FIELD_RESEARCH_SITE_PROGRESS, digsite.digCount + 1);
-                }
-                else
-                    sArchaeologyMgr->ChangeDigsite(player, memId);
-
-                uint32 SkillValue = player->GetPureSkillValue(SKILL_ARCHAEOLOGY);
-
-                if (SkillValue < 50)
-                    player->UpdateGatherSkill(SKILL_ARCHAEOLOGY, SkillValue, 0);
-
-                return;
-            }
-
-            // Set SurveyGoEntry for distance
-            if (player->GetDistance2d(digsite.x, digsite.y) < 35.0f)
-                SurveyGoEntry = 204272;
-            else if (player->GetDistance2d(digsite.x, digsite.y) < 85.0f)
-                SurveyGoEntry = 206589;
-            else
-                SurveyGoEntry = 206590;
-
-            // Spawn Survey Tools
-            Map* map = player->GetMap();
-
-            QuaternionData rot = QuaternionData::fromEulerAnglesZYX(player->GetAngle(digsite.x, digsite.y), 0.f, 0.f);
-            GameObject* go = GameObject::CreateGameObject(SurveyGoEntry, map, Position(player->GetPositionX() + 2, player->GetPositionY() + 2, player->GetPositionZ()), rot, 255, GO_STATE_READY);
-
-            if (!go)
-            {
-                delete go;
-                return;
-            }
-
-            PhasingHandler::InheritPhaseShift(go, m_caster);
-
-            go->SetRespawnTime(60);
-            go->SetSpellId(m_spellInfo->Id);
-            m_caster->AddGameObject(go);
-            map->AddToMap(go);
-            m_caster->m_ObjectSlot[1] = go->GetGUID();
+            m_caster->RemoveGameObject(obj, true);
         }
+
+        m_caster->m_ObjectSlot[1] = ObjectGuid::Empty;
+
+        // Read digsite info
+        int memId = player->GetArchaeologyMgr().GetDigsite(player->GetPositionX(), player->GetPositionY());
+        uint32 digsiteId = 0;
+
+        std::vector<uint32> const& digsites = player->GetDynamicValues(PLAYER_DYNAMIC_FIELD_RESEARCH_SITE);
+        for (auto const& digSite : digsites)
+            digsiteId = digSite;
+
+        if (memId < 0 || memId > 16)
+            return;
+
+        Digsite digsite = player->GetArchaeologyMgr().GetDigsitePosition(memId);
+
+        // If digsite info is empty, generate new position and read data
+        if (digsite.x == 0 && digsite.y == 0)
+        {
+            sArchaeologyMgr->GenerateRandomPosition(player, digsite.digCount);
+            digsite = player->GetArchaeologyMgr().GetDigsitePosition(memId); // Refresh the digsite now that we have coordinates
+        }
+
+        // -------------------
+        // Spawn Find GameObject
+        // -------------------
+        if (player->GetDistance2d(digsite.x, digsite.y) < 15.0f) // Hack fix, should be 5.0f
+        {
+            // Set FindGoEntry for treasure
+            auto currencyId = sArchaeologyMgr->GetCurrencyId(digsiteId);
+            switch (currencyId)
+            {
+            case 384: FindGoEntry = 204282; break; // Dwarf
+            case 398: FindGoEntry = 207188; break; // Draenei
+            case 393: FindGoEntry = 206836; break; // Fossil
+            case 394: FindGoEntry = 203071; break; // Night Elf
+            case 400: FindGoEntry = 203078; break; // Nerubian
+            case 397: FindGoEntry = 207187; break; // Orc
+            case 401: FindGoEntry = 207190; break; // Tol'vir
+            case 385: FindGoEntry = 202655; break; // Troll
+            case 399: FindGoEntry = 207189; break; // Vrykul
+            case 754: FindGoEntry = 218950; break; // Mantid
+            case 676: FindGoEntry = 211163; break; // Pandaren
+            case 677: FindGoEntry = 211174; break; // Mogu
+            case 829: FindGoEntry = 234105; break; // Arakkoa
+            case 821: FindGoEntry = 226521; break; // Draenor Clans
+            case 828: FindGoEntry = 234106; break; // Ogre
+            case 1172: FindGoEntry = 268440; break; // Highborne
+            case 1173: FindGoEntry = 246804; break; // Highmountain Tauren
+            case 1174: FindGoEntry = 268451; break; // Demonic
+            default:
+                TC_LOG_ERROR("spells", "EffectSummonSurveyTools: unknown currency ID %u for digsite %u, defaulting to Night Elf", currencyId, digsiteId);
+                currencyId = 394;
+                FindGoEntry = 203071;
+                break;
+            }
+
+            player->SummonGameObject(FindGoEntry, *player, QuaternionData(), 0);
+
+            // Currency Gain
+            if (player->getRace() == RACE_DWARF)
+                player->ModifyCurrency(currencyId, urand(6, 10));
+            else
+                player->ModifyCurrency(currencyId, urand(5, 9));
+
+            // Count progress
+            uint8 maxFinds = sArchaeologyMgr->GetMaxFindsForDigsite(digsite.digsiteId);
+
+            if (digsite.digCount + 1 < maxFinds)
+            {
+                ++digsite.digCount;
+
+                player->GetArchaeologyMgr().SetDigsitePosition(memId, 0, 0, digsite.digCount);
+                player->SetDynamicValue(PLAYER_DYNAMIC_FIELD_RESEARCH_SITE_PROGRESS, 0, digsite.digCount);
+
+                // Send progress to client
+                player->GetArchaeologyMgr().SendSurveyCast(
+                    player,
+                    digsite.digCount,
+                    maxFinds,
+                    sArchaeologyMgr->IsActiveBranch(player, currencyId),
+                    true
+                );
+            }
+            else
+            {
+                sArchaeologyMgr->ChangeDigsite(player, memId);
+            }
+
+            // Skill-Check
+            uint32 SkillValue = player->GetPureSkillValue(SKILL_ARCHAEOLOGY);
+            if (SkillValue < 50)
+                player->UpdateGatherSkill(SKILL_ARCHAEOLOGY, SkillValue, 0);
+
+            return;
+        }
+
+        // Spawn Survey Tools
+        if (player->GetDistance2d(digsite.x, digsite.y) < 35.0f)
+            SurveyGoEntry = 204272;
+        else if (player->GetDistance2d(digsite.x, digsite.y) < 85.0f)
+            SurveyGoEntry = 206589;
+        else
+            SurveyGoEntry = 206590;
+
+        Map* map = player->GetMap();
+
+        QuaternionData rot = QuaternionData::fromEulerAnglesZYX(player->GetAngle(digsite.x, digsite.y), 0.f, 0.f);
+        GameObject* go = GameObject::CreateGameObject(SurveyGoEntry, map,
+            Position(player->GetPositionX() + 2, player->GetPositionY() + 2, player->GetPositionZ()),
+            rot, 255, GO_STATE_READY);
+
+        if (!go)
+        {
+            delete go;
+            return;
+        }
+
+        PhasingHandler::InheritPhaseShift(go, m_caster);
+
+        go->SetRespawnTime(60);
+        go->SetSpellId(m_spellInfo->Id);
+        m_caster->AddGameObject(go);
+        map->AddToMap(go);
+        m_caster->m_ObjectSlot[1] = go->GetGUID();
     }
 }
+
 
 void Spell::EffectResurrect(SpellEffIndex effIndex)
 {

@@ -24,6 +24,18 @@
 
 class Player;
 
+enum DigsiteId : uint16
+{
+    DIGSITE_TROLL = 1,
+    DIGSITE_FOSSIL = 2,
+    DIGSITE_DRAENEI = 3,
+    DIGSITE_NERUBIAN = 4,
+    DIGSITE_MOGU = 5,
+    DIGSITE_ORC = 6,
+    DIGSITE_DWARF = 7,
+    DIGSITE_NIGHT_ELF = 8,
+};
+
 class ArchaeologyMgr
 {
     private:
@@ -57,6 +69,7 @@ class ArchaeologyMgr
         void GenerateRandomPosition(Player* player, uint8 count);
         int GetCurrencyId(uint16 digsiteId);
         int GetArtifactSkillReqLevel(uint32 spellId);
+        uint8 GetMaxFindsForDigsite(uint16 digsiteId);
 
     private:
         typedef std::unordered_map<uint16, ResearchDigsitesEntry> DigsitesMap;

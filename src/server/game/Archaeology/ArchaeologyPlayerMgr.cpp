@@ -378,3 +378,13 @@ bool ArchaeologyPlayerMgr::IsFirstProjectComplete(uint32 artifactId)
 
     return false;
 }
+
+void ArchaeologyPlayerMgr::SendSurveyCast(Player* player, uint32 count, uint32 max, uint32 branchId, bool completed)
+{
+    WorldPackets::Misc::ArchaeologySurveryCast packet;
+    packet.ResearchBranchID = count;
+    packet.TotalFinds = max;
+    packet.NumFindsCompleted = branchId;
+    packet.SuccessfulFind = completed;
+    player->SendDirectMessage(packet.Write());
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -1031,6 +1031,19 @@ namespace WorldPackets
 
             ObjectGuid Guid;
             uint32 RaceId;
+        };
+
+        class ArchaeologySurveryCast final : public ServerPacket
+        {
+        public:
+            ArchaeologySurveryCast() : ServerPacket(SMSG_ARCHAEOLOGY_SURVERY_CAST, 13) {}
+
+            WorldPacket const* Write() override;
+
+            int32 ResearchBranchID = 0;
+            uint32 TotalFinds = 0;
+            uint32 NumFindsCompleted = 0;
+            bool SuccessfulFind = false;
         };
     }
 }
