@@ -75,6 +75,36 @@ void ArchaeologyMgr::LoadDigsites()
     TC_LOG_INFO("server.loading", ">> Loaded %u archaeology digsites in %u ms", digCount, GetMSTimeDiffToNow(oldMSTime));
 }
 
+void ArchaeologyMgr::LoadDigsiteLimits()
+{
+    _digsiteMaxFinds.clear();
+
+    if (QueryResult result = WorldDatabase.Query("SELECT digsiteId, maxFinds, comment FROM archaeology_digsite_limits"))
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            uint16 id = fields[0].GetUInt16();
+            uint8  maxFind = fields[1].GetUInt8();
+            // std::string comment = fields[2].GetString(); // for debug
+
+            if (maxFind < 3 || maxFind > 6)
+            {
+                TC_LOG_WARN("archaeology", "Digsite %u has invalid maxFinds=%u, clamping to 3", id, maxFind);
+                maxFind = 3;
+            }
+
+            _digsiteMaxFinds[id] = maxFind;
+        } while (result->NextRow());
+
+        TC_LOG_INFO("server.loading", ">> Loaded %u archaeology digsite limits", (uint32)_digsiteMaxFinds.size());
+    }
+    else
+    {
+        TC_LOG_INFO("server.loading", ">> Loaded 0 archaeology digsite limits (table empty)");
+    }
+}
+
 void ArchaeologyMgr::InitBranch(Player* player, uint32 currencyId)
 {
     if (!player->HasSkill(SKILL_ARCHAEOLOGY))
@@ -290,20 +320,9 @@ int ArchaeologyMgr::GetArtifactSkillReqLevel(uint32 spellId)
 
 uint8 ArchaeologyMgr::GetMaxFindsForDigsite(uint16 digsiteId)
 {
-    switch (digsiteId)
-    {
-    case DIGSITE_TROLL:
-    case DIGSITE_FOSSIL:
-    case DIGSITE_DRAENEI:
-    case DIGSITE_NERUBIAN:
-        return 3;
-    case DIGSITE_MOGU:
-        return 6;
-    case DIGSITE_ORC:
-        return 6;
-    case DIGSITE_DWARF:
-        return 9;
-    default:
-        return 3;
-    }
+    auto it = _digsiteMaxFinds.find(digsiteId);
+    if (it != _digsiteMaxFinds.end())
+        return it->second;
+
+    return 3; // Fallback
 }

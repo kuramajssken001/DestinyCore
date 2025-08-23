@@ -2092,6 +2092,9 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading Archaeology Digsites...");
     sArchaeologyMgr->LoadDigsites();
 
+    TC_LOG_INFO("server.loading", "Loading Archaeology Digsites Limits...");
+    sArchaeologyMgr->LoadDigsiteLimits();
+
     TC_LOG_INFO("server.loading", "Initializing Scripts...");
     sScriptMgr->Initialize();
     sScriptMgr->OnConfigLoad(false);                                // must be done after the ScriptMgr has been properly initialized

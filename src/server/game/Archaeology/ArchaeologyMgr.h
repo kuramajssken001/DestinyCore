@@ -24,18 +24,6 @@
 
 class Player;
 
-enum DigsiteId : uint16
-{
-    DIGSITE_TROLL = 1,
-    DIGSITE_FOSSIL = 2,
-    DIGSITE_DRAENEI = 3,
-    DIGSITE_NERUBIAN = 4,
-    DIGSITE_MOGU = 5,
-    DIGSITE_ORC = 6,
-    DIGSITE_DWARF = 7,
-    DIGSITE_NIGHT_ELF = 8,
-};
-
 class ArchaeologyMgr
 {
     private:
@@ -62,6 +50,7 @@ class ArchaeologyMgr
 
     public:
         void LoadDigsites();
+        void LoadDigsiteLimits();
         void InitBranch(Player* player, uint32 currencyId);
         void ChangeDigsite(Player* player, uint8 memId);
         void AddDigsitesToMap(Player* player, uint32 mapId);
@@ -74,6 +63,7 @@ class ArchaeologyMgr
     private:
         typedef std::unordered_map<uint16, ResearchDigsitesEntry> DigsitesMap;
         DigsitesMap mResearchDigsitesMap;
+        std::unordered_map<uint16, uint8> _digsiteMaxFinds;
 };
 
 #define sArchaeologyMgr ArchaeologyMgr::instance()
