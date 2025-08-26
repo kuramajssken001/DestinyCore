@@ -1,106 +1,103 @@
-# AshamaneCore
 
---------------
+# DestinyCore
 
+[![License: GPL v2](https://img.shields.io/badge/License-GPLv2-blue.svg)](./LICENSE)
+[![Stars](https://img.shields.io/github/stars/slash-design/DestinyCore.svg?style=flat&logo=github)](https://github.com/slash-design/DestinyCore/stargazers)
+[![Forks](https://img.shields.io/github/forks/slash-design/DestinyCore.svg?style=flat&logo=github)](https://github.com/slash-design/DestinyCore/network/members)
 
-* [Build Status](#build-status)
-* [Introduction](#introduction)
-* [Requirements](#requirements)
-* [Install](#install)
-* [Reporting issues](#reporting-issues)
-* [Submitting fixes](#submitting-fixes)
-* [Copyright](#copyright)
-* [Authors &amp; Contributors](#authors--contributors)
-* [Links](#links)
+---
 
+## 🚀 Build Status
 
+Windows | GCC | Clang
+:------------: | :------------: | :------------:
+[![Windows x64](https://github.com/slash-design/DestinyCore/actions/workflows/build-win-x64.yml/badge.svg)](https://github.com/slash-design/DestinyCore/actions/workflows/build-win-x64.yml) | [![GCC](https://github.com/slash-design/DestinyCore/actions/workflows/build-gcc.yml/badge.svg)](https://github.com/slash-design/DestinyCore/actions/workflows/build-gcc.yml) | [![Clang](https://github.com/slash-design/DestinyCore/actions/workflows/build-clang.yml/badge.svg)](https://github.com/slash-design/DestinyCore/actions/workflows/build-clang.yml)
 
-## Build Status
+---
 
-[![master Build Status](https://travis-ci.org/AshamaneProject/AshamaneCore.svg?branch=master)](https://travis-ci.org/AshamaneProject/AshamaneCore)
-[![Build status](https://ci.appveyor.com/api/projects/status/kb0wjxh3va9c3e0k/branch/master?svg=true)](https://ci.appveyor.com/project/Traesh/ashamanecore/branch/master)
+## 📖 Introduction
 
-## Introduction
+**DestinyCore** is a modern, modular **MMORPG server framework** written in C++ that supports **multiple platforms** (Windows, Linux, macOS) and builds cleanly with **GCC, Clang, and MSVC**.  
 
-AshamaneCore is a *MMORPG* Framework based mostly in C++.
+It is designed to be **lightweight, scalable, and extensible**, providing developers and server administrators with a stable foundation for World of Warcraft® (Legion 7.3.5) and beyond.  
 
-It is fully based on *TrinityCore*, with upgrades like :
+Key goals of DestinyCore:
+- ⚡ Modern C++ design (C++20+)
+- 🔌 Modular architecture (authserver, worldserver, shared libs)
+- 🤖 Integrated **PlayerBots** system
+- 🌍 Multi-database support (auth, characters, world)
+- 🛠️ Easy build system (CMake + GitHub Actions CI)
+- 🎮 MMO-ready networking with scalability in mind
 
-- Class Hall Basics (WIP)
-- World Quests
-- Challenge Mode (Mythic+)
-- Mercenary battleground system
-- Rated Arenas
-- TimeWalkers (BC/WotLK/Cataclsym/MoP)
-- Legion scripts (WIP)
-    - BlackRookHold
-    - Darkheart Thicket
-    - Eye Of Azshara
-    - Mardum (DH start zone)
-    - Emerald Nightmare (1/7)
-    - Tomb of Sargeras (1/9)
-- Wod Scripts (WIP)
-    - full blizzlike Jungle of Tanaan intro
-    - Garrison pre-quests (for both Horde & Alliance)
-    - Garrison building activation
-    - Bloodmaul Slagmines
-    - Everbloom
-    - Shadowmoon Burial Grounds
-    - Highmaul
-- Pandaria Scripts
-    - all dungeons & world bosses
+---
 
-with Ashamane Database (ADB) :
+## 🛠️ Requirements
 
-- All Cataclysm zones spawns
-- All Mist of Pandaria zones spawns
-- All Draenor zones spawns
-- All Legion zones spawns (including Class Halls)
+DestinyCore depends on modern development tools and libraries:
 
-It is completely open source; community involvement is highly encouraged.
+- **CMake 3.31+**
+- **Boost 1.84.0**
+- **MySQL 8.0**
+- **OpenSSL 3.x**
+- **GCC / Clang / MSVC (Visual Studio 2022 recommended)**
 
-If you wish to contribute ideas or code please visit our site linked below or
-make pull requests to our [Github repository](https://github.com/AshamaneProject/AshamaneCore/pulls).
+---
 
-## Requirements
+## 📦 Installation
 
-Software requirements are available in the [wiki](https://www.trinitycore.info/display/tc/Requirements) for
-Windows, Linux and macOS.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/slash-design/DestinyCore.git
+   cd DestinyCore
+   ```
 
-## Install
+2. Create a build directory:
+   ```bash
+   cmake -S . -B build -DTOOLS=ON
+   cmake --build build
+   ```
 
-Detailed installation guides are available in the [wiki](https://www.trinitycore.info/display/tc/Installation+Guide) for
-Windows, Linux and macOS.
+3. Configure your databases (`auth`, `characters`, `world`) and import the SQL structures provided in `/sql/base`.
 
-## Contribute
+4. Start the servers:
+   ```bash
+   ./bin/worldserver
+   ./bin/bnetserver
+   ```
 
-You can help Ashamane using our [Patreon Page](https://www.patreon.com/ashamane). All the collected money will be used to pay developers for their work using bountysource
+---
 
-## Reporting issues
+## 🤝 Contributing
 
-Issues can be reported via our [Mantis issue tracker](https://bt.ashamane.com).
+We welcome all contributions!  
+Whether you’re fixing a bug, improving documentation, or adding new features — PRs are always appreciated.
 
-Please take the time to review existing issues before submitting your own to
-prevent duplicates.
+- Fork the repo  
+- Create a feature branch  
+- Submit a pull request  
 
-## Submitting fixes
+---
 
-C++ fixes are submitted as pull requests via Github.
-For SQL only fixes open a ticket or if a bug report exists for the bug post on existing ticket.
+## 🐛 Reporting Issues
 
-## Copyright
+Issues can be reported directly via the [GitHub Issue Tracker](https://github.com/slash-design/DestinyCore/issues).  
+Before creating a new one, please check for existing reports to avoid duplicates.
 
-License: GPL 2.0
+---
 
-Read file [COPYING](COPYING).
+## 📜 License
 
-## Authors &amp; Contributors
+This project is licensed under **GPL v2.0**.  
+See the [LICENSE](./LICENSE) file for details.
 
-Read file [THANKS](THANKS).
+---
 
-## Links
+## 🌐 Links
 
-* [Website](https://www.ashamane.com)
-* [Wiki](https://www.trinitycore.info)
-* [Forums](http://forum.ashamane.com/)
-* [TrinityCore](https://www.trinitycore.org/)
+- 📂 [GitHub Repository](https://github.com/slash-design/DestinyCore)
+- 📌 [Issues](https://github.com/slash-design/DestinyCore/issues)
+- 📖 [Documentation (WIP)](https://github.com/slash-design/DestinyCore/wiki)
+
+---
+
+⭐ If you like DestinyCore, consider giving the project a star on GitHub!
