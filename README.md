@@ -11,7 +11,7 @@
 
 Windows | GCC | Clang
 :------------: | :------------: | :------------:
-[![Windows x64](https://github.com/slash-design/DestinyCore/actions/workflows/build-win-x64.yml/badge.svg)](https://github.com/slash-design/DestinyCore/actions/workflows/build-win-x64.yml) | [![GCC](https://github.com/slash-design/DestinyCore/actions/workflows/build-gcc.yml/badge.svg)](https://github.com/slash-design/DestinyCore/actions/workflows/build-gcc.yml) | [![Clang](https://github.com/slash-design/DestinyCore/actions/workflows/build-clang.yml/badge.svg)](https://github.com/slash-design/DestinyCore/actions/workflows/build-clang.yml)
+[![Windows x64](https://github.com/slash-design/DestinyCore/actions/workflows/win-x64-build.yml/badge.svg)](https://github.com/slash-design/DestinyCore/actions/workflows/win-x64-build.yml) | [![GCC](https://github.com/slash-design/DestinyCore/actions/workflows/gcc-build.yml/badge.svg)](https://github.com/slash-design/DestinyCore/actions/workflows/gcc-build.yml) | [![Clang](https://github.com/slash-design/DestinyCore/actions/workflows/clang-build.yml/badge.svg)](https://github.com/slash-design/DestinyCore/actions/workflows/clang-build.yml)
 
 ---
 
