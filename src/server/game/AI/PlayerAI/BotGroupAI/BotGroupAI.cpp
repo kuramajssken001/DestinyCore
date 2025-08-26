@@ -1460,21 +1460,21 @@ void BotGroupAI::ProcessFollowToMaster()
 	}
 	Position targetPos = BotUtility::GetPositionFromGroup(m_MasterPlayer, me->GetGUID(), me->GetGroup());
 	m_Movement->MovementTo(targetPos.GetPositionX(), targetPos.GetPositionY(), targetPos.GetPositionZ(), 0);
-	//float distance = me->GetDistance(m_MasterPlayer->GetPosition());
-	//if (distance <= NEEDFLEE_CHECKRANGE && distance > 0.1f)
-	//{
-	//	me->GetMotionMaster()->Clear();
-	//	me->GetMotionMaster()->MoveFollow(m_MasterPlayer, 1.0f, m_MasterPlayer->GetOrientation());
-	//	return;
-	//}
+	float distance = me->GetDistance(m_MasterPlayer->GetPosition());
+	if (distance <= NEEDFLEE_CHECKRANGE && distance > 0.1f)
+	{
+		me->GetMotionMaster()->Clear();
+		me->GetMotionMaster()->MoveFollow(m_MasterPlayer, 1.0f, m_MasterPlayer->GetOrientation());
+		return;
+	}
 
-	//if (me->IsWithinLOSInMap(m_MasterPlayer))
-	//{
-	//	me->GetMotionMaster()->Clear();
-	//	me->GetMotionMaster()->MoveFollow(m_MasterPlayer, 1.0f, m_MasterPlayer->GetOrientation());
-	//}
-	//else
-	//	m_Movement->MovementTo(m_MasterPlayer->GetPositionX(), m_MasterPlayer->GetPositionY(), m_MasterPlayer->GetPositionZ(), 1);
+	if (me->IsWithinLOSInMap(m_MasterPlayer))
+	{
+		me->GetMotionMaster()->Clear();
+		me->GetMotionMaster()->MoveFollow(m_MasterPlayer, 1.0f, m_MasterPlayer->GetOrientation());
+	}
+	else
+		m_Movement->MovementTo(m_MasterPlayer->GetPositionX(), m_MasterPlayer->GetPositionY(), m_MasterPlayer->GetPositionZ(), 1);
 }
 
 bool BotGroupAI::NonCombatProcess()

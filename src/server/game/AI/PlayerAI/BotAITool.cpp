@@ -1640,32 +1640,32 @@ bool BotAIFindNearLoot::DoFindLoot(uint32 diff, BotBGAIMovement* movement, uint3
 
 Creature* BotAIFindNearLoot::FindLootCreature(float range)
 {
-	std::list<Creature*> nearCreature;
-	Trinity::AllWorldObjectsInRange checker(me, range);
-	Trinity::CreatureListSearcher<Trinity::AllWorldObjectsInRange> searcher(me, nearCreature, checker);
-	//me->VisitNearbyGridObject(range, searcher);
+    std::list<Creature*> nearCreature;
+    Trinity::AllWorldObjectsInRange checker(me, range);
+    Trinity::CreatureListSearcher<Trinity::AllWorldObjectsInRange> searcher(me, nearCreature, checker);
+    //Cell::VisitAllObjects(me, searcher, range);
 
-	float nearDistance = 9999;
-	Creature* pNearCreature = NULL;
-	for (Creature* pCreature : nearCreature)
-	{
-		if (pCreature->IsAlive() || pCreature->IsPet() || pCreature->IsTotem() || pCreature->IsSummon())
-			continue;
-		Loot* pLoot = &pCreature->loot;
-		if (pLoot->empty() || pLoot->isLooted())
-			continue;
-		if (pCreature->GetLootRecipient() != me)
-			continue;
-		//if (!pLoot->PlayerBotCanLoot(me->GetGUID()))
-		//	continue;
-		float dist = me->GetDistance(pCreature->GetPosition());
-		if (!pNearCreature || dist < nearDistance)
-		{
-			nearDistance = dist;
-			pNearCreature = pCreature;
-		}
-	}
-	return pNearCreature;
+    float nearDistance = 9999;
+    Creature* pNearCreature = NULL;
+    for (Creature* pCreature : nearCreature)
+    {
+        if (pCreature->IsAlive() || pCreature->IsPet() || pCreature->IsTotem() || pCreature->IsSummon())
+            continue;
+        Loot* pLoot = &pCreature->loot;
+        if (pLoot->empty() || pLoot->isLooted())
+            continue;
+        if (pCreature->GetLootRecipient() != me)
+            continue;
+        if (!pLoot->PlayerBotCanLoot(me->GetGUID()))
+            continue;
+        float dist = me->GetDistance(pCreature->GetPosition());
+        if (!pNearCreature || dist < nearDistance)
+        {
+            nearDistance = dist;
+            pNearCreature = pCreature;
+        }
+    }
+    return pNearCreature;
 }
 
 void BotAILootedItems::LookupLootedItems(uint32 diff)
