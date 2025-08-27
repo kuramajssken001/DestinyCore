@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -19,19 +19,19 @@
 #include "GitRevision.h"
 #include "StringFormat.h"
 
-void Trinity::Banner::Show(char const* applicationName, void(*log)(char const* text), void(*logExtraInfo)())
+void Destiny::Banner::Show(char const* applicationName, void(*log)(char const* text), void(*logExtraInfo)())
 {
     log(Trinity::StringFormat("%s (%s)", GitRevision::GetFullVersion(), applicationName).c_str());
-    log("<Ctrl-C> to stop.\n");
-    log(" ______                       __");
-    log("/\\__  _\\       __          __/\\ \\__");
-    log("\\/_/\\ \\/ _ __ /\\_\\    ___ /\\_\\ \\, _\\  __  __");
-    log("   \\ \\ \\/\\`'__\\/\\ \\ /' _ `\\/\\ \\ \\ \\/ /\\ \\/\\ \\");
-    log("    \\ \\ \\ \\ \\/ \\ \\ \\/\\ \\/\\ \\ \\ \\ \\ \\_\\ \\ \\_\\ \\");
-    log("     \\ \\_\\ \\_\\  \\ \\_\\ \\_\\ \\_\\ \\_\\ \\__\\\\/`____ \\");
-    log("      \\/_/\\/_/   \\/_/\\/_/\\/_/\\/_/\\/__/ `/___/> \\");
-    log("                                 C O R E  /\\___/");
-    log("http://TrinityCore.org                    \\/__/\n");
+    log(R"(<Ctrl-C> to stop.)" "\n");
+    log(R"( ____                    __)");
+    log(R"(/\  _`\                 /\ \__  __)");
+    log(R"(\ \ \/\ \     __    ____\ \ ,_\/\_\    ___   __  __)");
+    log(R"( \ \ \ \ \  /'__`\ /',__\\ \ \/\/\ \ /' _ `\/\ \/\ \)");
+    log(R"(  \ \ \_\ \/\  __//\__, `\\ \ \_\ \ \/\ \/\ \ \ \_\ \)");
+    log(R"(   \ \____/\ \____\/\____/ \ \__\\ \_\ \_\ \_\/`____ \)");
+    log(R"(    \/___/  \/____/\/___/   \/__/ \/_/\/_/\/_/`/___/> \)");
+    log(R"(                                        C O R E  /\___/)");
+    log(R"(https://DestinyCore.org                          \/__/)" "\n");
 
     if (logExtraInfo)
         logExtraInfo();

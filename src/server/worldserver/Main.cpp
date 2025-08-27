@@ -183,7 +183,7 @@ extern int main(int argc, char** argv)
     // If logs are supposed to be handled async then we need to pass the IoContext into the Log singleton
     sLog->Initialize(sConfigMgr->GetBoolDefault("Log.Async.Enable", false) ? ioContext.get() : nullptr);
 
-    Trinity::Banner::Show("worldserver-daemon",
+    Destiny::Banner::Show("worldserver-daemon",
         [](char const* text)
         {
             TC_LOG_INFO("server.worldserver", "%s", text);

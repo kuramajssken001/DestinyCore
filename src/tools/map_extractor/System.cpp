@@ -1374,7 +1374,7 @@ static bool RetardCheck()
 
 int main(int argc, char * arg[])
 {
-    Trinity::Banner::Show("Map & DBC Extractor", [](char const* text) { printf("%s\n", text); }, nullptr);
+    Destiny::Banner::Show("Map & DBC Extractor", [](char const* text) { printf("%s\n", text); }, nullptr);
 
     input_path = boost::filesystem::current_path();
     output_path = boost::filesystem::current_path();

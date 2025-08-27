@@ -304,7 +304,7 @@ std::unordered_map<uint32, std::vector<uint32>> LoadMap(std::string const& local
 
 int main(int argc, char** argv)
 {
-    Trinity::Banner::Show("MMAP generator", [](char const* text) { printf("%s\n", text); }, nullptr);
+    Destiny::Banner::Show("MMAP generator", [](char const* text) { printf("%s\n", text); }, nullptr);
 
     unsigned int threads = std::thread::hardware_concurrency();
     int mapnum = -1;

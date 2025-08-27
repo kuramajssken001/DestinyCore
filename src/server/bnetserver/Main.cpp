@@ -112,7 +112,7 @@ int main(int argc, char** argv)
     sLog->RegisterAppender<AppenderDB>();
     sLog->Initialize(nullptr);
 
-    Trinity::Banner::Show("bnetserver",
+    Destiny::Banner::Show("bnetserver",
         [](char const* text)
         {
             TC_LOG_INFO("server.bnetserver", "%s", text);

@@ -152,7 +152,7 @@ int main(int argc, char** argv)
 
     try
     {
-        Trinity::Banner::Show("connection_patcher", [](char const* text) { std::cout << text << std::endl; }, nullptr);
+        Destiny::Banner::Show("connection_patcher", [](char const* text) { std::cout << text << std::endl; }, nullptr);
 
         auto vm = GetConsoleArguments(argc, argv);
 
