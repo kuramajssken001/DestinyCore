@@ -4469,4 +4469,17 @@ dkquest = 0
 pbot = 1
 
 #
+# PlayerBot Health Modifier
+#
+#   pbot_hp
+#        Description: Sets the starting/max health of PlayerBots.
+#                     0 = Disabled (no extra HP)
+#                     1 = Normal HP (default)
+#                     >1 = Multiply HP by (pbot_hp - 1) factor
+#        Default:     1
+#
+
+pbot_hp = 1
+
+#
 ####################################################################################################
