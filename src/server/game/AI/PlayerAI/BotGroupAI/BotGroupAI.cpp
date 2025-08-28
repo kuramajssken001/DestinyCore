@@ -643,7 +643,7 @@ void BotGroupAI::ProcessBotCommand(Player* srcPlayer, std::string cmd)
 		return;
 	std::string param;
 	if (!CanReciveCommand(cmd, param))
-		return;
+    	return;
 	if (cmd == "summon")
 		ProcessSummonCommand();
 	else if (cmd == "attack")
