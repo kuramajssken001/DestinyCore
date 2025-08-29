@@ -1260,60 +1260,95 @@ m_LastWaterAura(0)
 
 bool BotAIUseFood::UpdateBotFood(uint32 diff, uint32 downMountID)
 {
-	static const float readyPct = 95;
-	if (me->IsInCombat())
-	{
-		ClearFoodState();
-		return false;
-	}
-	if (Group* pGroup = me->GetGroup())
-	{
-		if (!pGroup->AllGroupNotCombat())
-			return false;
-	}
-	float lifePct = me->GetHealthPct();
-	float manaPct = (m_HasMana) ? ((float)me->GetPower(POWER_MANA) / (float)me->GetMaxPower(POWER_MANA) * 100.0f) : 100.0f;
-	if (lifePct >= readyPct && manaPct >= readyPct)
-	{
-		ClearFoodState();
-		return false;
-	}
-	FoodInfo* pInfo = GetFoodInfoByLevel(me->getLevel());
-	if (!pInfo || pInfo->level == 0)
-		return false;
-	if (lifePct < readyPct && !me->HasAura(pInfo->foodBuff))
-	{
-		Item* pItem = BotUtility::FindItemFromAllBag(me, pInfo->foodEntry);
-		if (!pItem)
-			pItem = BotUtility::StoreNewItemByEntry(me, pInfo->foodEntry, 10);
-		if (pItem)
-		{
-			me->StopMoving();
-			if (downMountID && me->IsMounted() && me->HasAura(downMountID))
-				me->RemoveOwnedAura(downMountID, ObjectGuid::Empty, 0, AURA_REMOVE_BY_CANCEL);
-			SpellCastTargets targets;
-			targets.SetTargetMask(0);
-			me->CastItemUseSpell(pItem, targets, ObjectGuid::Empty, 0);// == SpellCastResult::SPELL_CAST_OK)
-			m_LastFoodAura = pInfo->foodBuff;
-		}
-	}
-	if (manaPct < readyPct && !me->HasAura(pInfo->waterBuff))
-	{
-		Item* pItem = BotUtility::FindItemFromAllBag(me, pInfo->waterEntry);
-		if (!pItem)
-			pItem = BotUtility::StoreNewItemByEntry(me, pInfo->waterEntry, 10);
-		if (pItem)
-		{
-			me->StopMoving();
-			if (downMountID && me->IsMounted() && me->HasAura(downMountID))
-				me->RemoveOwnedAura(downMountID, ObjectGuid::Empty, 0, AURA_REMOVE_BY_CANCEL);
-			SpellCastTargets targets;
-			targets.SetTargetMask(0);
-			me->CastItemUseSpell(pItem, targets, ObjectGuid::Empty, 0);// == SpellCastResult::SPELL_CAST_OK)
-			m_LastWaterAura = pInfo->waterBuff;
-		}
-	}
-	return true;
+    static const float readyPct = 95.0f;
+
+    // If in combat, clear eating/drinking state
+    if (me->IsInCombat())
+    {
+        ClearFoodState();
+        return false;
+    }
+
+    // If in group and any member is in combat, do not use food
+    if (Group* pGroup = me->GetGroup())
+    {
+        if (!pGroup->AllGroupNotCombat())
+            return false;
+    }
+
+    float lifePct = me->GetHealthPct();
+    float manaPct = (m_HasMana) ? ((float)me->GetPower(POWER_MANA) / (float)me->GetMaxPower(POWER_MANA) * 100.0f) : 100.0f;
+
+    // If already above ready threshold, clear state and skip
+    if (lifePct >= readyPct && manaPct >= readyPct)
+    {
+        ClearFoodState();
+        return false;
+    }
+
+    // Get food/water info appropriate for bot level
+    FoodInfo* pInfo = GetFoodInfoByLevel(me->getLevel());
+    if (!pInfo || pInfo->level == 0)
+        return false;
+
+    // Fallback misc array for server-side cast (Bots don't have a client)
+    int32 dummyMisc[2] = { 0, 0 };
+
+    // --- FOOD ---
+    if (lifePct < readyPct && !me->HasAura(pInfo->foodBuff))
+    {
+        Item* pItem = BotUtility::FindItemFromAllBag(me, pInfo->foodEntry);
+        if (!pItem)
+            pItem = BotUtility::StoreNewItemByEntry(me, pInfo->foodEntry, 10);
+
+        if (pItem)
+        {
+            me->StopMoving();
+
+            // If mounted, remove mount aura
+            if (downMountID && me->IsMounted() && me->HasAura(downMountID))
+                me->RemoveOwnedAura(downMountID, ObjectGuid::Empty, 0, AURA_REMOVE_BY_CANCEL);
+
+            // Prepare target for self-cast
+            SpellCastTargets targets;
+            targets.SetUnitTarget(me);
+
+            // Cast the item spell safely
+            me->CastItemUseSpell(pItem, targets, ObjectGuid::Empty, dummyMisc);
+
+            // Remember last food buff applied
+            m_LastFoodAura = pInfo->foodBuff;
+        }
+    }
+
+    // --- WATER ---
+    if (manaPct < readyPct && !me->HasAura(pInfo->waterBuff))
+    {
+        Item* pItem = BotUtility::FindItemFromAllBag(me, pInfo->waterEntry);
+        if (!pItem)
+            pItem = BotUtility::StoreNewItemByEntry(me, pInfo->waterEntry, 10);
+
+        if (pItem)
+        {
+            me->StopMoving();
+
+            // If mounted, remove mount aura
+            if (downMountID && me->IsMounted() && me->HasAura(downMountID))
+                me->RemoveOwnedAura(downMountID, ObjectGuid::Empty, 0, AURA_REMOVE_BY_CANCEL);
+
+            // Prepare target for self-cast
+            SpellCastTargets targets;
+            targets.SetUnitTarget(me);
+
+            // Cast the item spell safely
+            me->CastItemUseSpell(pItem, targets, ObjectGuid::Empty, dummyMisc);
+
+            // Remember last water buff applied
+            m_LastWaterAura = pInfo->waterBuff;
+        }
+    }
+
+    return true;
 }
 
 BotAIUsePotion::BotAIUsePotion(Player* self) :
