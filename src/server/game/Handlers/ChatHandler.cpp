@@ -368,6 +368,46 @@ void WorldSession::HandleChatMessage(ChatMsg type, uint32 lang, std::string msg,
             if (type == CHAT_MSG_PARTY_LEADER)
                 group->ProcessGroupBotCommand(GetPlayer(), msg);
 
+            // AI-PartyTalk
+            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                Player* member = itr->GetSource();
+                if (!member || !member->IsPlayerBot())
+                    continue;
+
+                LocaleConstant locale = GetPlayer()->GetSession()->GetSessionDbcLocale();
+                QueryResult result;
+
+                // First try locale specific
+                result = WorldDatabase.PQuery(
+                    "SELECT `reply` FROM `ai_talk_group_locale` "
+                    "WHERE locale = %u AND '%s' REGEXP cname "
+                    "ORDER BY RAND() LIMIT 1",
+                    locale, msg.c_str()
+                );
+
+                // Fallback in English
+                if (!result)
+                {
+                    result = WorldDatabase.PQuery(
+                        "SELECT `reply` FROM `ai_talk_group` "
+                        "WHERE '%s' REGEXP cname "
+                        "ORDER BY RAND() LIMIT 1",
+                        msg.c_str()
+                    );
+                }
+
+                if (result)
+                {
+                    Field* fields = result->Fetch();
+                    std::string rpmsg = fields[0].GetString();
+
+                    WorldPackets::Chat::Chat botPacket;
+                    botPacket.Initialize(ChatMsg(CHAT_MSG_PARTY), LANG_UNIVERSAL, member, nullptr, rpmsg);
+                    group->BroadcastPacket(botPacket.Write(), false);
+                }
+            }
+
             break;
         }
         case CHAT_MSG_GUILD:
