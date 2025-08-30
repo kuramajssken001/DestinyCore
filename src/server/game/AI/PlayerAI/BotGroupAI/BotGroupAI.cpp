@@ -1333,22 +1333,29 @@ bool BotGroupAI::TrySettingToMaster()
 	if (pSession->IsAccountBotSession())
 		return false;
 
-	int32 masterLV = m_MasterPlayer->getLevel();
-	int32 minLV = (masterLV <= gapLV) ? 1 : masterLV - gapLV;
-	int32 maxLV = ((masterLV + gapLV) >= 80) ? 80 : masterLV + gapLV;
-	if (masterLV >= 80)
-		minLV = 80;
-	maxLV = PlayerBotSetting::CheckMaxLevel(maxLV);
-	if (maxLV < minLV)
-		maxLV = minLV;
-	int32 meLV = me->getLevel();
-	if (meLV >= minLV && meLV <= maxLV)
-		return false;
-	if (masterLV == sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
-	{
-		minLV = masterLV;
-		maxLV = masterLV;
-	}
+    int32 masterLV = m_MasterPlayer->getLevel();
+    int32 worldMaxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
+
+    int32 minLV = (masterLV <= gapLV) ? 1 : masterLV - gapLV;
+    int32 maxLV = (masterLV + gapLV >= worldMaxLevel) ? worldMaxLevel : masterLV + gapLV;
+
+    if (masterLV >= worldMaxLevel)
+        minLV = worldMaxLevel;
+
+    maxLV = PlayerBotSetting::CheckMaxLevel(maxLV);
+
+    if (maxLV < minLV)
+        maxLV = minLV;
+
+    int32 meLV = me->getLevel();
+    if (meLV >= minLV && meLV <= maxLV)
+        return false;
+
+    if (masterLV == worldMaxLevel)
+    {
+        minLV = worldMaxLevel;
+        maxLV = worldMaxLevel;
+    }
 	
 	BotGlobleSchedule schedule2(BotGlobleScheduleType::BGSType_Settting, 0);
 	schedule2.parameter1 = minLV;

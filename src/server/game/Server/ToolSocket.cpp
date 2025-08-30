@@ -273,16 +273,16 @@ Json::Value jsonMaxLevel = sConfigMgr->GetIntDefault("max_level", 6);
 			switch (maxLevel)
 			{
 			case 0:
-				realLevel = 45;
-				break;
-			case 1:
 				realLevel = 60;
 				break;
-			case 2:
+			case 1:
 				realLevel = 70;
 				break;
-			case 3:
+			case 2:
 				realLevel = 80;
+				break;
+			case 3:
+				realLevel = 85;
 				break;
 			case 4:
 				realLevel = 90;
@@ -539,7 +539,7 @@ void ToolSocket::CmdBotChange(Json::Value& info)
 	uint32 minlv = info["minlv"].asInt();
 	uint32 maxlv = info["maxlv"].asInt();
 	uint32 talent = info["talent"].asInt();
-	if (minlv < 20 || minlv > 80 || maxlv < minlv || maxlv < 20 || maxlv > 80 || talent > 2)
+	if (minlv < 20 || minlv > 110 || maxlv < minlv || maxlv < 20 || maxlv > 110 || talent > 2)
 	{
 		SendNormalResult("bot_change", false);
 		return;
@@ -558,7 +558,7 @@ void ToolSocket::CmdPlayerChange(Json::Value& info)
 	uint32 minlv = info["minlv"].asInt();
 	uint32 maxlv = info["maxlv"].asInt();
 	uint32 talent = info["talent"].asInt();
-	if (minlv < 20 || minlv > 80 || maxlv < minlv || maxlv < 20 || maxlv > 80 || talent > 2)
+	if (minlv < 20 || minlv > 110 || maxlv < minlv || maxlv < 20 || maxlv > 110 || talent > 2)
 	{
 		SendNormalResult("player_change", false);
 		return;
@@ -612,26 +612,35 @@ void ToolSocket::CmdPVEAutoSetting(Json::Value& info)
 void ToolSocket::CmdPVEMaxLevel(Json::Value& info)
 {
 	uint32 max_level = info["max_level"].asInt();
-	if (max_level > 3)
+	if (max_level > 6)
 	{
 		SendNormalResult("pve_maxlevel", false);
 		return;
 	}
-	uint32 realLevel = 80;
+    uint32 realLevel = 110;
 	switch (max_level)
 	{
 	case 0:
-		realLevel = 45;
+        realLevel = 60;
 		break;
 	case 1:
-		realLevel = 60;
+        realLevel = 70;
 		break;
 	case 2:
-		realLevel = 70;
-		break;
-	case 3:
 		realLevel = 80;
 		break;
+	case 3:
+		realLevel = 85;
+		break;
+    case 4:
+        realLevel = 90;
+        break;
+    case 5:
+        realLevel = 100;
+        break;
+    case 6:
+        realLevel = 110;
+        break;
 	}
 	sWorld->setIntConfig(CONFIG_MAX_PLAYER_LEVEL, realLevel);
 	SendNormalResult("pve_maxlevel", true);

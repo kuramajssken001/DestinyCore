@@ -4287,12 +4287,17 @@ auto_setting = 1
 #
 # Maximum Level
 #
-#   max_level
-#        Description: Maximum level a PlayerBot can reach.
-#        Default:     3
-#
+#    max_level
+#        Description: Sets the maximum level of the PlayerBots.
+#        Default:     0 - Level 60
+#                     1 - Level 70
+#                     2 - Level 80
+#                     3 - Level 85
+#                     4 - Level 90
+#                     5 - Level 100
+#                     6 - Level 110
 
-max_level = 3
+max_level = 6
 
 #
 # Maximum Dungeon Access

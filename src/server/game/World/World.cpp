@@ -2402,24 +2402,33 @@ void World::SetInitialWorldSettings()
         int autoSetting = sConfigMgr->GetIntDefault("auto_setting", 1);
         BotUtility::BotCanSettingToMaster = (autoSetting != 0) ? true : false;
 
-        Json::Value jsonMaxLevel = sConfigMgr->GetIntDefault("max_level", 3);
-        int maxLevel = sConfigMgr->GetIntDefault("max_level", 3);
-        if (maxLevel >= 0 && maxLevel < 4)
+        Json::Value jsonMaxLevel = sConfigMgr->GetIntDefault("max_level", 6);
+        int maxLevel = sConfigMgr->GetIntDefault("max_level", 6);
+        if (maxLevel >= 0 && maxLevel < 6)
         {
-            uint32 realLevel = 80;
+            uint32 realLevel = 110;
             switch (maxLevel)
             {
             case 0:
-                realLevel = 45;
-                break;
-            case 1:
                 realLevel = 60;
                 break;
-            case 2:
+            case 1:
                 realLevel = 70;
                 break;
-            case 3:
+            case 2:
                 realLevel = 80;
+                break;
+            case 3:
+                realLevel = 85;
+                break;
+            case 4:
+                realLevel = 90;
+                break;
+            case 5:
+                realLevel = 100;
+                break;
+            case 6:
+                realLevel = 110;
                 break;
             }
             sWorld->setIntConfig(CONFIG_MAX_PLAYER_LEVEL, realLevel);
