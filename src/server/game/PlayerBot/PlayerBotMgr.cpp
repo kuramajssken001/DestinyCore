@@ -751,7 +751,7 @@ void PlayerBotMgr::SupplementAccount()
         // Maintain internal structure
         if (m_idPlayerBotBase.find(accountId) == m_idPlayerBotBase.end())
         {
-            PlayerBotBaseInfo* pInfo = new PlayerBotBaseInfo(accountId, accName.c_str(), accHash, false);
+            PlayerBotBaseInfo* pInfo = new PlayerBotBaseInfo(accountId, accName.c_str(), accHash, false, battlenetId);
             m_idPlayerBotBase[accountId] = pInfo;
         }
 
@@ -783,9 +783,11 @@ void PlayerBotMgr::AddNewAccountBotBaseInfo(std::string name)
     uint32 id = fields[0].GetUInt32();
     std::string username = fields[1].GetString();
     std::string pass = fields[2].GetString();
+    uint32 bnetId = fields[3].GetUInt32();
+
     if (m_idAccountBotBase.find(id) == m_idAccountBotBase.end())
     {
-        PlayerBotBaseInfo* pInfo = new PlayerBotBaseInfo(id, username.c_str(), pass, true);
+        PlayerBotBaseInfo* pInfo = new PlayerBotBaseInfo(id, username.c_str(), pass, true, bnetId);
         m_idAccountBotBase[id] = pInfo;
     }
 }
@@ -795,7 +797,7 @@ void PlayerBotMgr::LoadPlayerBotBaseInfo()
     uint32 oldMSTime = getMSTime();
 
     ClearBaseInfo();
-    QueryResult result = LoginDatabase.Query("SELECT id, username, sha_pass_hash FROM account");
+    QueryResult result = LoginDatabase.Query("SELECT id, username, sha_pass_hash, battlenet_account FROM account");
     if (!result)
     {
         TC_LOG_INFO("server.loading", ">> LoadPlayerBot Find 0 account!");
@@ -809,6 +811,8 @@ void PlayerBotMgr::LoadPlayerBotBaseInfo()
         uint32 id = fields[0].GetUInt32();
         std::string username = fields[1].GetString();
         std::string pass = fields[2].GetString();
+        uint32 bnetId = fields[3].GetUInt32();
+
         sOnlineMgr->AddNewAccount(id, username); // Real player acc and bot acc all in
 
         std::string lowerName = boost::algorithm::to_lower_copy(username);
@@ -816,7 +820,7 @@ void PlayerBotMgr::LoadPlayerBotBaseInfo()
         {
             if (m_idPlayerBotBase.find(id) == m_idPlayerBotBase.end())
             {
-                PlayerBotBaseInfo* pInfo = new PlayerBotBaseInfo(id, username.c_str(), pass, false);
+                PlayerBotBaseInfo* pInfo = new PlayerBotBaseInfo(id, username.c_str(), pass, false, bnetId);
                 m_idPlayerBotBase[id] = pInfo;
             }
             m_LastBotAccountIndex = id;
@@ -825,7 +829,7 @@ void PlayerBotMgr::LoadPlayerBotBaseInfo()
         {
             if (m_idAccountBotBase.find(id) == m_idAccountBotBase.end())
             {
-                PlayerBotBaseInfo* pInfo = new PlayerBotBaseInfo(id, username.c_str(), pass, true);
+                PlayerBotBaseInfo* pInfo = new PlayerBotBaseInfo(id, username.c_str(), pass, true, bnetId);
                 m_idAccountBotBase[id] = pInfo;
             }
         }
@@ -908,7 +912,7 @@ PlayerBotSession* PlayerBotMgr::UpPlayerBotSessionByBaseInfo(PlayerBotBaseInfo* 
         return NULL;
     std::string name = pAcc->username.c_str();
     std::string battlenetAccountName;
-    PlayerBotSession* pBotSession = new PlayerBotSession{ pAcc->id, name, 0, AccountTypes::SEC_GAMEMASTER, 2, 0, LocaleConstant::LOCALE_deDE, 0, false, std::string(battlenetAccountName) };
+    PlayerBotSession* pBotSession = new PlayerBotSession{ pAcc->id, name, pAcc->battlenetAccountId, AccountTypes::SEC_GAMEMASTER, 2, 0, LocaleConstant::LOCALE_deDE, 0, false, std::string(battlenetAccountName) };
     //pbSession->ReadAddonsInfo("");
     if (accountInfo)
         pBotSession->SetAccountBotSession();

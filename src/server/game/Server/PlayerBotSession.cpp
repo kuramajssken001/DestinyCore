@@ -31,7 +31,7 @@ m_LastCastTime(CAST_SCHEDULE_TICK),
 m_NoWorldTick(0),
 m_AccountBot(false),
 
-WorldSession(id, std::string(name), 0, nullptr, SEC_PLAYER, 6, 0, "Wn64", LOCALE_deDE, 0, false, std::string(battlenetAccountName))
+WorldSession(id, std::string(name), battlenetAccountId, nullptr, SEC_PLAYER, 6, 0, "Wn64", LOCALE_deDE, 0, false, std::string(battlenetAccountName))
 {
     SetAddress("DestinyCore");
 }

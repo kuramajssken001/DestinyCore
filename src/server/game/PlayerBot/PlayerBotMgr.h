@@ -93,13 +93,14 @@ struct PlayerBotBaseInfo
 	bool isAccountInfo;
 	uint32 id;
 	std::string username;
+    uint32 battlenetAccountId;
 	std::string pass;
 	using CharInfoMap = std::map<uint64, PlayerBotCharBaseInfo>;
 	CharInfoMap characters;
 	std::queue<WorldPacket> needCreateBots;
 
-	PlayerBotBaseInfo(uint32 uid, const char *name, std::string &pa, bool isAcc) :
-		isAccountInfo(isAcc), id(uid), pass(pa)
+	PlayerBotBaseInfo(uint32 uid, const char *name, std::string &pa, bool isAcc, uint32 bnetId) :
+		isAccountInfo(isAcc), id(uid), pass(pa), battlenetAccountId(bnetId)
 	{
 		characters.clear();
 		username = name;
