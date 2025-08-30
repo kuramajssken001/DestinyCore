@@ -28814,6 +28814,10 @@ void Player::SendTimeSync()
     m_timeSyncTimer = 10000;
     m_timeSyncServer = getMSTime();
 
+    // Check if it is a PlayerBot
+    if (IsPlayerBot())
+        return;
+
     if (m_timeSyncQueue.size() > 3)
         TC_LOG_ERROR("network", "Player::SendTimeSync: Did not receive CMSG_TIME_SYNC_RESP for over 30 seconds from '%s' (%s), possible cheater",
             GetName().c_str(), GetGUID().ToString().c_str());
