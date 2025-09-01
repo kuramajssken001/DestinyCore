@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -137,6 +137,7 @@ namespace WorldPackets
                 {
                     uint32 BillingPlan = 0;
                     uint32 TimeRemain = 0;
+                    uint32 Unknown735 = 0;
                     bool InGameRoom = false;
                 };
 
