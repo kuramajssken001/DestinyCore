@@ -14987,6 +14987,22 @@ void Unit::GetFriendlyUnitListInRange(std::list<Unit*> &list, float fMaxSearchRa
     cell.Visit(p, grid_unit_searcher, *GetMap(), *this, fMaxSearchRange);
 }
 
+void Unit::GetAttackableUnitListInRangeOfTarget(std::list<Unit*>& list, float fMaxSearchRange, Unit* target) const
+{
+    CellCoord p(Trinity::ComputeCellCoord(target->GetPositionX(), target->GetPositionY()));
+    Cell cell(p);
+    cell.SetNoCreate();
+
+    Trinity::AnyUnfriendlyUnitInObjectRangeCheck u_check(target, this, fMaxSearchRange);
+    Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck> searcher(this, list, u_check);
+
+    TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
+    TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AnyUnfriendlyUnitInObjectRangeCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
+
+    cell.Visit(p, world_unit_searcher, *GetMap(), *target, fMaxSearchRange);
+    cell.Visit(p, grid_unit_searcher, *GetMap(), *target, fMaxSearchRange);
+}
+
 void Unit::GetAreatriggerListInRange(std::list<AreaTrigger*>& list, float fMaxSearchRange) const
 {
     CellCoord l_Coords(Trinity::ComputeCellCoord(GetPositionX(), GetPositionY()));

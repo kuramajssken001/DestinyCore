@@ -113,6 +113,8 @@ enum PriestSpells
     SPELL_PRIEST_MIND_BLAST                         = 8092,
     SPELL_PRIEST_MIND_BOMB                          = 205369,
     SPELL_PRIEST_MIND_BOMB_STUN                     = 226943,
+    SPELL_PRIEST_MIND_SEAR                          = 234702,
+    SPELL_PRIEST_MIND_SEAR_DAMAGE                   = 237388,
     SPELL_PRIEST_MIND_SEAR_INSANITY                 = 208232,
     SPELL_PRIEST_MISERY                             = 238558,
     SPELL_PRIEST_NPC_PSYFIEND                       = 59190,
@@ -1198,15 +1200,48 @@ class spell_pri_mana_leech : public SpellScriptLoader
         }
 };
 
-// 49821 - Mind Sear
+// 15407 - Mind Flay
+class spell_pri_mind_flay : public AuraScript
+{
+    PrepareAuraScript(spell_pri_mind_flay);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PRIEST_MIND_SEAR, SPELL_PRIEST_MIND_SEAR_DAMAGE, SPELL_PRIEST_SHADOW_WORD_PAIN });
+    }
+
+    void HandlePeriodic(AuraEffect const* aurEff)
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetTarget();
+        if (!caster || !target)
+            return;
+
+        if (caster->HasAura(SPELL_PRIEST_MIND_SEAR) && target->HasAura(SPELL_PRIEST_SHADOW_WORD_PAIN, caster->GetGUID()))
+        {
+            std::list<Unit*> targets;
+            caster->GetAttackableUnitListInRangeOfTarget(targets, 8.0f, target);
+            for (Unit* unit : targets)
+                if (target != unit)
+                    caster->CastSpell(unit, SPELL_PRIEST_MIND_SEAR_DAMAGE, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_pri_mind_flay::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+    }
+};
+
+// 234702 - Mind Sear
 class spell_pri_mind_sear : public SpellScriptLoader
 {
 public:
     spell_pri_mind_sear() : SpellScriptLoader("spell_pri_mind_sear") {}
 
-    class spell_pri_mind_sear_SpellScript : public SpellScript
+    class spell_pri_mind_sear_AuraScript : public AuraScript
     {
-        PrepareSpellScript(spell_pri_mind_sear_SpellScript);
+        PrepareAuraScript(spell_pri_mind_sear_AuraScript);
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
@@ -1215,7 +1250,7 @@ public:
             return true;
         }
 
-        void HandleInsanity(SpellEffIndex /*effIndex*/)
+        void OnProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
         {
             Unit* caster = GetCaster();
             if (!caster)
@@ -1226,16 +1261,15 @@ public:
 
         void Register() override
         {
-            OnEffectHitTarget += SpellEffectFn(spell_pri_mind_sear_SpellScript::HandleInsanity, EFFECT_1, SPELL_EFFECT_SCHOOL_DAMAGE);
+            OnEffectProc += AuraEffectProcFn(spell_pri_mind_sear_AuraScript::OnProc, EFFECT_0, SPELL_AURA_DUMMY);
         }
     };
 
-    SpellScript* GetSpellScript() const override
+    AuraScript* GetAuraScript() const override
     {
-        return new spell_pri_mind_sear_SpellScript();
+        return new spell_pri_mind_sear_AuraScript();
     }
 };
-
 
 // 47948 - Pain and Suffering (Proc)
 class spell_pri_pain_and_suffering_proc : public SpellScriptLoader
@@ -2996,6 +3030,7 @@ void AddSC_priest_spell_scripts()
     new spell_pri_levitate();
     new spell_pri_lightwell_renew();
     new spell_pri_mana_leech();
+    RegisterAuraScript(spell_pri_mind_flay);
     new spell_pri_mind_sear();
     new spell_pri_pain_and_suffering_proc();
     RegisterSpellScript(spell_pri_penance);
