@@ -1793,6 +1793,13 @@ public:
     {
         npc_enraged_worgen_dmAI(Creature* creature) : ScriptedAI(creature) { }
 
+        void Reset() override
+        {
+            if (!me->GetMap()->IsHeroic())
+                me->DespawnOrUnsummon();
+        }
+
+
         void EnterCombat(Unit* /*who*/) override
         {
             DoZoneInCombat();
