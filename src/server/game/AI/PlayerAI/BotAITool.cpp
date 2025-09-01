@@ -25,6 +25,7 @@
 #include "Language.h"
 #include "Guild.h"
 #include "SpellAuras.h"
+#include "SpellMgr.h"
 #include "WorldSession.h"
 #include "TradeData.h"
 #include "SpellHistory.h"
@@ -81,14 +82,21 @@ SpellEntry* BotUtility::BuildNewArenaSpellEntry()
 	return newSpellEntry;
 }
 
-//void BotUtility::ModifySpecialSpells(SpellInfoMap& spellMap)
-//{
-//	if (SpellInfo* pSpellEntry = spellMap[8690]) // ÐÞ¸ÄÂ¯Ê¯CD
-//	{
-//        pSpellEntry->CastTimeEntry = sSpellCastTimesStore.LookupEntry(6);
-//        pSpellEntry->CategoryRecoveryTime = 30000;
-//	}
-//}
+void BotUtility::ModifySpecialSpells()
+{
+    // Spell ID 8690 = Hearthstone
+    if (SpellInfo const* pSpellEntry = sSpellMgr->GetSpellInfo(8690))
+	{
+        // CastTimeEntry and CategoryRecoveryTime are non-const members, so we cast away constness
+        SpellInfo* spell = const_cast<SpellInfo*>(pSpellEntry);
+
+        // Set cast time to entry ID 6 from SpellCastTimes.dbc
+        spell->CastTimeEntry = sSpellCastTimesStore.LookupEntry(6);
+
+        // Set category recovery time to 30 seconds
+        spell->CategoryRecoveryTime = 30000;
+	}
+}
 
 //void BotUtility::BuildNewArenaHellSpells(SpellInfoMap& spellMap)
 //{

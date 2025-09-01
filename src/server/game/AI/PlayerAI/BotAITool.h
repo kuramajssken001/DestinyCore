@@ -89,8 +89,8 @@ public:
 
 public:
     static SpellEntry* BuildNewArenaSpellEntry();
-    //	static void ModifySpecialSpells(SpellInfoMap& spellMap);
-        //static void BuildNewArenaHellSpells(SpellInfoMap& spellMap);
+    static void ModifySpecialSpells();
+    //static void BuildNewArenaHellSpells(SpellInfoMap& spellMap);
     static void AddArenaBotSpellsByPlayer(Player* player);
     static void RemoveArenaBotSpellsByPlayer(Player* player);
     static void TryCancelDuel(Player* player);
