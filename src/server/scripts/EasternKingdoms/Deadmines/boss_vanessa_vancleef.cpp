@@ -1531,7 +1531,7 @@ public:
 class npc_glubtok_dm : public CreatureScript
 {
 public:
-    npc_glubtok_dm() : CreatureScript("npc_glubtok_dm") { }
+    npc_glubtok_dm() : CreatureScript("npc_glubtok_dm") {}
 
     CreatureAI* GetAI(Creature* creature) const override
     {
@@ -1540,7 +1540,7 @@ public:
 
     struct npc_glubtok_dmAI : public BossAI
     {
-        npc_glubtok_dmAI(Creature* creature) : BossAI(creature, DATA_NIGHTMARE_MECHANICAL) { }
+        npc_glubtok_dmAI(Creature* creature) : BossAI(creature, DATA_NIGHTMARE_MECHANICAL) {}
 
         uint32 FlagResetTimer;
 
@@ -1549,6 +1549,8 @@ public:
             _Reset();
             FlagResetTimer = 10000;
             events.ScheduleEvent(EVENT_ICYCLE_AOE, urand(11000, 15000));
+            if (!me->GetMap()->IsHeroic() && me->FindNearestCreature(43778, 45.0f, true))
+                me->DespawnOrUnsummon();
         }
 
         void EnterCombat(Unit* /*who*/) override
@@ -1564,7 +1566,7 @@ public:
             me->GetPlayerListInGrid(players, 150.0f);
 
             for (std::list<Player*>::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                ( *itr )->AddAura(SPELL_EFFECT_1, ( *itr ));
+                (*itr)->AddAura(SPELL_EFFECT_1, (*itr));
 
             me->TextEmote(VANESSA_NIGHTMARE_14, 0, true);
 
@@ -1580,8 +1582,9 @@ public:
             if (FlagResetTimer <= diff)
             {
                 me->SetVisible(true);
-                me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
-            } else FlagResetTimer -= diff;
+                me->RemoveUnitFlag(UnitFlags(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC));
+            }
+            else FlagResetTimer -= diff;
 
             events.Update(diff);
 
@@ -1589,15 +1592,15 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_ICYCLE_AOE:
-                        if (Player* pPlayer = me->SelectNearestPlayer(200.0f))
-                            DoCast(pPlayer, SPELL_ICYCLE);
-                        events.ScheduleEvent(EVENT_ICYCLE_AOE, urand(6000, 8000));
-                        break;
-                    case EVENT_SPIRIT_STRIKE:
-                        DoCastVictim(SPELL_SPIRIT_STRIKE);
-                        events.ScheduleEvent(EVENT_SPIRIT_STRIKE, urand(5000, 7000));
-                        break;
+                case EVENT_ICYCLE_AOE:
+                    if (Player* pPlayer = me->SelectNearestPlayer(200.0f))
+                        DoCast(pPlayer, SPELL_ICYCLE);
+                    events.ScheduleEvent(EVENT_ICYCLE_AOE, urand(6000, 8000));
+                    break;
+                case EVENT_SPIRIT_STRIKE:
+                    DoCastVictim(SPELL_SPIRIT_STRIKE);
+                    events.ScheduleEvent(EVENT_SPIRIT_STRIKE, urand(5000, 7000));
+                    break;
                 }
             }
             DoMeleeAttackIfReady();
