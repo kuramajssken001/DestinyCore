@@ -577,6 +577,20 @@ namespace WorldPackets
             ObjectGuid NpcGuid;
             uint32 GarrFollowerTypeID = 0;
         };
+
+        class GarrisonResearchTalent final : public ServerPacket
+        {
+        public:
+            GarrisonResearchTalent() : ServerPacket(SMSG_GARRISON_RESEARCH_TALENT, 20) { }
+
+            WorldPacket const* Write() override;
+
+            int32 Result = 0;
+            uint32 GarrTypeID = 0;
+            uint32 TalentID = 0;
+            uint32 ResearchTime = 0;
+            uint32 Flags = 0;
+        };
     }
 }
 

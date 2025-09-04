@@ -534,3 +534,14 @@ WorldPacket const* WorldPackets::Garrison::GarrisonRequestMissionNpc::Write()
 
     return &_worldPacket;
 }
+
+WorldPacket const* WorldPackets::Garrison::GarrisonResearchTalent::Write()
+{
+    _worldPacket << Result;
+    _worldPacket << GarrTypeID;
+    _worldPacket << TalentID;
+    _worldPacket << ResearchTime;
+    _worldPacket << Flags;
+
+    return &_worldPacket;
+}
