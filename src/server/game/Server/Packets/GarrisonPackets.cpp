@@ -526,3 +526,11 @@ WorldPacket const* WorldPackets::Garrison::GarrisonFollowerChangeXP::Write()
 
     return &_worldPacket;
 }
+
+WorldPacket const* WorldPackets::Garrison::GarrisonRequestMissionNpc::Write()
+{
+    _worldPacket << NpcGuid;
+    _worldPacket << GarrFollowerTypeID;
+
+    return &_worldPacket;
+}

@@ -566,6 +566,17 @@ namespace WorldPackets
 
             WorldPacket const* Write() override;
         };
+
+        class GarrisonRequestMissionNpc final : public ServerPacket
+        {
+        public:
+            GarrisonRequestMissionNpc() : ServerPacket(SMSG_GARRISON_REQUEST_MISSION_NPC, 36 + 4 + 4) { }
+
+            WorldPacket const* Write() override;
+
+            ObjectGuid NpcGuid;
+            uint32 GarrFollowerTypeID = 0;
+        };
     }
 }
 
