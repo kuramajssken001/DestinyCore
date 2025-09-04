@@ -166,8 +166,8 @@ public:
 
     static bool HandleLfgDebugCommand(ChatHandler* handler, char const* /*args*/)
     {
-        sLFGMgr->ToggleTesting();
-        handler->PSendSysMessage(sLFGMgr->IsTesting() ? LANG_DEBUG_LFG_ON : LANG_DEBUG_LFG_OFF);
+        sLFGMgr->ToggleSoloLFG(); // Solo LFG
+        handler->PSendSysMessage(sLFGMgr->IsSoloLFG() ? LANG_DEBUG_LFG_ON : LANG_DEBUG_LFG_OFF);
         return true;
     }
 

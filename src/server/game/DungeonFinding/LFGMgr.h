@@ -448,9 +448,9 @@ class TC_GAME_API LFGMgr
         WorldPackets::LFG::RideTicket const* GetTicket(ObjectGuid guid) const;
 
         /// Toggle LFG in debug mode
-        void ToggleTesting();
+        void ToggleSoloLFG(); // Solo LFG
         /// Check if debug mode
-        bool IsTesting() const { return m_isTesting; }
+        bool IsSoloLFG() const { return m_isSoloLFG; } // Solo LFG
 
         // LfgQueue
         /// Get last lfg state (NONE, DUNGEON or FINISHED_DUNGEON)
@@ -515,7 +515,7 @@ class TC_GAME_API LFGMgr
         uint32 m_QueueTimer;                               ///< used to check interval of update
         uint32 m_lfgProposalId;                            ///< used as internal counter for proposals
         uint32 m_options;                                  ///< Stores config options
-        bool m_isTesting;
+        bool m_isSoloLFG;                                  ///< Solo LFG
 
         LfgQueueTeamContainer QueuesStore;                 ///< Queues
         LfgCachedDungeonContainer CachedDungeonMapStore;   ///< Stores all dungeons by groupType
