@@ -545,3 +545,16 @@ WorldPacket const* WorldPackets::Garrison::GarrisonResearchTalent::Write()
 
     return &_worldPacket;
 }
+
+WorldPacket const* WorldPackets::Garrison::GarrisonResponseClassSpecCategoryInfo::Write()
+{
+    _worldPacket << GarrFollowerTypeID;
+    _worldPacket << static_cast<uint32>(Datas.size());
+    for (auto const& v : Datas)
+    {
+        _worldPacket << v.Category;
+        _worldPacket << v.Option;
+    }
+
+    return &_worldPacket;
+}

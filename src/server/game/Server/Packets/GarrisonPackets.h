@@ -160,6 +160,12 @@ namespace WorldPackets
             uint32 Count;
         };
 
+        struct FollowersClassSpecInfo
+        {
+            uint32 Category = 0;
+            uint32 Option = 0;
+        };
+
         class GetGarrisonInfoResult final : public ServerPacket
         {
         public:
@@ -590,6 +596,17 @@ namespace WorldPackets
             uint32 TalentID = 0;
             uint32 ResearchTime = 0;
             uint32 Flags = 0;
+        };
+
+        class GarrisonResponseClassSpecCategoryInfo final : public ServerPacket
+        {
+        public:
+            GarrisonResponseClassSpecCategoryInfo() : ServerPacket(SMSG_GARRISON_RESPONSE_CLASS_SPEC_CASTEGORY_INFO, 4 + 4) { }
+
+            WorldPacket const* Write() override;
+
+            int32 GarrFollowerTypeID = 0;
+            std::vector<FollowersClassSpecInfo> Datas;
         };
     }
 }
