@@ -486,17 +486,26 @@ void WorldPackets::Garrison::GarrisonCompleteMission::Read()
 WorldPacket const* WorldPackets::Garrison::GarrisonCompleteMissionResult::Write()
 {
     _worldPacket << Result;
-    _worldPacket << Mission;
-    _worldPacket << Mission.MissionRecID;
-    _worldPacket << uint32(Followers.size());
+    _worldPacket << MissionData;
+    _worldPacket << MissionRecID;
+    _worldPacket.WriteBit(Succeeded);
+    _worldPacket.FlushBits();
 
-    for (auto itr : Followers)
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Garrison::GarrisonCompleteMissionResultNew::Write()
+{
+    _worldPacket << Result;
+    _worldPacket << MissionData;
+    _worldPacket << MissionRecID;
+    _worldPacket << static_cast<uint32>(followerData.size());
+    for (auto data : followerData)
     {
-        _worldPacket << itr.first;
-        _worldPacket << itr.second;
+        _worldPacket << data.FollowerDbID;
+        _worldPacket << data.unk32;
     }
-
-    _worldPacket.WriteBit(Succeed);
+    _worldPacket.WriteBit(Succeeded);
     _worldPacket.FlushBits();
 
     return &_worldPacket;

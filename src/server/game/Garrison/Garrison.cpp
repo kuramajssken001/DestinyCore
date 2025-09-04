@@ -717,8 +717,8 @@ void Garrison::CompleteMission(uint32 garrMissionId)
 
     WorldPackets::Garrison::GarrisonCompleteMissionResult garrisonCompleteMissionResult;
     garrisonCompleteMissionResult.Result = canComplete ? GarrisonMission::Result::Success : GarrisonMission::Result::Fail;
-    garrisonCompleteMissionResult.Mission = mission->PacketInfo;
-    garrisonCompleteMissionResult.Succeed = success;
+    garrisonCompleteMissionResult.MissionData = mission->PacketInfo;
+    garrisonCompleteMissionResult.Succeeded = success;
     _owner->SendDirectMessage(garrisonCompleteMissionResult.Write());
 }
 

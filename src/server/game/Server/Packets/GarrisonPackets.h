@@ -166,6 +166,12 @@ namespace WorldPackets
             uint32 Option = 0;
         };
 
+        struct GarrMissionFollowerData
+        {
+            uint64 FollowerDbID = 0;
+            uint32 unk32 = 0;
+        };
+
         class GetGarrisonInfoResult final : public ServerPacket
         {
         public:
@@ -528,14 +534,29 @@ namespace WorldPackets
         class GarrisonCompleteMissionResult final : public ServerPacket
         {
         public:
-            GarrisonCompleteMissionResult() : ServerPacket(SMSG_GARRISON_COMPLETE_MISSION_RESULT, 4) { }
-
-            uint32 Result = 0;
-            GarrisonMission Mission;
-            std::map<uint64 /*followerDBID*/, uint32 /*unk*/> Followers;
-            bool Succeed = false;
+            GarrisonCompleteMissionResult() : ServerPacket(SMSG_GARRISON_COMPLETE_MISSION_RESULT, sizeof(GarrisonMission) + 4 + 4 + 1) { }
 
             WorldPacket const* Write() override;
+
+            GarrisonMission MissionData;
+            uint32 Result = 0;
+            uint32 MissionRecID = 0;
+            bool Succeeded = false;
+        };
+
+        //!  SMSG_GARRISON_UNK_2  was. Possible SMSG_GARRISON_MISSION_REWARD_RESPONSE?
+        class GarrisonCompleteMissionResultNew final : public ServerPacket
+        {
+        public:
+            GarrisonCompleteMissionResultNew() : ServerPacket(SMSG_GARRISON_COMPLETE_MISSION_RESULT_NEW, sizeof(GarrisonMission) + 4 + 4 + 1) { }
+
+            WorldPacket const* Write() override;
+
+            std::vector<GarrMissionFollowerData> followerData;
+            GarrisonMission MissionData;
+            uint32 Result = 0;
+            uint32 MissionRecID = 0;
+            bool Succeeded = false;
         };
 
         class GarrisonMissionBonusRoll final : public ClientPacket
