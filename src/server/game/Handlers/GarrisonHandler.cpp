@@ -184,33 +184,36 @@ void WorldSession::HandleRequestLandingPageShipmentInfoOpcode(WorldPackets::Garr
     if (!garrison)
         return;
 
-    //std::vector<MS::Garrison::GarrisonWorkOrder> l_WorkOrders = garrison->GetWorkOrders();
+    auto l_WorkOrders = garrison->GetWorkOrders();
 
-    WorldPacket l_Data(SMSG_GARRISON_LANDING_PAGE_SHIPMENT_INFO, 1024);
+    WorldPackets::Garrison::GarrisonLandingPageShipmentInfo result;
+    std::vector<WorldPackets::Garrison::GarrisonShipment> Shipments;
 
-    l_Data << uint32(GarrisonType::GARRISON_TYPE_CLASS_HALL);
+    result.GarrisonType = uint32(GarrisonType::GARRISON_TYPE_NONE);//GARRISON_TYPE_CLASS_HALL
 
-    l_Data << uint32(0); //l_WorkOrders.size()
-    /*
     for (uint32 l_I = 0; l_I < l_WorkOrders.size(); ++l_I)
     {
-        uint32 l_Duration = 0;
+        uint64 l_Follower = 0;
 
         CharShipmentEntry const* l_Entry = sCharShipmentStore.LookupEntry(l_WorkOrders[l_I].ShipmentID);
+        WorldPackets::Garrison::GarrisonShipment shipment;
 
         if (l_Entry)
-            l_Duration = l_Entry->Duration;
+            l_Follower = (uint64)l_Entry->GarrFollowerID;
 
-        /// @TODO http://www.mmo-champion.com/content/4662-Patch-6-1-Iron-Horde-Scrap-Meltdown-Garrison-Vendor-Rush-Orders-Blue-Posts
-        l_Data << uint32(l_WorkOrders[l_I].ShipmentID);
-        l_Data << uint64(l_WorkOrders[l_I].DatabaseID);
-        l_Data << uint64(garrison->GetBuilding(l_WorkOrders[l_I].PlotInstanceID).FollowerAssigned);
-        l_Data << uint32(l_WorkOrders[l_I].CreationTime);
-        l_Data << uint32(l_WorkOrders[l_I].CompleteTime - l_WorkOrders[l_I].CreationTime);
-        l_Data << uint32(0);                                    ///< Rewarded XP BuildingType
+        if (l_WorkOrders[l_I].DatabaseID == 0)
+            continue;
+
+        shipment.ShipmentId = uint64(l_WorkOrders[l_I].DatabaseID);
+        shipment.ShipmentRecId = uint32(l_WorkOrders[l_I].ShipmentID);
+        shipment.AssignedFollowerDBID = (uint64)l_Follower;// //garrison->GetBuilding(l_WorkOrders[l_I].PlotInstanceID).FollowerAssigned);
+        shipment.CreationTime = uint32(l_WorkOrders[l_I].CreationTime);
+        shipment.ShipmentDuration = uint32(l_WorkOrders[l_I].CompleteTime - l_WorkOrders[l_I].CreationTime);
+        shipment.BuildingType = 0; ///< Rewarded XP BuildingType
+        Shipments.push_back(shipment);                                ///< Rewarded XP BuildingType
     }
-    */
-    SendPacket(&l_Data);
+    result.Shipments = Shipments;
+    SendPacket(result.Write());
 }
 
 void WorldSession::HandleGarrisonAssignFollowerToBuilding(WorldPackets::Garrison::GarrisonAssignFollowerToBuilding& /*packet*/)
@@ -307,19 +310,44 @@ void WorldSession::HandleGarrisonGetShipmentInfo(WorldPackets::Garrison::Garriso
 
                 if (!garrison || !_player->IsInGarrison())
                     return;
+
+                l_PlotInstanceID = garrison->GetClassHallPlotId(unit->GetEntry());
+
                 WorldPacket l_Response(SMSG_GET_SHIPMENT_INFO_RESPONSE, 1024);
                 l_Response.WriteBit(true);
                 l_Response.FlushBits();
+
+                auto l_WorkOrders = garrison->GetWorkOrders();
+
+                uint32 l_PendingWorkOrderCount = std::count_if(l_WorkOrders.begin(), l_WorkOrders.end(), [l_PlotInstanceID](const std::pair<uint64 /*dbId*/, Garrison::WorkOrder>& p_Order) -> bool
+                    {
+                        return p_Order.second.PlotInstanceID == l_PlotInstanceID;
+                    });
+
                 l_Response << uint32(l_ShipmentID);
                 l_Response << uint32(l_OrderAvailable);
                 l_Response << uint32(l_PendingWorkOrderCount);
                 l_Response << uint32(l_PlotInstanceID);
+
+                for (uint32 l_I = 0; l_I < l_WorkOrders.size(); ++l_I)
+                {
+                    if (l_WorkOrders[l_I].PlotInstanceID != l_PlotInstanceID)
+                        continue;
+
+                    l_Response << uint32(l_WorkOrders[l_I].ShipmentID);
+                    l_Response << uint64(l_WorkOrders[l_I].DatabaseID);
+                    l_Response << uint64(0);                                    ///< 6.1.x FollowerID
+                    l_Response << uint32(l_WorkOrders[l_I].CreationTime);
+                    l_Response << uint32(l_WorkOrders[l_I].CompleteTime - l_WorkOrders[l_I].CreationTime);
+                    l_Response << uint32(0);                                    ///< 6.1.x Rewarded XP
+                }
+
                 SendPacket(&l_Response);
                 break;
             }
         }
     }
-
+}
 
 
     //if (unit->AI())
@@ -390,7 +418,6 @@ void WorldSession::HandleGarrisonGetShipmentInfo(WorldPackets::Garrison::Garriso
     }
 
     SendPacket(&l_Response); */
-}
 
 void WorldSession::HandleGarrisonResearchTalent(WorldPackets::Garrison::GarrisonResearchTalent& researchTalent)
 {
@@ -406,7 +433,6 @@ void WorldSession::HandleGarrisonResearchTalent(WorldPackets::Garrison::Garrison
 
 void WorldSession::HandleGarrisonRequestClassSpecCategoryInfo(WorldPackets::Garrison::GarrisonRequestClassSpecCategoryInfo& requestClassSpecCategoryInfo)
 {
-    printf("HandleGarrisonRequestClassSpecCategoryInfo GarrFollowerTypeId=%d \n", requestClassSpecCategoryInfo.GarrFollowerTypeId);
     WorldPackets::Garrison::GarrisonFollowerCategories result;
     result.GarrFollowerTypeId = requestClassSpecCategoryInfo.GarrFollowerTypeId;
     result.CategoryInfoCount = 0;
@@ -416,7 +442,7 @@ void WorldSession::HandleGarrisonRequestClassSpecCategoryInfo(WorldPackets::Garr
 
 void WorldSession::HandleGarrisonCreateShipmentOpcode(WorldPackets::Garrison::GarrisonCreateShipment& createShipment)
 {
-    printf("HandleGarrisonCreateShipmentOpcode npcId=%d \n", createShipment.NpcGUID.GetEntry());
+    //printf("HandleGarrisonCreateShipmentOpcode npcId=%d \n", createShipment.NpcGUID.GetEntry());
     if (!createShipment.Count)
         createShipment.Count = 1;
     if (!_player)
@@ -426,9 +452,115 @@ void WorldSession::HandleGarrisonCreateShipmentOpcode(WorldPackets::Garrison::Ga
     if (!unit)
         return;
 
-    WorldPackets::Garrison::GarrisonCreateShipmentResponse result;
-    result.ShipmentID = 0;
-    result.ShipmentRecID = 0;
-    result.Result = 1;
-    SendPacket(result.Write());
+    uint32 l_ShipmentID = 0;
+    uint32 l_OrderMax = 0;
+    uint32 l_PlotInstanceID = 0;
+    uint32 l_ShipmentRecID = 0;
+    Garrison* garrison;
+    for (uint32 i = 0; i < sCharShipmentStore.GetNumRows(); ++i)
+    {
+        if (CharShipmentEntry const* charShipmentData = sCharShipmentStore.LookupEntry(i))
+        {
+            if (charShipmentData->ShipmentContainerID == unit->GetShipmentContainerID())
+            {
+                l_ShipmentID = charShipmentData->ID;
+                //uint32 l_ShipmentRecID = charShipmentData->;
+
+                CharShipmentContainerEntry const* charShipmentContainerData = sCharShipmentContainerStore.LookupEntry(charShipmentData->ShipmentContainerID);
+
+                garrison = _player->GetGarrison(GarrisonType(charShipmentContainerData->GarrTypeID));
+
+                if (!garrison || !_player->IsInGarrison())
+                    return;
+
+
+
+                if (!l_ShipmentID)
+                {
+                    TC_LOG_INFO("HandleGarrisonCreateShipmentOpcode => %s", "Invalid ShipmentID");
+                }
+
+                for (uint32 l_OrderI = 0; l_OrderI < createShipment.Count; ++l_OrderI)
+                {
+                    //if (((int32)l_OrderMax - (int32)garrison->GetWorkOrderCount(l_PlotInstanceID)) < 1)
+                    //{
+                    //    l_OnError("Max work order for this building reached");
+                    //    return;
+                    //}
+
+                    l_PlotInstanceID = garrison->GetClassHallPlotId(unit->GetEntry());
+
+                    if (!l_PlotInstanceID)
+                    {
+                        TC_LOG_INFO("HandleGarrisonCreateShipmentOpcode => %s", "Invalid l_PlotInstanceID");
+                        return;
+                    }
+
+                    if (!charShipmentData)
+                    {
+                        TC_LOG_INFO("HandleGarrisonCreateShipmentOpcode => %s", "Shipment entry not found");
+                        return;
+                    }
+
+                    const SpellInfo* l_Spell = sSpellMgr->GetSpellInfo(charShipmentData->SpellID);
+
+                    if (!l_Spell)
+                    {
+                        TC_LOG_INFO("HandleGarrisonCreateShipmentOpcode => %s", "Shipment spell not found");
+                        return;
+                    }
+                    /*
+                    bool l_HasReagents = true;
+                    for (uint32 l_I = 0; l_I < MAX_SPELL_REAGENTS; ++l_I)
+                    {
+                        uint32 l_ItemEntry = l_Spell->Reagent[l_I];
+                        uint32 l_ItemCount = l_Spell->ReagentCount[l_I];
+
+                        if (!l_ItemEntry || !l_ItemCount)
+                            continue;
+
+                        if (!_player->HasItemCount(l_ItemEntry, l_ItemCount))
+                            l_HasReagents = false;
+                    }
+
+                    if (l_Spell->CurrencyID)
+                    {
+                        if (!_player->HasCurrency(l_Spell->CurrencyID, l_Spell->CurrencyCount))
+                            l_HasReagents = false;
+                    }
+
+                    if (!l_HasReagents)
+                    {
+                        TC_LOG_INFO("HandleGarrisonCreateShipmentOpcode => %s", "Doesn't have reagents");
+                        return;
+                    }
+
+                    for (uint32 l_I = 0; l_I < MAX_SPELL_REAGENTS; ++l_I)
+                    {
+                        uint32 l_ItemEntry = l_Spell->Reagent[l_I];
+                        uint32 l_ItemCount = l_Spell->ReagentCount[l_I];
+
+                        if (!l_ItemEntry || !l_ItemCount)
+                            continue;
+
+                        _player->DestroyItemCount(l_ItemEntry, l_ItemCount, true);
+                    }
+
+                    if (l_Spell->CurrencyID)
+                        _player->ModifyCurrency(l_Spell->CurrencyID, -int32(l_Spell->CurrencyCount), false);
+                    */
+                    _player->CastSpell(_player, l_Spell, TRIGGERED_FULL_MASK);
+
+                    uint64 l_DatabaseID = garrison->StartWorkOrder(l_PlotInstanceID, l_ShipmentID);
+
+                    WorldPackets::Garrison::GarrisonCreateShipmentResponse result;
+                    result.ShipmentID = l_DatabaseID;
+                    result.ShipmentRecID = l_ShipmentID;
+                    result.Result = 1;
+                    SendPacket(result.Write());
+                }
+                break;
+            }
+        }
+    }
 }

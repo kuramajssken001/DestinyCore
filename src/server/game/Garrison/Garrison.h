@@ -70,6 +70,7 @@ public:
         uint32 ShipmentID;      ///< Shipment ID (CharShipment.db2)
         uint32 CreationTime;    ///< Timestamp of creation
         uint32 CompleteTime;    ///< Timestamp of completion
+        uint64 ownerID;
     };
 
     explicit Garrison(Player* owner);
@@ -101,6 +102,7 @@ public:
 
     // Followers
     void AddFollower(uint32 garrFollowerId);
+    void AddShipmentFollower(uint32 garrFollowerId);
     Follower* GetFollower(uint64 dbId);
     template<typename Predicate>
     uint32 CountFollowers(Predicate&& predicate) const
@@ -145,16 +147,19 @@ public:
     // WorkOrders
     std::unordered_map<uint64 /*dbId*/, Garrison::WorkOrder> const& GetWorkOrders()const { return _workorders; }
     Garrison::WorkOrder* GetWorkOrder(uint64 dbId);
+    uint32 GetClassHallPlotId(uint32 creatureID) const;
     /// Get building max work order
     uint32 GetBuildingMaxWorkOrder(uint32 plotInstanceID) const;
     /// Get in progress work order count
     uint32 GetWorkOrderCount(uint32 plotInstanceID) const;
     /// Get in progress work order count
-    std::vector<WorkOrder> GetBuildingWorkOrders(uint32 plotInstanceID) const;
+    std::vector<Garrison::WorkOrder> GetBuildingWorkOrders(uint32 plotInstanceID) const;
     /// Start new work order
     uint64 StartWorkOrder(uint32 plotInstanceID, uint32 shipmentID);
     /// Delete work order
     void DeleteWorkOrder(uint64 dbId);
+    void RewardWorkOrder(uint32 shipmentContainerID);
+    void UpdateWorkOrders();
 
     bool IsWodGarrison() const { return GetType() == GARRISON_TYPE_GARRISON; }
     WodGarrison* ToWodGarrison() { if (IsWodGarrison()) return reinterpret_cast<WodGarrison*>(this); else return nullptr; }

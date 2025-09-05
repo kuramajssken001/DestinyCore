@@ -21,7 +21,7 @@
 enum GarrisonTimers
 {
     GUPDATE_MISSIONS_DISTRIBUTION,
-
+    GUPDATE_WORKORDERS,
     GUPDATE_COUNT
 };
 

@@ -30,11 +30,14 @@
 #include "PhasingHandler.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "SpellMgr.h"
+#include "SpellInfo.h"
 #include "VehicleDefines.h"
 
 Garrison::Garrison(Player* owner) : _garrisonType(), _owner(owner), _siteLevel(nullptr), _followerActivationsRemainingToday(1)
 {
     _timers[GUPDATE_MISSIONS_DISTRIBUTION].SetInterval(MINUTE * IN_MILLISECONDS);
+    _timers[GUPDATE_WORKORDERS].SetInterval(10 * IN_MILLISECONDS);
 }
 
 bool Garrison::Create(uint32 garrSiteId)
@@ -68,6 +71,12 @@ void Garrison::Update(uint32 const diff)
     {
         _timers[GUPDATE_MISSIONS_DISTRIBUTION].Reset();
         GenerateMissions();
+    }
+
+    if (_timers[GUPDATE_WORKORDERS].Passed())
+    {
+        _timers[GUPDATE_WORKORDERS].Reset();
+        UpdateWorkOrders();
     }
 }
 
@@ -243,7 +252,7 @@ bool Garrison::LoadFromDB()
             uint64 dbId = fields[0].GetUInt64();
             uint32 plotInstanceId = fields[1].GetUInt32();
 
-            _workorderIds.insert(plotInstanceId);
+            //_workorderIds.insert(plotInstanceId);
             WorkOrder& workorder = _workorders[dbId];
             workorder.DatabaseID = dbId;
             workorder.PlotInstanceID = plotInstanceId;
@@ -251,6 +260,7 @@ bool Garrison::LoadFromDB()
             workorder.CreationTime = fields[3].GetUInt32();
             workorder.CompleteTime = fields[4].GetUInt32();
 
+            workorder.ownerID = fields[5].GetUInt64();
         } while (workordersStmt->NextRow());
     }
 
@@ -334,6 +344,9 @@ void Garrison::SaveToDB(CharacterDatabaseTransaction& trans)
     for (auto const& p : _workorders)
     {
         WorkOrder const& workorder = p.second;
+        if ((uint32)workorder.DatabaseID == 0)
+            continue;
+        //printf("_workorders >>>DatabaseID=%d; PlotInstanceID=%d\n", (uint32)workorder.DatabaseID, workorder.PlotInstanceID);
         uint8 index = 0;
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GARRISON_WORKORDER);
 
@@ -460,6 +473,38 @@ void Garrison::AddFollower(uint32 garrFollowerId)
     CharacterDatabase.CommitTransaction(trans);
 }
 
+void Garrison::AddShipmentFollower(uint32 garrFollowerId)
+{
+    WorldPackets::Garrison::GarrisonAddFollowerResult addFollowerResult;
+    addFollowerResult.GarrTypeID = _garrisonType;
+    GarrFollowerEntry const* followerEntry = sGarrFollowerStore.LookupEntry(garrFollowerId);
+    if (!followerEntry)
+    {
+        addFollowerResult.Result = GARRISON_ERROR_INVALID_FOLLOWER;
+        _owner->SendDirectMessage(addFollowerResult.Write());
+        return;
+    }
+
+    uint64 dbId = sGarrisonMgr.GenerateFollowerDbId();
+    Follower& follower = _followers[dbId];
+    follower.PacketInfo.DbID = dbId;
+    follower.PacketInfo.GarrFollowerID = garrFollowerId;
+    follower.PacketInfo.Quality = followerEntry->Quality;   // TODO: handle magic upgrades
+    follower.PacketInfo.FollowerLevel = followerEntry->FollowerLevel;
+    follower.PacketInfo.ItemLevelWeapon = followerEntry->ItemLevelWeapon;
+    follower.PacketInfo.ItemLevelArmor = followerEntry->ItemLevelArmor;
+    follower.PacketInfo.AbilityID = sGarrisonMgr.RollFollowerAbilities(garrFollowerId, followerEntry, follower.PacketInfo.Quality, GetFaction(), true);
+    follower.PacketInfo.FollowerStatus = 24;
+    addFollowerResult.Follower = follower.PacketInfo;
+    _owner->SendDirectMessage(addFollowerResult.Write());
+
+    _owner->UpdateCriteria(CRITERIA_TYPE_RECRUIT_GARRISON_FOLLOWER, follower.PacketInfo.DbID);
+
+    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+    SaveToDB(trans);
+    CharacterDatabase.CommitTransaction(trans);
+}
+
 Garrison::Follower* Garrison::GetFollower(uint64 dbId)
 {
     for (auto it = _followers.begin(); it != _followers.end(); ++it)
@@ -536,10 +581,10 @@ void Garrison::ChangeFollowerActivationState(uint64 followerDBID, bool active)
 
             follower->PacketInfo.FollowerStatus = follower->PacketInfo.FollowerStatus & ~FOLLOWER_STATUS_INACTIVE;
 
-            WorldPacket l_Data(SMSG_GARRISON_NUM_FOLLOWER_ACTIVATIONS_REMAINING, 12);
-            l_Data << uint32(GetSiteLevel()->GarrSiteID);
-            l_Data << uint32(GetNumFollowerActivationsRemaining());
-            _owner->SendDirectMessage(&l_Data);
+            WorldPacket data(SMSG_GARRISON_NUM_FOLLOWER_ACTIVATIONS_REMAINING, 12);
+            data << uint32(GetSiteLevel()->GarrSiteID);
+            data << uint32(GetNumFollowerActivationsRemaining());
+            _owner->SendDirectMessage(&data);
         }
     }
     else
@@ -553,10 +598,10 @@ void Garrison::ChangeFollowerActivationState(uint64 followerDBID, bool active)
 
             follower->PacketInfo.FollowerStatus |= FOLLOWER_STATUS_INACTIVE;
 
-            WorldPacket l_Data(SMSG_GARRISON_REMOVE_FOLLOWER_FROM_BUILDING_RESULT);
-            l_Data << uint64(followerDBID);
-            l_Data << uint32(GarrisonError::GARRISON_SUCCESS);
-            _owner->SendDirectMessage(&l_Data);
+            WorldPacket data(SMSG_GARRISON_REMOVE_FOLLOWER_FROM_BUILDING_RESULT);
+            data << uint64(followerDBID);
+            data << uint32(GarrisonError::GARRISON_SUCCESS);
+            _owner->SendDirectMessage(&data);
         }
     }
 
@@ -803,6 +848,128 @@ Garrison::WorkOrder* Garrison::GetWorkOrder(uint64 dbId)
     }
 
     return nullptr;
+}
+
+uint32 Garrison::GetClassHallPlotId(uint32 creatureID) const
+{
+    uint32 garrPlotInstanceId = 0;
+    std::vector<GarrisonClassHallPlotGOInfo> plots = sGarrisonMgr.GetPlotClassHallByCreatureId(creatureID);
+    if (plots.size() > 0)
+    {
+        for (auto it = plots.begin(); it != plots.end(); it++)
+        {
+            garrPlotInstanceId = (uint32)(*it).PlotId;
+            return garrPlotInstanceId;
+        }
+    }
+    return 0;
+}
+
+uint32 Garrison::GetWorkOrderCount(uint32 plotInstanceID) const
+{
+    return (uint32)std::count_if(_workorders.begin(), _workorders.end(), [plotInstanceID](const std::pair<uint64 /*dbId*/, Garrison::WorkOrder>& p_Order) -> bool
+        {
+            return p_Order.second.PlotInstanceID == plotInstanceID;
+        });
+}
+
+std::vector<Garrison::WorkOrder> Garrison::GetBuildingWorkOrders(uint32 plotInstanceID) const
+{
+    std::vector<Garrison::WorkOrder> orders;
+
+    for (auto it = _workorders.begin(); it != _workorders.end(); ++it)
+        if (it->second.PlotInstanceID == plotInstanceID)
+            orders.push_back(it->second);
+
+    return orders;
+}
+
+uint64 Garrison::StartWorkOrder(uint32 plotInstanceID, uint32 shipmentID)
+{
+    CharShipmentEntry const* charShipmentEntry = sCharShipmentStore.LookupEntry(shipmentID);
+
+    if (!charShipmentEntry)
+        return 0;
+
+    uint32 MaxCompleteTime = time(0);
+
+    for (uint32 I = 0; I < _workorders.size(); ++I)
+    {
+        if (_workorders[I].PlotInstanceID == plotInstanceID)
+            MaxCompleteTime = std::max<uint32>(MaxCompleteTime, _workorders[I].CompleteTime);
+    }
+
+    uint64 dbId = sGarrisonMgr.GenerateWorkorderDbId();
+    WorkOrder& workOrder = _workorders[dbId];;
+    workOrder.DatabaseID = dbId;
+    workOrder.PlotInstanceID = plotInstanceID;
+    workOrder.ShipmentID = shipmentID;
+    workOrder.CreationTime = MaxCompleteTime;
+    workOrder.CompleteTime = MaxCompleteTime + charShipmentEntry->Duration;
+    workOrder.ownerID = _owner->GetGUID().GetCounter();
+
+    SQLTransaction trans = CharacterDatabase.BeginTransaction();
+
+    uint8 index = 0;
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GARRISON_WORKORDER);
+    stmt->setUInt64(index++, workOrder.DatabaseID);
+    stmt->setUInt64(index++, _owner->GetGUID().GetCounter());
+    stmt->setUInt32(index++, workOrder.PlotInstanceID);
+    stmt->setUInt32(index++, workOrder.ShipmentID);
+    stmt->setUInt32(index++, workOrder.CreationTime);
+    stmt->setUInt32(index++, workOrder.CompleteTime);
+    trans->Append(stmt);
+
+    CharacterDatabase.CommitTransaction(trans);
+
+    return workOrder.DatabaseID;
+}
+
+void Garrison::DeleteWorkOrder(uint64 dbId)
+{
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GARRISON_WORKORDER);
+    stmt->setUInt64(0, dbId);
+    CharacterDatabase.AsyncQuery(stmt);
+
+    for (auto it = _workorders.begin(); it != _workorders.end(); ++it)
+    {
+        if ((uint32)it->second.DatabaseID == (uint32)dbId)
+        {
+            _workorders.erase(it);
+            break;
+        }
+    }
+}
+
+void Garrison::RewardWorkOrder(uint32 shipmentContainerID)
+{
+    for (uint32 i = 0; i < sCharShipmentStore.GetNumRows(); ++i)
+    {
+        if (CharShipmentEntry const* charShipmentData = sCharShipmentStore.LookupEntry(i))
+        {
+            if (charShipmentData->ShipmentContainerID == shipmentContainerID)
+            {
+                CharShipmentContainerEntry const* charShipmentContainerData = sCharShipmentContainerStore.LookupEntry(charShipmentData->ShipmentContainerID);
+                const SpellInfo* spell = sSpellMgr->GetSpellInfo(charShipmentData->OnCompleteSpellID);
+                uint32 CurrentTimeStamp = time(0);
+
+                for (auto it = _workorders.begin(); it != _workorders.end(); ++it)
+                {
+                    if (it->second.CompleteTime <= CurrentTimeStamp && it->second.ShipmentID == charShipmentData->ID)
+                    {
+                        if (spell)
+                            _owner->CastSpell(_owner, spell, TRIGGERED_FULL_MASK);
+                        if (charShipmentData->DummyItemID)
+                            _owner->AddItem(charShipmentData->DummyItemID, 1);
+                        if (charShipmentData->GarrFollowerID)
+                            AddShipmentFollower(charShipmentData->GarrFollowerID);
+                        DeleteWorkOrder(it->second.DatabaseID);
+                    }
+                }
+                break;
+            }
+        }
+    }
 }
 
 void Garrison::StartMission(uint32 garrMissionId, std::vector<uint64 /*DbID*/> Followers)
@@ -1064,14 +1231,14 @@ GarrFollowerEntry const* Garrison::Follower::GetEntry() const
 
 bool Garrison::Follower::IsShipyard() const
 {
-    GarrFollowerEntry const* l_Entry = GetEntry();
-    return l_Entry && l_Entry->GarrFollowerTypeID == GarrisonFollowerType::FOLLOWER_TYPE_SHIPYARD;
+    GarrFollowerEntry const* entry = GetEntry();
+    return entry && entry->GarrFollowerTypeID == GarrisonFollowerType::FOLLOWER_TYPE_SHIPYARD;
 }
 
 bool Garrison::Follower::IsGarrison() const
 {
-    GarrFollowerEntry const* l_Entry = GetEntry();
-    return l_Entry && (l_Entry->GarrFollowerTypeID == GarrisonFollowerType::FOLLOWER_TYPE_GARRISON || l_Entry->GarrFollowerTypeID == GarrisonFollowerType::FOLLOWER_TYPE_CLASS_HALL);
+    GarrFollowerEntry const* entry = GetEntry();
+    return entry && (entry->GarrFollowerTypeID == GarrisonFollowerType::FOLLOWER_TYPE_GARRISON || entry->GarrFollowerTypeID == GarrisonFollowerType::FOLLOWER_TYPE_CLASS_HALL);
 }
 
 void Garrison::Follower::SendFollowerUpdate(WorldSession* session) const
@@ -1085,4 +1252,56 @@ void Garrison::Follower::SendFollowerUpdate(WorldSession* session) const
 void Garrison::Follower::SendFollowerUpdate(Player* player) const
 {
     SendFollowerUpdate(player->GetSession());
+}
+
+void Garrison::UpdateWorkOrders()
+{
+    if (!GetOwner()->IsInGarrison())
+        return;
+
+    if (_workorders.size() > 0)
+    {
+        for (auto const& p : _workorders)
+        {
+            WorkOrder const& workorder = p.second;
+            CharShipmentEntry const* charShipmentEntry = sCharShipmentStore.LookupEntry(workorder.ShipmentID);
+
+            if (charShipmentEntry == nullptr)
+                continue;
+
+            CharShipmentContainerEntry const* charShipmentContainerEntry = sCharShipmentContainerStore.LookupEntry(charShipmentEntry->ShipmentContainerID);
+
+            if (charShipmentContainerEntry == nullptr)
+                continue;
+
+
+
+            bool complete = false;
+            GarrisonClassHallPlotGOInfo const* GOInfo = sGarrisonMgr.GetPlotClassHallGOInfo(workorder.PlotInstanceID);
+            uint32 GobDisplayID = GOInfo->workDisplayId;
+            uint32 CurrentTimeStamp = time(0);
+            uint32 ShipmentsSize = (uint32)_workorders.size();
+
+            GameObject* workOrderGameObject = _owner->FindNearestGameObject(GOInfo->GameObjectId, 30.f);
+
+            if (!workOrderGameObject)
+                workOrderGameObject = _owner->SummonGameObject(GOInfo->GameObjectId, GOInfo->Pos, QuaternionData(), WEEK, true);
+
+            if (workorder.CompleteTime <= CurrentTimeStamp)
+                complete = true;
+
+            if (!complete)
+            {
+                workOrderGameObject->SetDisplayId(GobDisplayID);
+                workOrderGameObject->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_FREEZE_ANIMATION);
+            }
+            else
+            {
+                workOrderGameObject->SetDisplayId(GOInfo->completeDisplayId);
+                workOrderGameObject->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_FREEZE_ANIMATION);
+                workOrderGameObject->SetGoState(GO_STATE_READY);
+            }
+        }
+
+    }
 }

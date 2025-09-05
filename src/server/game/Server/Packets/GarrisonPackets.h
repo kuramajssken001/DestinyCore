@@ -128,6 +128,16 @@ namespace WorldPackets
             time_t StartTime = time_t(0);
         };
 
+        struct GarrisonShipment
+        {
+            uint32 ShipmentRecId = 0;
+            uint64 ShipmentId = 0;
+            uint64 AssignedFollowerDBID = 0;
+            uint32 CreationTime = time_t(2288912640);
+            uint32 ShipmentDuration = 0;
+            uint32 BuildingType = 0;
+        };
+
         struct GarrisonTalent
         {
             int32 GarrTalentID = 0;
@@ -836,6 +846,16 @@ namespace WorldPackets
             uint64 ShipmentID = 0;
             uint32 Result = 0;
 
+            WorldPacket const* Write() override;
+        };
+
+        class GarrisonLandingPageShipmentInfo final : public ServerPacket
+        {
+        public:
+            GarrisonLandingPageShipmentInfo() : ServerPacket(SMSG_GARRISON_LANDING_PAGE_SHIPMENT_INFO, 4) { }
+            uint32 GarrisonType = 0;
+
+            std::vector<GarrisonShipment> Shipments;
             WorldPacket const* Write() override;
         };
     }

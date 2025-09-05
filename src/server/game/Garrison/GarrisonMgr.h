@@ -48,6 +48,17 @@ struct FinalizeGarrisonPlotGOInfo
     } FactionInfo[2];
 };
 
+struct GarrisonClassHallPlotGOInfo
+{
+    uint32 PlotId;
+    uint32 CreatureId;
+    uint32 GameObjectId;
+    Position Pos;
+    uint16 AnimKitId;
+    uint32 workDisplayId;
+    uint32 completeDisplayId;
+};
+
 struct GarrAbilities
 {
     std::unordered_set<GarrAbilityEntry const*> Counters;
@@ -70,6 +81,8 @@ public:
     uint32 GetGarrBuildingPlotInst(uint32 garrBuildingId, uint32 garrSiteLevelPlotInstId) const;
     uint32 GetPreviousLevelBuildingId(uint32 buildingType, uint32 currentLevel) const;
     FinalizeGarrisonPlotGOInfo const* GetPlotFinalizeGOInfo(uint32 garrPlotInstanceID) const;
+    GarrisonClassHallPlotGOInfo const* GetPlotClassHallGOInfo(uint32 garrPlotInstanceID) const;
+    std::vector<GarrisonClassHallPlotGOInfo> GetPlotClassHallByCreatureId(uint32 creatureID) const;
     uint64 GenerateFollowerDbId();
     uint64 GenerateMissionDbId();
     uint64 GenerateWorkorderDbId();
@@ -84,6 +97,7 @@ private:
     void InitializeDbIdSequences();
     void LoadPlotFinalizeGOInfo();
     void LoadFollowerClassSpecAbilities();
+    void LoadPlotClassHallGOInfo();
 
     std::unordered_map<uint32 /*garrSiteId*/, std::vector<GarrSiteLevelPlotInstEntry const*>> _garrisonPlotInstBySiteLevel;
     std::unordered_map<uint32 /*mapId*/, std::unordered_map<uint32 /*garrPlotId*/, GameObjectsEntry const*>> _garrisonPlots;
@@ -91,6 +105,7 @@ private:
     std::unordered_map<std::pair<uint32 /*garrBuildingId*/, uint32 /*garrSiteLevelPlotInstId*/>, uint32 /*garrBuildingPlotInstId*/> _garrisonBuildingPlotInstances;
     std::unordered_map<uint32 /*buildingType*/, std::vector<uint32>> _garrisonBuildingsByType;
     std::unordered_map<uint32 /*garrPlotInstanceId*/, FinalizeGarrisonPlotGOInfo> _finalizePlotGOInfo;
+    std::unordered_map<uint32 /*garrPlotInstanceId*/, GarrisonClassHallPlotGOInfo> _classHallPlotGOInfo;
     std::unordered_map<uint32 /*garrFollowerId*/, GarrAbilities> _garrisonFollowerAbilities[2];
     std::unordered_map<uint32 /*classSpecId*/, std::list<GarrAbilityEntry const*>> _garrisonFollowerClassSpecAbilities;
     std::set<GarrAbilityEntry const*> _garrisonFollowerRandomTraits;

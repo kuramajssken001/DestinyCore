@@ -574,11 +574,9 @@ WorldPacket const* WorldPackets::Garrison::GarrisonOpenRecruitmentNpc::Write()
 {
     _worldPacket << NpcGUID;
     _worldPacket << Unk1;
-    //_worldPacket << Unk2;
-    //_worldPacket << Unk3;
     if (followers.empty())
     {
-        for (uint8 l_Itr = 0; l_Itr < 3; ++l_Itr)
+        for (uint8 itr = 0; itr < 3; ++itr)
         {
             GarrisonFollower follower;
             InsertGarrisonFollower(_worldPacket, follower);
@@ -608,7 +606,7 @@ WorldPacket const* WorldPackets::Garrison::GarrisonRecruitFollowerResult::Write(
 
     if (followers.empty())
     {
-        for (uint8 l_Itr = 0; l_Itr < 3; ++l_Itr)
+        for (uint8 itr = 0; itr < 3; ++itr)
         {
             GarrisonFollower follower;
             InsertGarrisonFollower(_worldPacket, follower);
@@ -758,4 +756,24 @@ void WorldPackets::Garrison::GarrisonAssignFollowerToBuilding::Read()
     _worldPacket >> NpcGUID;
     _worldPacket >> PlotInstanceID;
     _worldPacket >> FollowerDBID;
+}
+
+WorldPacket const* WorldPackets::Garrison::GarrisonLandingPageShipmentInfo::Write()
+{
+    _worldPacket << GarrisonType;
+    _worldPacket << uint32(Shipments.size());
+    if (Shipments.size() > 0)
+    {
+        for (GarrisonShipment shipment : Shipments)
+        {
+            _worldPacket << shipment.ShipmentRecId;
+            _worldPacket << shipment.ShipmentId;
+            _worldPacket << shipment.AssignedFollowerDBID;
+            _worldPacket << shipment.CreationTime;
+            _worldPacket << shipment.ShipmentDuration;
+            _worldPacket << shipment.BuildingType;
+        }
+    }
+
+    return &_worldPacket;
 }
