@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -164,11 +164,8 @@ bool Garrison::LoadFromDB()
                 if (!ability)
                     continue;
 
-                auto itr = _followers.find(dbId);
-                if (itr == _followers.end())
-                    continue;
-
-                itr->second.PacketInfo.AbilityID.push_back(ability);
+                if (Garrison::Follower* follower = GetFollower(dbId))
+                    follower->PacketInfo.AbilityID.push_back(ability);
             } while (abilitiesStmt->NextRow());
         }
     }
@@ -213,22 +210,21 @@ bool Garrison::LoadFromDB()
                 uint64 dbId = fields[0].GetUInt64();
                 uint8 type  = fields[1].GetUInt8();
 
-                auto itr = _missions.find(dbId);
-                if (itr == _missions.end())
-                    continue;
+                if (Mission* mission = GetMission(dbId))
+                {
+                    WorldPackets::Garrison::GarrisonMissionReward reward;
+                    reward.ItemID = fields[2].GetInt32();
+                    reward.ItemQuantity = fields[3].GetUInt32();
+                    reward.CurrencyID = fields[4].GetInt32();
+                    reward.CurrencyQuantity = fields[5].GetUInt32();
+                    reward.FollowerXP = fields[6].GetUInt32();
+                    reward.BonusAbilityID = fields[7].GetUInt32();
 
-                WorldPackets::Garrison::GarrisonMissionReward reward;
-                reward.ItemID           = fields[2].GetInt32();
-                reward.ItemQuantity     = fields[3].GetUInt32();
-                reward.CurrencyID       = fields[4].GetInt32();
-                reward.CurrencyQuantity = fields[5].GetUInt32();
-                reward.FollowerXP       = fields[6].GetUInt32();
-                reward.BonusAbilityID   = fields[7].GetUInt32();
-
-                if (type == GarrisonMission::RewardType::Normal)
-                    itr->second.Rewards.push_back(reward);
-                else
-                    itr->second.BonusRewards.push_back(reward);
+                    if (type == GarrisonMission::RewardType::Normal)
+                        mission->Rewards.push_back(reward);
+                    else
+                        mission->BonusRewards.push_back(reward);
+                }
 
             } while (rewardsStmt->NextRow());
         }
@@ -422,9 +418,13 @@ void Garrison::AddFollower(uint32 garrFollowerId)
 
 Garrison::Follower* Garrison::GetFollower(uint64 dbId)
 {
-    auto itr = _followers.find(dbId);
-    if (itr != _followers.end())
-        return &itr->second;
+    for (auto it = _followers.begin(); it != _followers.end(); ++it)
+    {
+        if ((uint32)it->second.PacketInfo.DbID == (uint32)dbId)
+        {
+            return &it->second;
+        }
+    }
 
     return nullptr;
 }
@@ -505,16 +505,20 @@ void Garrison::AddMission(uint32 garrMissionId)
 
 Garrison::Mission* Garrison::GetMission(uint64 dbId)
 {
-    auto itr = _missions.find(dbId);
-    if (itr != _missions.end())
-        return &itr->second;
+    for (auto it = _missions.begin(); it != _missions.end(); ++it)
+    {
+        if ((uint32)it->second.PacketInfo.DbID == (uint32)dbId)
+        {
+            return &it->second;
+        }
+    }
 
     return nullptr;
 }
 
 Garrison::Mission* Garrison::GetMissionByID(uint32 ID)
 {
-    auto missionItr = std::find_if(_missions.begin(), _missions.end(), [ID](auto itr)
+    auto missionItr = std::find_if(_missions.begin(), _missions.end(), [ID](auto& itr)
     {
         return itr.second.PacketInfo.MissionRecID == ID;
     });
@@ -533,7 +537,7 @@ void Garrison::DeleteMission(uint64 dbId)
 std::vector<Garrison::Follower*> Garrison::GetMissionFollowers(uint32 garrMissionId)
 {
     std::vector<Follower*> missionFollowers;
-    for (auto followerItr : _followers)
+    for (auto& followerItr : _followers)
         if (followerItr.second.PacketInfo.CurrentMissionID == garrMissionId)
             missionFollowers.push_back(&followerItr.second);
 
@@ -766,7 +770,10 @@ void Garrison::RewardMission(Mission* mission, bool withOvermaxReward)
             {
                 std::vector<Follower*> followers = GetMissionFollowers(mission->PacketInfo.MissionRecID);
                 for (Follower* follower : followers)
+                {
                     follower->EarnXP(GetOwner(), reward.FollowerXP);
+                    follower->PacketInfo.CurrentMissionID = 0;
+                }
             }
 
             //if (reward.BonusAbilityID)
@@ -776,6 +783,20 @@ void Garrison::RewardMission(Mission* mission, bool withOvermaxReward)
                 // TODO
         }
     }
+}
+
+uint32 Garrison::GetRandomRewardId() const
+{
+    uint32 itemid = 0;
+    uint32 rollid = 0;
+    for (int i = 0; i < 20; i++)
+    {
+        rollid = urand(21, 123);
+
+        if (itemid > 0)
+            break;
+    }
+    return rollid;
 }
 
 Map* Garrison::FindMap() const

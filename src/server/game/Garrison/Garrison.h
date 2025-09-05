@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef Garrison_h__
-#define Garrison_h__
+#ifndef GARRISON_H
+#define GARRISON_H
 
 #include "Define.h"
 #include "DatabaseEnvFwd.h"
@@ -117,6 +117,7 @@ public:
     void CompleteMission(uint32 garrMissionId);
     void CalculateMissonBonusRoll(uint32 garrMissionId);
     void RewardMission(Mission* mission, bool withOvermaxReward);
+    uint32 GetRandomRewardId() const;
 
     std::pair<std::vector<GarrMissionEntry const*>, std::vector<double>> GetAvailableMissions() const;
     void GenerateMissions();
@@ -144,6 +145,7 @@ protected:
     uint32 _followerActivationsRemainingToday;
 
     std::unordered_map<uint64 /*dbId*/, Garrison::Mission> _missions;
+    std::vector<Garrison::Mission> m_Missions;
     std::unordered_set<uint32> _missionIds;
 };
 
