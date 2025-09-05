@@ -79,12 +79,16 @@ enum Talk
 class playerscript_surge_of_life_trigger : public PlayerScript
 {
 public:
-    playerscript_surge_of_life_trigger() : PlayerScript("playerscript_surge_of_life_trigger") { }
+    playerscript_surge_of_life_trigger() : PlayerScript("playerscript_surge_of_life_trigger") {}
 
     uint32 checkTimer = 5000;
     bool needRecast = true;
-    void OnUpdateArea(Player* player, Area* newArea, Area* /*oldArea*/)
+
+    void OnUpdateArea(Player* player, Area* newArea, Area* /*oldArea*/) override
     {
+        if (!player || !newArea)
+            return;
+
         if (newArea->GetId() == 9333)
         {
             player->RemoveAurasDueToSpell(SPELL_ESSENCE_OF_THE_LIFEBINDER);
@@ -93,29 +97,36 @@ public:
         }
     }
 
-    void OnSuccessfulSpellCast(Player* player, Spell* spell)
+    void OnSuccessfulSpellCast(Player* player, Spell* spell) override
     {
+        if (!player || !spell || !spell->GetSpellInfo())
+            return;
+
         if (player->GetAreaId() == 9333)
         {
-            if (spell->GetSpellInfo()->Id == SPELL_SURGE_OF_LIFE)
+            switch (spell->GetSpellInfo()->Id)
             {
+            case SPELL_SURGE_OF_LIFE:
                 player->RemoveAurasDueToSpell(SPELL_ESSENCE_OF_THE_LIFEBINDER);
                 player->CastSpell(player, SPELL_SURGE_OF_LIFE_BUFF, true);
                 player->CastSpell(player, SPELL_SURGE_OF_LIFE_JUMP, true);
                 needRecast = true;
                 checkTimer = 5000;
-            }
+                break;
 
-            if (spell->GetSpellInfo()->Id == SPELL_DIVE_DOWN)
-            {
+            case SPELL_DIVE_DOWN:
                 needRecast = true;
                 checkTimer = 5000;
+                break;
             }
-        }        
+        }
     }
 
     void OnUpdate(Player* player, uint32 diff) override
     {
+        if (!player)
+            return;
+
         if (checkTimer <= diff)
         {
             if (needRecast && player->GetAreaId() == 9333)
@@ -127,9 +138,11 @@ public:
             }
             checkTimer = 5000;
         }
-        else checkTimer -= diff;
+        else
+            checkTimer -= diff;
     }
 };
+
 
 //122500
 struct boss_essence_of_eonar : public BossAI

@@ -1,4 +1,20 @@
-/*scenario_artifact_ruins_of_falanaar*/
+/*
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "PhasingHandler.h"
 #include "ScriptedGossip.h"
 #include "InstanceScenario.h"
@@ -215,14 +231,22 @@ class reach_to_stage_2 : public PlayerScript
 public:
     reach_to_stage_2() : PlayerScript("reach_to_stage_2") {}
 
-    void OnUpdateAreaAlternate(Player* player, uint32 newArea, uint32 /*oldArea*/)
+    void OnUpdateAreaAlternate(Player* player, uint32 newArea, uint32 /*oldArea*/) override
     {
+        if (!player)
+            return;
+
         if (newArea == 8189)
-            if (InstanceScript * instance = player->GetInstanceScript())
+        {
+            if (InstanceScript* instance = player->GetInstanceScript())
+            {
                 if (instance->GetData(DATA_STAGE_1) == NOT_STARTED)
                     instance->SetData(DATA_STAGE_1, DONE);
+            }
+        }
     }
 };
+
 
 struct npc_ravenous_withered_107790 : public ScriptedAI
 {

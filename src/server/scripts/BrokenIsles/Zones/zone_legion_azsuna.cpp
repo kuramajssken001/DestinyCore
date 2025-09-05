@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2017-2018 AshamaneProject <https://github.com/AshamaneProject>
- * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -840,16 +839,22 @@ class spell_rally_the_nightwatchers : public SpellScript
 class ps_quest_rally_the_nightwatchers : public PlayerScript
 {
 public:
-    ps_quest_rally_the_nightwatchers() : PlayerScript("ps_quest_rally_the_nightwatchers") { }
+    ps_quest_rally_the_nightwatchers() : PlayerScript("ps_quest_rally_the_nightwatchers") {}
 
-    void OnQuestAccept(Player* player, Quest const* quest)
+    void OnQuestAccept(Player* player, Quest const* quest) override
     {
+        if (!player || !quest)
+            return;
+
         if (quest->GetQuestId() == 42108)
             player->CastSpell(player, 210554, true);
     }
 
-    void OnUpdateArea(Player* player, Area* newArea, Area* /*oldArea*/)
+    void OnUpdateArea(Player* player, Area* newArea, Area* /*oldArea*/) override
     {
+        if (!player || !newArea)
+            return;
+
         switch (newArea->GetId())
         {
         case 7357:
@@ -862,6 +867,7 @@ public:
         }
     }
 };
+
 
 //QQQ
 class merayl_q42159 : public CreatureScript
@@ -1230,12 +1236,18 @@ public:
 
     void OnQuestAccept(Player* player, Quest const* quest)
     {
+        if (!player || !quest)
+            return;
+
         if (quest->GetQuestId() == 42370)
             player->CastSpell(player, 212782, true);
     }
 
     void OnUpdateArea(Player* player, Area* newArea, Area* /*oldArea*/)
     {
+        if (!player || !newArea)
+            return;
+
         switch (newArea->GetId())
         {
         case 7358:

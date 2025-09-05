@@ -1,7 +1,5 @@
 /*
- * Copyright (C) 2018+ MagicStormProject <https://github.com/MagicStormTeam>
- * Copyright (C) 2017-2018 AshamaneProject <https://github.com/AshamaneProject>
- * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -2139,20 +2137,28 @@ private:
     class QuestInDeepSlumberUseItem : public PlayerScript
     {
     public:
-        QuestInDeepSlumberUseItem() : PlayerScript("QuestInDeepSlumberUseItem") { }
+        QuestInDeepSlumberUseItem() : PlayerScript("QuestInDeepSlumberUseItem") {}
 
-        void OnSuccessfulSpellCast(Player* player, Spell* spell) 
+        void OnSuccessfulSpellCast(Player* player, Spell* spell) override
         {
+            if (!player || !spell || !spell->GetSpellInfo())
+                return;
+
             if (spell->GetSpellInfo()->Id == 206548)
             {
                 if (player->HasQuest(QUEST_IN_DEEP_SLUMBER))
-                {                   
+                {
                     if (Creature* npc = player->FindNearestCreature(NPC_NARALEX_104349, 25.0f, true))
-                        npc->AI()->Talk(1);
-                    //add phase cast spell
+                    {
+                        if (npc->AI())
+                            npc->AI()->Talk(1);
+                    }
+
+                    // Phase cast spell
                     player->CastSpell(player, 206552, true);
-                    //killcredit
+                    // Kill credit
                     player->CastSpell(player, 206553, true);
+
                     PhasingHandler::AddPhase(player, PHASE_IN_DEEP_SLUMBER, true);
 
                     player->CastSpell(player, 206571, true);
@@ -2161,14 +2167,17 @@ private:
             }
         }
 
-        void OnUpdateAreaAlternate(Player* player, uint32 /*newArea*/, uint32 /*oldArea*/)
+        void OnUpdateAreaAlternate(Player* player, uint32 /*newArea*/, uint32 /*oldArea*/) override
         {
-            if (player->GetQuestStatus(QUEST_IN_DEEP_SLUMBER) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(QUEST_IN_DEEP_SLUMBER) == QUEST_STATUS_COMPLETE)
-            {
+            if (!player)
+                return;
+
+            auto status = player->GetQuestStatus(QUEST_IN_DEEP_SLUMBER);
+            if (status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_COMPLETE)
                 PhasingHandler::AddPhase(player, PHASE_IN_DEEP_SLUMBER, true);
-            }
         }
     };
+
     /// spell 206637  conversation NPC 104398
 
     struct npc_bashana_runetotem_104398 : public ScriptedAI
