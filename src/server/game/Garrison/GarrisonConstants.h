@@ -27,7 +27,9 @@ enum GarrisonTimers
 
 enum GarrisonMisc
 {
-    GARRISON_WOD_CURRENCY   = 824,
+    GARRISON_WOD_CURRENCY           = 824,
+    FollowerActivationCost          = (250 * 10000),
+    MaxActiveFollowerAllowedCount   = 20,
 };
 
 enum GarrisonSite

@@ -2609,11 +2609,15 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
 
         void AddGarrisonFollower(uint32 garrFollowerId);
         void AddGarrisonMission(uint32 garrMissionId);
+        void AddGarrisonShipment(uint32 garrShipmentId);
 
         void SendGarrisonInfo() const;
         void SendGarrisonRemoteInfo() const;
         void SendGarrisonBlueprintAndSpecializationData() const;
 
+        void GetGarrisonOpenTalentNpc(ObjectGuid guid);
+        void SendFollowerRecruitmentUI(ObjectGuid guid);
+        void SendShipmentCrafterUI(ObjectGuid guid, uint32 shipmentContainerID);
         // End Garrisons
 
         // Arena

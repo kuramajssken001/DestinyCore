@@ -108,6 +108,10 @@ bool Garrison::LoadFromDB()
     stmt->setUInt8(1, _garrisonType);
     PreparedQueryResult rewardsStmt = CharacterDatabase.Query(stmt);
 
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GARRISON_WORKORDER);
+    stmt->setUInt64(0, lowGuid);
+    PreparedQueryResult workordersStmt = CharacterDatabase.Query(stmt);
+
     if (!garrisonStmt)
         return false;
 
@@ -230,6 +234,26 @@ bool Garrison::LoadFromDB()
         }
     }
 
+    //SELECT id, plot_instance_id, shipment_id, creation_time, complete_time FROM character_garrison_work_order
+    if (workordersStmt)
+    {
+        do
+        {
+            fields = workordersStmt->Fetch();
+            uint64 dbId = fields[0].GetUInt64();
+            uint32 plotInstanceId = fields[1].GetUInt32();
+
+            _workorderIds.insert(plotInstanceId);
+            WorkOrder& workorder = _workorders[dbId];
+            workorder.DatabaseID = dbId;
+            workorder.PlotInstanceID = plotInstanceId;
+            workorder.ShipmentID = fields[2].GetUInt32();
+            workorder.CreationTime = fields[3].GetUInt32();
+            workorder.CompleteTime = fields[4].GetUInt32();
+
+        } while (workordersStmt->NextRow());
+    }
+
     return true;
 }
 
@@ -306,6 +330,22 @@ void Garrison::SaveToDB(CharacterDatabaseTransaction& trans)
             }
         }
     }
+
+    for (auto const& p : _workorders)
+    {
+        WorkOrder const& workorder = p.second;
+        uint8 index = 0;
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_GARRISON_WORKORDER);
+
+        stmt->setUInt64(index++, workorder.DatabaseID);
+        stmt->setUInt64(index++, _owner->GetGUID().GetCounter());
+        stmt->setUInt32(index++, workorder.PlotInstanceID);
+        stmt->setUInt32(index++, workorder.ShipmentID);
+        stmt->setUInt32(index++, workorder.CreationTime);
+        stmt->setUInt32(index++, workorder.CompleteTime);
+
+        trans->Append(stmt);
+    }
 }
 
 void Garrison::DeleteFromDB(CharacterDatabaseTransaction& trans)
@@ -338,6 +378,10 @@ void Garrison::DeleteFromDB(CharacterDatabaseTransaction& trans, ObjectGuid::Low
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER_GARRISON_BUILDINGS);
     stmt->setUInt64(0, guid);
     stmt->setUInt8(1, garrType);
+    trans->Append(stmt);
+
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GARRISON_WORKORDERS);
+    stmt->setUInt64(0, guid);
     trans->Append(stmt);
 }
 
@@ -463,6 +507,67 @@ uint32 Garrison::GetMaxFollowerLevel() const
             maxFollowerLevel = std::max(maxFollowerLevel, itr.second.PacketInfo.FollowerLevel);
 
     return maxFollowerLevel;
+}
+
+void Garrison::ChangeFollowerActivationState(uint64 followerDBID, bool active)
+{
+    Follower* follower = GetFollower(followerDBID);;
+
+    if (active)
+    {
+        if (!_owner->HasEnoughMoney((uint64)GarrisonMisc::FollowerActivationCost))
+            return;
+
+        if (GetNumFollowerActivationsRemaining() < 1)
+            return;
+
+        if (follower)
+        {
+            if (!follower->IsGarrison())
+                return;
+
+            if (GetActiveFollowersCount() >= GarrisonMisc::MaxActiveFollowerAllowedCount)//+ GetFollowersCountBarracksBonus()
+                return;
+
+            _owner->ModifyMoney(-GarrisonMisc::FollowerActivationCost);
+
+            _followerActivationsRemainingToday--;
+            m_NumFollowerActivationRegenTimestamp = time(0);
+
+            follower->PacketInfo.FollowerStatus = follower->PacketInfo.FollowerStatus & ~FOLLOWER_STATUS_INACTIVE;
+
+            WorldPacket l_Data(SMSG_GARRISON_NUM_FOLLOWER_ACTIVATIONS_REMAINING, 12);
+            l_Data << uint32(GetSiteLevel()->GarrSiteID);
+            l_Data << uint32(GetNumFollowerActivationsRemaining());
+            _owner->SendDirectMessage(&l_Data);
+        }
+    }
+    else
+    {
+        if (!_owner->HasEnoughMoney((uint64)GarrisonMisc::FollowerActivationCost))
+            return;
+
+        if (follower)
+        {
+            _owner->ModifyMoney(-GarrisonMisc::FollowerActivationCost);
+
+            follower->PacketInfo.FollowerStatus |= FOLLOWER_STATUS_INACTIVE;
+
+            WorldPacket l_Data(SMSG_GARRISON_REMOVE_FOLLOWER_FROM_BUILDING_RESULT);
+            l_Data << uint64(followerDBID);
+            l_Data << uint32(GarrisonError::GARRISON_SUCCESS);
+            _owner->SendDirectMessage(&l_Data);
+        }
+    }
+
+    if (!follower)
+        return;
+    follower->SendFollowerUpdate(_owner);
+}
+
+uint32 Garrison::GetNumFollowerActivationsRemaining() const
+{
+    return _followerActivationsRemainingToday;
 }
 
 void Garrison::AddMission(uint32 garrMissionId)
@@ -685,6 +790,19 @@ void Garrison::GenerateMissions()
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     SaveToDB(trans);
     CharacterDatabase.CommitTransaction(trans);
+}
+
+Garrison::WorkOrder* Garrison::GetWorkOrder(uint64 dbId)
+{
+    for (auto it = _workorders.begin(); it != _workorders.end(); ++it)
+    {
+        if ((uint32)it->second.DatabaseID == (uint32)dbId)
+        {
+            return &it->second;
+        }
+    }
+
+    return nullptr;
 }
 
 void Garrison::StartMission(uint32 garrMissionId, std::vector<uint64 /*DbID*/> Followers)
@@ -937,4 +1055,34 @@ bool Garrison::Follower::HasAbility(uint32 garrAbilityId) const
     {
         return garrAbility->ID == garrAbilityId;
     }) != PacketInfo.AbilityID.end();
+}
+
+GarrFollowerEntry const* Garrison::Follower::GetEntry() const
+{
+    return sGarrFollowerStore.LookupEntry(PacketInfo.GarrFollowerID);
+}
+
+bool Garrison::Follower::IsShipyard() const
+{
+    GarrFollowerEntry const* l_Entry = GetEntry();
+    return l_Entry && l_Entry->GarrFollowerTypeID == GarrisonFollowerType::FOLLOWER_TYPE_SHIPYARD;
+}
+
+bool Garrison::Follower::IsGarrison() const
+{
+    GarrFollowerEntry const* l_Entry = GetEntry();
+    return l_Entry && (l_Entry->GarrFollowerTypeID == GarrisonFollowerType::FOLLOWER_TYPE_GARRISON || l_Entry->GarrFollowerTypeID == GarrisonFollowerType::FOLLOWER_TYPE_CLASS_HALL);
+}
+
+void Garrison::Follower::SendFollowerUpdate(WorldSession* session) const
+{
+    WorldPackets::Garrison::GarrisonFollowerChangedStatus followerStatus;
+    followerStatus.resultID = uint32(GarrisonError::GARRISON_SUCCESS);
+    followerStatus.followers.push_back(PacketInfo);
+    session->SendPacket(followerStatus.Write());
+}
+
+void Garrison::Follower::SendFollowerUpdate(Player* player) const
+{
+    SendFollowerUpdate(player->GetSession());
 }

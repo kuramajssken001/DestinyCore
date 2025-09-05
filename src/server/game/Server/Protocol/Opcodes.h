@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -20,8 +19,8 @@
 /// @{
 /// \file
 
-#ifndef _OPCODES_H
-#define _OPCODES_H
+#ifndef OPCODES_H
+#define OPCODES_H
 
 #include "Define.h"
 #include <string>
@@ -1076,6 +1075,7 @@ enum OpcodeServer : uint16
     SMSG_GAME_SPEED_SET                               = 0x26AA,
     SMSG_GAME_TIME_SET                                = 0x274B,
     SMSG_GAME_TIME_UPDATE                             = 0x274A,
+    SMSG_GARRISON_FOLLOWER_CATEGORIES                 = 0x2901,
     SMSG_GARRISON_ADD_FOLLOWER_RESULT                 = 0x2902,
     SMSG_GARRISON_ADD_MISSION_RESULT                  = 0x2906,
     SMSG_GARRISON_ASSIGN_FOLLOWER_TO_BUILDING_RESULT  = 0x2918,

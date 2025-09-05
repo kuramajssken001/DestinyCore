@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -544,17 +544,6 @@ WorldPacket const* WorldPackets::Garrison::GarrisonRequestMissionNpc::Write()
     return &_worldPacket;
 }
 
-WorldPacket const* WorldPackets::Garrison::GarrisonResearchTalent::Write()
-{
-    _worldPacket << Result;
-    _worldPacket << GarrTypeID;
-    _worldPacket << TalentID;
-    _worldPacket << ResearchTime;
-    _worldPacket << Flags;
-
-    return &_worldPacket;
-}
-
 WorldPacket const* WorldPackets::Garrison::GarrisonResponseClassSpecCategoryInfo::Write()
 {
     _worldPacket << GarrFollowerTypeID;
@@ -566,4 +555,207 @@ WorldPacket const* WorldPackets::Garrison::GarrisonResponseClassSpecCategoryInfo
     }
 
     return &_worldPacket;
+}
+
+void WorldPackets::Garrison::GarrisonGenerateRecruits::Read()
+{
+    _worldPacket >> NpcGUID;
+    _worldPacket >> TraitID;
+    _worldPacket >> AbiltyID;
+}
+
+WorldPacket const* WorldPackets::Garrison::GarrisonOpenTalentNpc::Write()
+{
+    _worldPacket << NpcGUID;
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Garrison::GarrisonOpenRecruitmentNpc::Write()
+{
+    _worldPacket << NpcGUID;
+    _worldPacket << Unk1;
+    //_worldPacket << Unk2;
+    //_worldPacket << Unk3;
+    if (followers.empty())
+    {
+        for (uint8 l_Itr = 0; l_Itr < 3; ++l_Itr)
+        {
+            GarrisonFollower follower;
+            InsertGarrisonFollower(_worldPacket, follower);
+        }
+    }
+    else
+    {
+        for (GarrisonFollower follower : followers)
+        {
+            InsertGarrisonFollower(_worldPacket, follower);
+        }
+    }
+    _worldPacket << CanRecruitFollower;
+    _worldPacket << Unk4;
+    return &_worldPacket;
+}
+
+void WorldPackets::Garrison::GarrisonRecruitsFollower::Read()
+{
+    _worldPacket >> NpcGUID;
+    _worldPacket >> FollowerID;
+}
+
+WorldPacket const* WorldPackets::Garrison::GarrisonRecruitFollowerResult::Write()
+{
+    _worldPacket << resultID;
+
+    if (followers.empty())
+    {
+        for (uint8 l_Itr = 0; l_Itr < 3; ++l_Itr)
+        {
+            GarrisonFollower follower;
+            InsertGarrisonFollower(_worldPacket, follower);
+        }
+    }
+    else
+    {
+        for (GarrisonFollower follower : followers)
+        {
+            InsertGarrisonFollower(_worldPacket, follower);
+        }
+    }
+
+    return &_worldPacket;
+}
+
+WorldPacket WorldPackets::Garrison::InsertGarrisonFollower(WorldPacket& worldPacket, WorldPackets::Garrison::GarrisonFollower follower)
+{
+    worldPacket << follower.DbID;
+    worldPacket << follower.GarrFollowerID;
+    worldPacket << follower.Quality;
+    worldPacket << follower.FollowerLevel;
+    worldPacket << follower.ItemLevelWeapon;
+    worldPacket << follower.ItemLevelArmor;
+    worldPacket << follower.Xp;
+    worldPacket << follower.Durability;
+    worldPacket << follower.CurrentBuildingID;
+
+    worldPacket << follower.CurrentMissionID;
+    worldPacket << uint32(follower.AbilityID.size());
+    worldPacket << follower.ZoneSupportSpellID;
+    worldPacket << follower.FollowerStatus;
+
+    for (auto it = follower.AbilityID.begin(); it != follower.AbilityID.end(); it++)
+        worldPacket << int32(((const GarrAbilityEntry*)*it)->ID);
+
+    worldPacket << follower.CustomName;
+    return worldPacket;
+}
+
+void WorldPackets::Garrison::GarrisonSetFollowerInactive::Read()
+{
+    _worldPacket >> followerDBID;
+    desActivate = _worldPacket.ReadBit();
+}
+
+WorldPacket const* WorldPackets::Garrison::GarrisonFollowerChangedStatus::Write()
+{
+    _worldPacket << resultID;
+
+    if (!followers.empty())
+    {
+        for (GarrisonFollower follower : followers)
+        {
+            InsertGarrisonFollower(_worldPacket, follower);
+        }
+    }
+
+    return &_worldPacket;
+}
+
+void WorldPackets::Garrison::GarrisonRequestShipmentInfo::Read()
+{
+    _worldPacket >> NpcGUID;
+}
+
+WorldPacket const* WorldPackets::Garrison::GarrisonOpenShipmentNpcFromGossip::Write()
+{
+    _worldPacket << NpcGUID;
+    _worldPacket << ShipmentContainerID;
+    return &_worldPacket;
+}
+
+void WorldPackets::Garrison::GarrisonResearchTalent::Read()
+{
+    _worldPacket >> GarrTalentID;
+}
+
+WorldPacket const* WorldPackets::Garrison::GarrisonResearchTalentResult::Write()
+{
+    _worldPacket << Result;
+    _worldPacket << GarrTypeId;
+    _worldPacket << GarrTalentID;
+    _worldPacket << StartTime;
+    _worldPacket << Unk1;
+    return &_worldPacket;
+}
+
+void WorldPackets::Garrison::GarrisonRequestClassSpecCategoryInfo::Read()
+{
+    _worldPacket >> GarrFollowerTypeId;
+}
+
+WorldPacket const* WorldPackets::Garrison::GarrisonFollowerCategories::Write()
+{
+    _worldPacket << GarrFollowerTypeId;
+    _worldPacket << CategoryInfoCount;
+    if (CategoryInfoCount > 0)
+    {
+        //packet.ReadInt32("GarrClassSpecId", indexes);
+        //packet.ReadInt32("GarrClassSpecPlayerCondId", indexes);
+    }
+    return &_worldPacket;
+}
+
+void WorldPackets::Garrison::GarrisonCreateShipment::Read()
+{
+    _worldPacket >> NpcGUID;
+    _worldPacket >> Count;
+}
+
+WorldPacket const* WorldPackets::Garrison::GarrisonCreateShipmentResponse::Write()
+{
+    _worldPacket << ShipmentID;
+    _worldPacket << ShipmentRecID;
+    _worldPacket << Result;
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Garrison::GarrisonCompleteShipmentResponse::Write()
+{
+    _worldPacket << ShipmentID;
+    _worldPacket << Result;
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Garrison::GarrisonGetShipmentsOfTypeResponse::Write()
+{
+    _worldPacket << ShipmentID;
+    _worldPacket << ShipmentRecID;
+    _worldPacket << CreationTime;
+    _worldPacket << ShipmentDuration;
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Garrison::GarrisonAssignFollowerToBuildingResult::Write()
+{
+    _worldPacket << FollowerDBID;
+    _worldPacket << Result;
+    _worldPacket << PlotInstanceID;
+
+    return &_worldPacket;
+}
+
+void WorldPackets::Garrison::GarrisonAssignFollowerToBuilding::Read()
+{
+    _worldPacket >> NpcGUID;
+    _worldPacket >> PlotInstanceID;
+    _worldPacket >> FollowerDBID;
 }

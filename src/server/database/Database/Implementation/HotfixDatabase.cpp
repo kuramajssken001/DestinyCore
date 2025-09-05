@@ -252,6 +252,17 @@ void HotfixDatabaseConnection::DoPrepareStatements()
     PREPARE_LOCALE_STMT(HOTFIX_SEL_CHR_SPECIALIZATION, "SELECT ID, Name_lang, FemaleName_lang, Description_lang FROM chr_specialization_locale"
         " WHERE locale = ?", CONNECTION_SYNCH);
 
+    // CharShipment.db2
+    PrepareStatement(HOTFIX_SEL_CHR_SHIPMENT, "SELECT ID, TreasureID, Duration, SpellID, DummyItemID, OnCompleteSpellID, ContainerID,  "
+        "GarrFollowerID, MaxShipments, Flags FROM chr_shipment ORDER BY ID DESC", CONNECTION_SYNCH);
+
+    // CharShipmentContainer.db2
+    PrepareStatement(HOTFIX_SEL_CHR_SHIPMENT_CONTAINER, "SELECT ID, PendingText_Lang, Description_Lang, WorkingSpellVisualID, UiTextureKitID,  "
+        "WorkingDisplayInfoID, SmallDisplayInfoID, MediumDisplayInfoID, LargeDisplayInfoID, CrossFactionID, BaseCapacity, GarrBuildingType,"
+        "GarrTypeID, MediumThreshold, LargeThreshold, Faction, CompleteSpellVisualID FROM chr_shipment_container ORDER BY ID DESC", CONNECTION_SYNCH);
+    PREPARE_LOCALE_STMT(HOTFIX_SEL_CHR_SHIPMENT_CONTAINER, "SELECT ID, PendingText_Lang, Description_Lang FROM chr_shipment_container_locale"
+        " WHERE locale = ?", CONNECTION_SYNCH);
+
     // CinematicCamera.db2
     PrepareStatement(HOTFIX_SEL_CINEMATIC_CAMERA, "SELECT ID, SoundID, OriginX, OriginY, OriginZ, OriginFacing, FileDataID FROM cinematic_camera"
         " ORDER BY ID DESC", CONNECTION_SYNCH);

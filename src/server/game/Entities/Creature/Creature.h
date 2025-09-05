@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYCORE_CREATURE_H
-#define TRINITYCORE_CREATURE_H
+#ifndef CREATURE_H
+#define CREATURE_H
 
 #include "Unit.h"
 #include "Common.h"
@@ -363,6 +363,9 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
         void ReenableHealthRegen() { m_disableHealthRegen = false; }
         bool HealthRegenDisabled() const { return m_disableHealthRegen; }
 
+        uint16 GetShipmentContainerID() { return m_shipmentContainerID; }
+        void SetShipmentContainerID(uint16 shipmentContainerID) { m_shipmentContainerID = shipmentContainerID; }
+
         uint8 GetAffixState() const { return GetCreatureTemplate()->AffixState; }
 
         bool disableAffix;
@@ -423,6 +426,8 @@ class TC_GAME_API Creature : public Unit, public GridObject<Creature>, public Ma
 
         bool IsInvisibleDueToDespawn() const override;
         bool CanAlwaysSee(WorldObject const* obj) const override;
+
+        uint16 m_shipmentContainerID;
 
     private:
         bool CheckNoGrayAggroConfig(uint32 playerLevel, uint32 creatureLevel) const; // No aggro from gray creatures

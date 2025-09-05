@@ -16299,6 +16299,7 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
             !spellInfo->HasEffect(DIFFICULTY_NONE, SPELL_EFFECT_APPLY_AURA) &&
             !spellInfo->HasEffect(DIFFICULTY_NONE, SPELL_EFFECT_SUMMON) &&
             !spellInfo->HasEffect(DIFFICULTY_NONE, SPELL_EFFECT_UPDATE_ZONE_AURAS_AND_PHASES) &&
+            !spellInfo->HasEffect(DIFFICULTY_NONE, SPELL_EFFECT_ADD_GARRISON_FOLLOWER) &&
             !spellInfo->HasEffect(DIFFICULTY_NONE, SPELL_EFFECT_DUMMY))
         {
             if (Unit* unit = questGiver->ToUnit())
@@ -29622,6 +29623,16 @@ void Player::AddGarrisonMission(uint32 garrMissionId)
             garrison->AddMission(garrMissionId);
 }
 
+void Player::AddGarrisonShipment(uint32 garrShipmentId)
+{
+    /*
+    if (CharShipmentEntry const* charshipmentEntry = sCharShipmentStore.LookupEntry(garrShipmentId))
+        if(CharShipmentContainerEntry const* charShipmentContainerData = sCharShipmentContainerStore.LookupEntry(charshipmentEntry->ShipmentContainerID))
+            if (Garrison* garrison = GetGarrison((GarrisonType)charShipmentContainerData->GarrTypeID))
+                garrison->AddShipment(garrShipmentId);
+    */
+}
+
 void Player::SendGarrisonInfo() const
 {
     WorldPackets::Garrison::GetGarrisonInfoResult garrisonInfoResult;
@@ -29712,6 +29723,29 @@ void Player::SendGarrisonBlueprintAndSpecializationData() const
         data.BlueprintsKnown = &knownBlueprints;
         SendDirectMessage(data.Write());
     }
+}
+
+void Player::GetGarrisonOpenTalentNpc(ObjectGuid guid)
+{
+    WorldPackets::Garrison::GarrisonOpenTalentNpc openTalentNpc;
+    openTalentNpc.NpcGUID = guid;
+    SendDirectMessage(openTalentNpc.Write());
+}
+
+void Player::SendFollowerRecruitmentUI(ObjectGuid guid)
+{
+    WorldPackets::Garrison::GarrisonOpenRecruitmentNpc recruitmentNpc;
+    recruitmentNpc.NpcGUID = guid;
+    recruitmentNpc.CanRecruitFollower = true;
+    SendDirectMessage(recruitmentNpc.Write());
+}
+
+void Player::SendShipmentCrafterUI(ObjectGuid guid, uint32 shipmentContainerID)
+{
+    WorldPackets::Garrison::GarrisonOpenShipmentNpcFromGossip shipmentNpc;
+    shipmentNpc.NpcGUID = guid;
+    shipmentNpc.ShipmentContainerID = shipmentContainerID;
+    SendDirectMessage(shipmentNpc.Write());
 }
 
 void Player::SendMovementSetCollisionHeight(float height)

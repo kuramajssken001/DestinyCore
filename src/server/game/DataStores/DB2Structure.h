@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITY_DB2STRUCTURE_H
-#define TRINITY_DB2STRUCTURE_H
+#ifndef DB2STRUCTURE_H
+#define DB2STRUCTURE_H
 
 #include "Define.h"
 #include "DBCEnums.h"
@@ -513,6 +513,41 @@ struct CharSectionsEntry
     int8 BaseSection;
     int8 VariationIndex;
     int8 ColorIndex;
+};
+
+struct CharShipmentEntry
+{
+    uint32 ID;
+    uint32 TreasureID;
+    uint32 Duration;
+    uint32 SpellID;
+    uint32 DummyItemID;
+    uint32 OnCompleteSpellID;
+    uint16 ShipmentContainerID;
+    uint16 GarrFollowerID;
+    uint8 MaxShipments;
+    uint8 Flags;
+};
+
+struct CharShipmentContainerEntry
+{
+    uint32 ID;
+    LocalizedString* PendingText_Lang;
+    LocalizedString* Description_Lang;
+    uint32 WorkingSpellVisualID;
+    int16 UiTextureKitID;
+    int16 WorkingDisplayInfoID;
+    int16 SmallDisplayInfoID;
+    int16 MediumDisplayInfoID;
+    int16 LargeDisplayInfoID;
+    int16 CrossFactionID;
+    uint8 BaseCapacity;
+    uint8 GarrBuildingType;
+    uint8 GarrTypeID;
+    uint8 MediumThreshold;
+    uint8 LargeThreshold;
+    uint8 Faction;
+    uint32 CompleteSpellVisualID;
 };
 
 #define MAX_OUTFIT_ITEMS 24

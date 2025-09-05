@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -20,8 +19,8 @@
 /// @{
 /// \file
 
-#ifndef __WORLDSESSION_H
-#define __WORLDSESSION_H
+#ifndef WORLDSESSION_H
+#define WORLDSESSION_H
 
 #include "AsyncCallbackProcessor.h"
 #include "Common.h"
@@ -361,12 +360,29 @@ namespace WorldPackets
         class GarrisonRequestScoutingMap;
         class GarrisonScoutingMapResult;
         class GarrisonAddMissionResult;
+        class GarrisonAssignFollowerToBuilding;
         class GarrisonStartMission;
         class GarrisonStartMissionResult;
         class GarrisonCompleteMission;
         class GarrisonCompleteMissionResult;
         class GarrisonMissionBonusRoll;
         class GarrisonMissionBonusRollResult;
+        class GarrisonGenerateRecruits;
+        class GarrisonOpenTalentNpc;
+        class GarrisonOpenRecruitmentNpc;
+        class GarrisonRecruitsFollower;
+        class GarrisonSetFollowerInactive;
+        class GarrisonFollowerChangedStatus;
+        class GarrisonRequestShipmentInfo;
+        class GarrisonOpenShipmentNpcFromGossip;
+        class GarrisonResearchTalent;
+        class GarrisonResearchTalentResult;
+        class GarrisonRequestClassSpecCategoryInfo;
+        class GarrisonFollowerCategories;
+        class GarrisonCreateShipment;
+        class GarrisonCreateShipmentResponse;
+        class GarrisonGetShipmentsOfTypeResponse;
+        class GarrisonRequestLandingPageShipmentInfo;
     }
 
     namespace Guild
@@ -1898,6 +1914,7 @@ class TC_GAME_API WorldSession
         void HandleGarrisonCancelConstruction(WorldPackets::Garrison::GarrisonCancelConstruction& garrisonCancelConstruction);
         void HandleGarrisonCheckUpgradeable(WorldPackets::Garrison::GarrisonCheckUpgradeable& garrisonCheckUpgradeable);
         void HandleGarrisonUpgrade(WorldPackets::Garrison::GarrisonUpgrade& garrisonUpgrade);
+        void HandleGarrisonAssignFollowerToBuilding(WorldPackets::Garrison::GarrisonAssignFollowerToBuilding& packet);
         void HandleGarrisonRequestBlueprintAndSpecializationData(WorldPackets::Garrison::GarrisonRequestBlueprintAndSpecializationData& garrisonRequestBlueprintAndSpecializationData);
         void HandleGarrisonGetBuildingLandmarks(WorldPackets::Garrison::GarrisonGetBuildingLandmarks& garrisonGetBuildingLandmarks);
         void HandleGarrisonOpenMissionNpc(WorldPackets::Garrison::GarrisonOpenMissionNpcClient& garrisonOpenMissionNpc);
@@ -1905,6 +1922,14 @@ class TC_GAME_API WorldSession
         void HandleGarrisonStartMission(WorldPackets::Garrison::GarrisonStartMission& startMission);
         void HandleGarrisonCompleteMission(WorldPackets::Garrison::GarrisonCompleteMission& completeMission);
         void HandleGarrisonMissionBonusRoll(WorldPackets::Garrison::GarrisonMissionBonusRoll& missionBonusRoll);
+        void HandleRequestLandingPageShipmentInfoOpcode(WorldPackets::Garrison::GarrisonRequestLandingPageShipmentInfo& /*packet*/);
+        void HandleGarrisonGenerateRecruits(WorldPackets::Garrison::GarrisonGenerateRecruits& generateRecruits);
+        void HandleGarrisonRecruitFollower(WorldPackets::Garrison::GarrisonRecruitsFollower& garrisonRecruitsFollower);
+        void HandleGarrisonSetFollowerInactive(WorldPackets::Garrison::GarrisonSetFollowerInactive& garrisonSetFollowerInactive);
+        void HandleGarrisonGetShipmentInfo(WorldPackets::Garrison::GarrisonRequestShipmentInfo& garrisonRequestShipmentInfo);
+        void HandleGarrisonResearchTalent(WorldPackets::Garrison::GarrisonResearchTalent& researchTalent);
+        void HandleGarrisonRequestClassSpecCategoryInfo(WorldPackets::Garrison::GarrisonRequestClassSpecCategoryInfo& requestClassSpecCategoryInfo);
+        void HandleGarrisonCreateShipmentOpcode(WorldPackets::Garrison::GarrisonCreateShipment& createShipment);
 
         // Warden
         void HandleWardenData(WorldPackets::Warden::WardenData& packet);
