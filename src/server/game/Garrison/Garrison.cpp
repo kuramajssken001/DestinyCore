@@ -490,6 +490,53 @@ void Garrison::AddMission(uint32 garrMissionId)
     reward.FollowerXP = 0;
     reward.BonusAbilityID = 0;
     reward.Unknown = 1118739;
+    std::vector<GarrssionMissionReward>* fRewards = sObjectMgr->GetGarrssionMissionReward(garrMissionId);
+    if (fRewards)
+    {
+        Trinity::Containers::RandomShuffle(*fRewards);
+        for (auto _reward : *fRewards)
+        {
+            //   if (_reward.RewardType == GarrisonMission::MissionRewardType::Item)
+            {
+                reward.ItemID = _reward.RewardId;
+                reward.ItemQuantity = _reward.RewardCount;
+            }
+            // if (_reward.RewardType == GarrisonMission::MissionRewardType::Currency)
+            {
+                reward.CurrencyID = _reward.RewardId;
+                reward.CurrencyQuantity = _reward.RewardCount;
+            }
+            break;
+        }
+    }
+    /*
+   RewardPackXCurrencyTypeEntry const* rewardCurrencyEntry = sRewardPackXCurrencyTypeStore.LookupEntry(missionEntry->OvermaxRewardPackID);
+    if (rewardCurrencyEntry)
+    {
+        reward.CurrencyID = rewardCurrencyEntry->CurrencyTypeID;
+        reward.CurrencyQuantity = rewardCurrencyEntry->Quantity;
+    }
+    RewardPackXItemEntry const* rewardItemEntry = sRewardPackXItemStore.LookupEntry(missionEntry->OvermaxRewardPackID);
+    if (rewardCurrencyEntry)
+    {
+        reward.ItemID = rewardItemEntry->ItemID;
+        reward.ItemQuantity = rewardItemEntry->ItemQuantity;
+    }*/
+    if (reward.CurrencyID == 0 && reward.ItemID == 0)
+    {
+        //  if (RewardPackXItemEntry const* rewardItem = sRewardPackXItemStore.LookupEntry(GetRandomRewardId()))
+        //  {
+            //  reward.ItemID = rewardItem->ItemID;
+          //    reward.ItemQuantity = rewardItem->ItemQuantity;
+       //   }
+        if (reward.ItemID == 0)
+        {
+            reward.CurrencyID = 1220;
+            reward.CurrencyQuantity = 100;
+            //reward.ItemID = 140587;
+            //reward.ItemQuantity = 1;
+        }
+    }
     mission.Rewards.push_back(reward);
 
     WorldPackets::Garrison::GarrisonAddMissionResult garrisonAddMissionResult;

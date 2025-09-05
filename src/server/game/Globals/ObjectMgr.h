@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _OBJECTMGR_H
-#define _OBJECTMGR_H
+#ifndef OBJECTMGR_H
+#define OBJECTMGR_H
 
 #include "Common.h"
 #include "ConditionMgr.h"
@@ -928,6 +927,14 @@ struct RaceUnlockRequirement
     uint32 AchievementId;
 };
 
+struct GarrssionMissionReward
+{
+    uint32 MissionId;
+    uint32 RewardType;
+    uint32 RewardId;
+    uint32 RewardCount;
+};
+
 class PlayerDumpReader;
 
 class TC_GAME_API ObjectMgr
@@ -989,6 +996,10 @@ class TC_GAME_API ObjectMgr
         CreatureAddon const* GetCreatureTemplateAddon(uint32 entry) const;
         ItemTemplate const* GetItemTemplate(uint32 entry) const;
         ItemTemplateContainer const* GetItemTemplateStore() const { return &_itemTemplateStore; }
+
+        void LoadGarrssionMissionReward();
+        std::vector<GarrssionMissionReward>* GetGarrssionMissionReward(uint32 id);
+        std::vector<GarrssionMissionReward> GarrssionMissionRewardMap;
 
         ScriptParams const& GetScriptParam(ObjectGuid::LowType lowGuid) { return _scriptParamContainer[lowGuid]; }
         ScriptParams const& GetTemplateScriptParam(uint32 entry) { return _templateScriptParamContainer[entry]; }

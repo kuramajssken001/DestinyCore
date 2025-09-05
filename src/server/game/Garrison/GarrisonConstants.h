@@ -360,4 +360,20 @@ namespace GarrisonMission
     };
 }
 
+namespace ClassHallTalentFlag
+{
+    enum : uint8
+    {
+        CLASS_HALL_TALENT_IN_RESEARCH = 0,
+        CLASS_HALL_TALENT_READY = 1,
+        CLASS_HALL_TALENT_CHANGE = 2,
+    };
+
+    enum MissionRewardType
+    {
+        Item = 0,
+        Currency = 1,
+        Gold = 2,
+    };
+}
 #endif

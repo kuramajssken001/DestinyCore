@@ -3279,6 +3279,48 @@ ItemTemplate const* ObjectMgr::GetItemTemplate(uint32 entry) const
     return nullptr;
 }
 
+void ObjectMgr::LoadGarrssionMissionReward()
+{
+    uint32 oldMSTime = getMSTime();
+
+    for (std::vector<GarrssionMissionReward>::iterator i = GarrssionMissionRewardMap.begin(); i != GarrssionMissionRewardMap.end(); ++i)
+        delete& i;
+    GarrssionMissionRewardMap.clear();
+    //                                                  0             1         2          3 
+    QueryResult result = WorldDatabase.Query("SELECT MissionId, RewardType, RewardId, RewardCount  FROM garrssion_mission_reward");
+
+    if (!result)
+        return;
+
+    do
+    {
+        Field* f = result->Fetch();
+        GarrssionMissionReward* fi = new GarrssionMissionReward;
+        fi->MissionId = f[0].GetUInt32();
+        fi->RewardType = f[1].GetUInt32();
+        fi->RewardId = f[2].GetUInt32();
+        fi->RewardCount = f[3].GetUInt32();
+        GarrssionMissionRewardMap.push_back(*fi);
+
+    } while (result->NextRow());
+
+    TC_LOG_INFO("server.loading", ">> Loaded garrssion_mission_reward in %u ms", GetMSTimeDiffToNow(oldMSTime));
+}
+
+std::vector<GarrssionMissionReward>* ObjectMgr::GetGarrssionMissionReward(uint32 id)
+{
+    std::vector<GarrssionMissionReward> _reward;
+    for (auto& __reward : GarrssionMissionRewardMap)
+    {
+        if (__reward.MissionId == id)
+            _reward.push_back(__reward);
+    }
+    if (_reward.size() > 0)
+        return &_reward;
+    else
+        return nullptr;
+}
+
 void ObjectMgr::LoadVehicleTemplateAccessories()
 {
     uint32 oldMSTime = getMSTime();
@@ -9593,6 +9635,8 @@ void ObjectMgr::LoadGarrisonScriptNames()
     } while (result->NextRow());
 
     TC_LOG_INFO("server.loading", ">> Loaded " SZFMTD " garrison scriptnames in %u ms", _scriptIdsByGarrisonStore.size(), GetMSTimeDiffToNow(oldMSTime));
+
+    LoadGarrssionMissionReward();
 }
 
 uint32 ObjectMgr::GetScriptIdForGarrison(uint32 siteLevelId)
