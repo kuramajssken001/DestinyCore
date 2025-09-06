@@ -494,6 +494,7 @@ void Garrison::AddShipmentFollower(uint32 garrFollowerId)
     follower.PacketInfo.ItemLevelWeapon = followerEntry->ItemLevelWeapon;
     follower.PacketInfo.ItemLevelArmor = followerEntry->ItemLevelArmor;
     follower.PacketInfo.AbilityID = sGarrisonMgr.RollFollowerAbilities(garrFollowerId, followerEntry, follower.PacketInfo.Quality, GetFaction(), true);
+    follower.PacketInfo.Durability = 2;
     follower.PacketInfo.FollowerStatus = 24;
     addFollowerResult.Follower = follower.PacketInfo;
     _owner->SendDirectMessage(addFollowerResult.Write());
