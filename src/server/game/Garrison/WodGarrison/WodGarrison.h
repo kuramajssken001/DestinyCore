@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2017-2018 AshamaneProject <https://github.com/AshamaneProject>
- * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef WodGarrison_h__
-#define WodGarrison_h__
+#ifndef WODGARRISON_H
+#define WODGARRISON_H
 
 #include "Player.h"
 #include "GameObjectData.h"
@@ -77,6 +76,7 @@ public:
     };
 
     explicit WodGarrison(Player* owner);
+    ~WodGarrison() {};
 
     bool LoadFromDB() override;
     void SaveToDB(CharacterDatabaseTransaction& trans) override;
@@ -117,4 +117,4 @@ private:
     std::unordered_set<uint32 /*garrBuildingId*/> _knownBuildings;
 };
 
-#endif // WodGarrison_h__
+#endif

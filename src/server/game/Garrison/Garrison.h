@@ -74,6 +74,8 @@ public:
     };
 
     explicit Garrison(Player* owner);
+    virtual ~Garrison() {};
+
     Player* GetOwner() const { return _owner; }
 
     virtual bool LoadFromDB();
@@ -193,4 +195,4 @@ protected:
     std::unordered_set<uint32> _workorderIds;
 };
 
-#endif // Garrison_h__
+#endif

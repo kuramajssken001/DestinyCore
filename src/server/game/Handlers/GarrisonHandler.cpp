@@ -115,6 +115,7 @@ void WorldSession::HandleGarrisonOpenMissionNpc(WorldPackets::Garrison::Garrison
     else
     {
         WorldPackets::Garrison::GarrisonOpenMissionNpc garrisonOpenMissionNpc;
+        garrisonOpenMissionNpc.garrType = GARRISON_TYPE_GARRISON;
         for (auto const& p : garrison->GetMissions())
         {
             garrisonOpenMissionNpc.Missions.push_back(p.first);

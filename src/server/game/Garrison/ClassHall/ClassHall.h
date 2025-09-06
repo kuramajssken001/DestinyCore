@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2017-2018 AshamaneProject <https://github.com/AshamaneProject>
- * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ClassHall_h__
-#define ClassHall_h__
+#ifndef CLASSHALL_H
+#define CLASSHALL_H
 
 #include "Player.h"
 #include "Garrison.h"
@@ -30,6 +29,7 @@ class TC_GAME_API ClassHall : public Garrison
 public:
 
     explicit ClassHall(Player* owner);
+    ~ClassHall() {};
 
     bool LoadFromDB() override;
     void SaveToDB(CharacterDatabaseTransaction& trans) override;
@@ -40,4 +40,4 @@ public:
     bool IsAllowedArea(AreaTableEntry const* area) const override;
 };
 
-#endif // ClassHall_h__
+#endif
