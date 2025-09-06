@@ -91,8 +91,12 @@ void WorldSession::HandleGarrisonOpenMissionNpc(WorldPackets::Garrison::Garrison
     GarrisonType garType = GARRISON_TYPE_CLASS_HALL; // Todo : differenciate depending of NPC
     switch (garrisonOpenMissionNpcClient.NpcGUID.GetEntry())
     {
-    case 80432:
-    case 81546:
+    case 81546://ALLIANCE
+    case 84224:
+    case 84698:
+    case 80432://HORDE 
+    case 86031:
+    case 85805:
         garType = GARRISON_TYPE_GARRISON;
         break;
     default:

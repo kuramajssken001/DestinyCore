@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -612,7 +611,27 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPackets::Movement::MoveSpline
                 TaxiPathNodeEntry const* node = flight->GetPath()[flight->GetCurrentNode()];
                 flight->SkipCurrentNode();
 
-                GetPlayer()->TeleportTo(curDestNode->ContinentID, node->Loc.X, node->Loc.Y, node->Loc.Z, GetPlayer()->GetOrientation());
+                switch (GetPlayer()->GetMapId())
+                {
+                case 1152:
+                case 1153:
+                case 1158:
+                case 1159:
+                case 1330:
+                case 1331:
+                    if (curDestNode->ContinentID == MAP_DRAENOR)
+                    {
+                        GetPlayer()->SeamlessTeleportToMap(MAP_DRAENOR);
+                        GetPlayer()->CleanupAfterTaxiFlight();
+                        GetPlayer()->SetFallInformation(0, GetPlayer()->GetPositionZ());
+                        if (GetPlayer()->pvpInfo.IsHostile)
+                            GetPlayer()->CastSpell(GetPlayer(), 2479, true);
+                    }
+                    break;
+                default:
+                    GetPlayer()->TeleportTo(curDestNode->ContinentID, node->Loc.X, node->Loc.Y, node->Loc.Z, GetPlayer()->GetOrientation());
+                    break;
+                }
             }
         }
 
@@ -622,6 +641,21 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPackets::Movement::MoveSpline
     // at this point only 1 node is expected (final destination)
     if (GetPlayer()->m_taxi.GetPath().size() != 1)
         return;
+
+    switch (GetPlayer()->GetMapId())
+    {
+    case 1152:
+    case 1153:
+    case 1158:
+    case 1159:
+    case 1330:
+    case 1331:
+        if (GetPlayer()->GetAreaId() != 7004 && GetPlayer()->GetAreaId() != 7078 && GetPlayer()->GetAreaId() != 7086 && GetPlayer()->GetAreaId() != 7103)
+            GetPlayer()->SeamlessTeleportToMap(MAP_DRAENOR);
+        break;
+    default:
+        break;
+    }
 
     GetPlayer()->CleanupAfterTaxiFlight();
     GetPlayer()->SetFallInformation(0, GetPlayer()->GetPositionZ());

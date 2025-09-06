@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2017-2018 AshamaneProject <https://github.com/AshamaneProject>
- * Copyright (C) 2008-2017 TrinityCore <http://www.trinitycore.org/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -26,6 +25,7 @@
 #include "ObjectMgr.h"
 #include "VehicleDefines.h"
 #include "WodGarrison.h"
+#include "MotionMaster.h"
 
 WodGarrison::WodGarrison(Player* owner) : Garrison(owner)
 {
@@ -242,7 +242,17 @@ void WodGarrison::Enter()
 
     if (MapEntry const* map = sMapStore.LookupEntry(_siteLevel->MapID))
         if (int32(_owner->GetMapId()) == map->ParentMapID)
-            _owner->SeamlessTeleportToMap(_siteLevel->MapID);
+        {
+            if (_owner->GetMotionMaster()->GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE)
+            {
+                _owner->GetScheduler().Schedule(Milliseconds(10000), [this](TaskContext context)
+                    {
+                        _owner->SeamlessTeleportToMap(_siteLevel->MapID);
+                    });
+            }
+            else
+                _owner->SeamlessTeleportToMap(_siteLevel->MapID);
+        }
 }
 
 void WodGarrison::Leave()
@@ -259,7 +269,8 @@ void WodGarrison::Leave()
                     return;
 
             Garrison::Leave();
-            _owner->SeamlessTeleportToMap(map->ParentMapID);
+            if (_owner->GetMotionMaster()->GetCurrentMovementGeneratorType() != FLIGHT_MOTION_TYPE)
+                _owner->SeamlessTeleportToMap(map->ParentMapID);
         }
         else // We already have been teleported
             Garrison::Leave();

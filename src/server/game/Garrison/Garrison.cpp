@@ -424,6 +424,7 @@ void Garrison::SetSiteLevel(GarrSiteLevelEntry const* siteLevel)
 {
     _siteLevel = siteLevel;
     AI_Initialize();
+    AI()->OnUpgrade(_owner);
 }
 
 void Garrison::AI_Initialize()
