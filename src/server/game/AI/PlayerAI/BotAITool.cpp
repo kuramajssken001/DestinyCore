@@ -949,9 +949,7 @@ void BotAITeleport::SetTeleport(uint32 mapID, Position& telePos)
 {
 	if (m_Teleporting)
 		return;
-if (mapID)
-if (mapID==1116 || mapID==449 || mapID==489 || mapID==529 || mapID==566 || mapID==638 || mapID==643 || mapID==644 || mapID==645 || mapID==646 || mapID==648 || mapID==654 || mapID==657 || mapID==669 || mapID==670 || mapID==671 || mapID==720 || mapID==725 || mapID==726 || mapID==730 || mapID==732 || mapID==754 || mapID==755 || mapID==757 || mapID==761 || mapID==859 || mapID==860 || mapID==861 || mapID==870 || mapID==938 || mapID==939 || mapID==940 || mapID==959 || mapID==960 || mapID==961 || mapID==962 || mapID==967 || mapID==974 || mapID==994 || mapID==996 || mapID==998 || mapID==1001 || mapID==1004 || mapID==1007 || mapID==1008 || mapID==1009 || mapID==1011 || mapID==1064 || mapID==1098 || mapID==1136)
-return;		
+	
 	m_MapId = mapID;
 	m_TeleportPositon = telePos;
 	m_Teleporting = true;
@@ -963,9 +961,6 @@ void BotAITeleport::SetTeleport(Player* pTarget, float offset)
 	if (m_Teleporting)
 		return;
 	if (!pTarget || !pTarget->GetMap() || !pTarget->IsInWorld() || me->InBattlegroundQueue() || me->InBattleground())
-		return;
-
-if (pTarget->GetMapId()==1116 ||  pTarget->GetMapId()==449 || pTarget->GetMapId()==489 || pTarget->GetMapId()==529 || pTarget->GetMapId()==566 || pTarget->GetMapId()==638 || pTarget->GetMapId()==643 || pTarget->GetMapId()==644 || pTarget->GetMapId()==645 || pTarget->GetMapId()==646 || pTarget->GetMapId()==648 || pTarget->GetMapId()==654 || pTarget->GetMapId()==657 || pTarget->GetMapId()==669 || pTarget->GetMapId()==670 || pTarget->GetMapId()==671 || pTarget->GetMapId()==720 || pTarget->GetMapId()==725 || pTarget->GetMapId()==726 || pTarget->GetMapId()==730 || pTarget->GetMapId()==732 || pTarget->GetMapId()==754 || pTarget->GetMapId()==755 || pTarget->GetMapId()==757 || pTarget->GetMapId()==761 || pTarget->GetMapId()==859 || pTarget->GetMapId()==860 || pTarget->GetMapId()==861 || pTarget->GetMapId()==870 || pTarget->GetMapId()==938 || pTarget->GetMapId()==939 || pTarget->GetMapId()==940 || pTarget->GetMapId()==959 || pTarget->GetMapId()==960 || pTarget->GetMapId()==961 || pTarget->GetMapId()==962 || pTarget->GetMapId()==967 || pTarget->GetMapId()==974 || pTarget->GetMapId()==994 || pTarget->GetMapId()==996 || pTarget->GetMapId()==998 || pTarget->GetMapId()==1001 || pTarget->GetMapId()==1004 || pTarget->GetMapId()==1007 || pTarget->GetMapId()==1008 || pTarget->GetMapId()==1009 || pTarget->GetMapId()==1011 || pTarget->GetMapId()==1064 || pTarget->GetMapId()==1098 || pTarget->GetMapId()==1136)
 		return;
 
 	Position pos = pTarget->GetPosition();
