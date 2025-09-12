@@ -162,7 +162,7 @@ void OpcodeTable::Initialize()
     DEFINE_HANDLER(CMSG_ARTIFACT_ADD_POWER,                                 STATUS_LOGGEDIN,  PROCESS_INPLACE,      &WorldSession::HandleArtifactAddPower);
     DEFINE_HANDLER(CMSG_ARTIFACT_ADD_RELIC_TALENT,                          STATUS_LOGGEDIN,  PROCESS_INPLACE,      &WorldSession::HandleArtifactAddRelicTalent);
     DEFINE_HANDLER(CMSG_ARTIFACT_ATTUNE_PREVIEW_RELIC,                      STATUS_UNHANDLED, PROCESS_THREADUNSAFE, &WorldSession::Handle_NULL);
-    DEFINE_HANDLER(CMSG_ARTIFACT_ATTUNE_SOCKETED_RELIC,                     STATUS_UNHANDLED, PROCESS_THREADUNSAFE, &WorldSession::Handle_NULL);
+    DEFINE_HANDLER(CMSG_ARTIFACT_ATTUNE_SOCKETED_RELIC,                     STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleArtifactAttuneSocketedRelic);
     DEFINE_HANDLER(CMSG_ARTIFACT_SET_APPEARANCE,                            STATUS_LOGGEDIN,  PROCESS_INPLACE,      &WorldSession::HandleArtifactSetAppearance);
     DEFINE_HANDLER(CMSG_ATTACK_STOP,                                        STATUS_LOGGEDIN,  PROCESS_INPLACE,      &WorldSession::HandleAttackStopOpcode);
     DEFINE_HANDLER(CMSG_ATTACK_SWING,                                       STATUS_LOGGEDIN,  PROCESS_INPLACE,      &WorldSession::HandleAttackSwingOpcode);

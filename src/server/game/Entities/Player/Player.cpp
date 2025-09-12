@@ -12280,6 +12280,19 @@ InventoryResult Player::CanUseItem(Item* pItem, bool not_loading) const
             if (getLevel() < pItem->GetRequiredLevel())
                 return EQUIP_ERR_CANT_EQUIP_LEVEL_I;
 
+            if (pItem->GetEntry() == 133755)
+            {
+                uint8 categoryID = ARTIFACT_CATEGORY_PRIMARY;
+                uint32 artifactID = pProto->GetArtifactID();
+
+                if (ArtifactEntry const* entry = sArtifactStore.LookupEntry(artifactID))
+                    categoryID = static_cast<ArtifactCategory>(entry->ArtifactCategoryID);
+
+                if (categoryID == ARTIFACT_CATEGORY_FISHING)
+                    pItem->ActivateFishArtifact(artifactID);
+                return EQUIP_ERR_OK;
+            }
+
             InventoryResult res = CanUseItem(pProto);
             if (res != EQUIP_ERR_OK)
                 return res;
