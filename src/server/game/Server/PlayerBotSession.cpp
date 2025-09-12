@@ -289,59 +289,48 @@ void PlayerBotSession::CastSchedule(uint32 diff)
 
 bool PlayerBotSession::ProcessOnline(BotGlobleSchedule& schedule)
 {
-	if (sPlayerBotMgr->m_MaxOnlineBot <= sPlayerBotMgr->m_BotOnlineCount)
-	{
-		LogoutPlayer(false);
-		return true;
-	}
+    if (schedule.parameter1 <= 0)
+        return true;
+    if (PlayerLoading())
+        return false;
+    if (GetPlayer())
+        return true;
+    PlayerBotBaseInfo* pInfo = sPlayerBotMgr->GetPlayerBotAccountInfo(GetAccountId());
+    if (!pInfo)
+    {
+        pInfo = sPlayerBotMgr->GetAccountBotAccountInfo(GetAccountId());
+        if (!pInfo)
+        {
+            ClearAllSchedule();
+            return false;
+        }
+    }
 
-	if (schedule.parameter1 <= 0)
-		return true;
-	if (PlayerLoading())
-		return false;
-	if (GetPlayer())
-		return true;
-	PlayerBotBaseInfo* pInfo = sPlayerBotMgr->GetPlayerBotAccountInfo(GetAccountId());
-	if (!pInfo)
-	{
-		pInfo = sPlayerBotMgr->GetAccountBotAccountInfo(GetAccountId());
-		if (!pInfo)
-		{
-			ClearAllSchedule();
-			return false;
-		}
-	}
-
-	bool fuction = true;
-	if (schedule.parameter1 > 1)
-		fuction = false;
-	PlayerBotCharBaseInfo& charInfo = (schedule.parameter2 == 0) ? pInfo->GetRandomCharacterByFuction(fuction) : pInfo->GetCharacter(fuction, schedule.parameter2);
-	if (charInfo.guid == 0)
-		return true;
+    bool fuction = true;
+    if (schedule.parameter1 > 1)
+        fuction = false;
+    PlayerBotCharBaseInfo& charInfo = (schedule.parameter2 == 0) ? pInfo->GetRandomCharacterByFuction(fuction) : pInfo->GetCharacter(fuction, schedule.parameter2);
+    if (charInfo.guid == 0)
+        return true;
 
     WorldPacket _worldPacket(CMSG_PLAYER_LOGIN);
     WorldPackets::Character::PlayerLogin cmd(std::move(_worldPacket));
     cmd.Guid = ObjectGuid::Create<HighGuid::Player>(charInfo.guid);
     cmd.FarClip = 0.0f;
     HandlePlayerLoginOpcode(cmd);
-	HandleContinuePlayerLogin();
-	return false;
+    HandleContinuePlayerLogin();
+    return false;
 }
 
 bool PlayerBotSession::ProcessOnlineByGUID(BotGlobleSchedule& schedule)
 {
-    if (sPlayerBotMgr->m_MaxOnlineBot <= sPlayerBotMgr->m_BotOnlineCount)
-    {
-        LogoutPlayer(false);
+    if (schedule.playerGUID <= 0)
         return true;
-    }
+    if (PlayerLoading())
+        return false;
+    if (GetPlayer())
+        return true;
 
-	if (schedule.playerGUID.IsEmpty())
-		return true;
-	if (PlayerLoading())
-		return false;
-	if (GetPlayer())
-		return true;
     WorldPacket _worldPacket(CMSG_PLAYER_LOGIN);
     WorldPackets::Character::PlayerLogin cmd(std::move(_worldPacket));
     cmd.Guid = schedule.playerGUID;
