@@ -1426,11 +1426,17 @@ bool BotAIUsePotion::TryUsePotion()
 bool BotAIUsePotion::TryUseLifeVial()
 {
 	Item* pItem = FindLifeVial();
+
 	if (!pItem)
 		return false;
+
 	SpellCastTargets targets;
 	targets.SetTargetMask(0);
-	if (me->CastItemUseSpell(pItem, targets, ObjectGuid::Empty, 0))
+
+    // Fallback misc array for server-side cast (Bots don't have a client)
+    int32 dummyMisc[2] = { 0, 0 };
+
+	if (me->CastItemUseSpell(pItem, targets, ObjectGuid::Empty, dummyMisc))
 		return true;
 	return false;
 }
@@ -1438,11 +1444,17 @@ bool BotAIUsePotion::TryUseLifeVial()
 bool BotAIUsePotion::TryUseManaVial()
 {
 	Item* pItem = FindManaVial();
+
 	if (!pItem)
 		return false;
+
 	SpellCastTargets targets;
 	targets.SetTargetMask(0);
-	if (me->CastItemUseSpell(pItem, targets, ObjectGuid::Empty, 0))
+
+    // Fallback misc array for server-side cast (Bots don't have a client)
+    int32 dummyMisc[2] = { 0, 0 };
+
+	if (me->CastItemUseSpell(pItem, targets, ObjectGuid::Empty, dummyMisc))
 		return true;
 	return false;
 }
