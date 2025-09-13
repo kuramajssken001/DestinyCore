@@ -359,7 +359,7 @@ void OpcodeTable::Initialize()
     DEFINE_HANDLER(CMSG_DEPOSIT_REAGENT_BANK,                               STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleDepositReagentBankOpcode);
     DEFINE_HANDLER(CMSG_DESTROY_ITEM,                                       STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleDestroyItemOpcode);
     DEFINE_HANDLER(CMSG_DF_BOOT_PLAYER_VOTE,                                STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleLfgSetBootVoteOpcode);
-    DEFINE_HANDLER(CMSG_DF_GET_JOIN_STATUS,                                 STATUS_UNHANDLED, PROCESS_THREADSAFE,   &WorldSession::HandleDFGetJoinStatus);
+    DEFINE_HANDLER(CMSG_DF_GET_JOIN_STATUS,                                 STATUS_LOGGEDIN,  PROCESS_THREADSAFE,   &WorldSession::HandleDFGetJoinStatus);
     DEFINE_HANDLER(CMSG_DF_GET_SYSTEM_INFO,                                 STATUS_LOGGEDIN,  PROCESS_THREADSAFE,   &WorldSession::HandleDFGetSystemInfo);
     DEFINE_HANDLER(CMSG_DF_JOIN,                                            STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleLfgJoinOpcode);
     DEFINE_HANDLER(CMSG_DF_LEAVE,                                           STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleLfgLeaveOpcode);
