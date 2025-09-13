@@ -240,6 +240,7 @@ namespace WorldPackets
         class SetFactionInactive;
         class SetWatchedFaction;
         class SetPlayerDeclinedNames;
+        class SetCurrencyFlags;
 
         enum class LoginFailureReason : uint8;
     }
@@ -1988,6 +1989,9 @@ class TC_GAME_API WorldSession
 
         // Challenge Modes
         void HandleChallengeModeStart(WorldPackets::ChallengeMode::StartRequest& /*start*/);
+
+        // Currency
+        void HandleSetCurrencyFlags(WorldPackets::Character::SetCurrencyFlags& packet);
 
         union ConnectToKey
         {
