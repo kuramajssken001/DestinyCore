@@ -33,6 +33,7 @@
 #include "Bag.h"
 #include "MotionMaster.h"
 #include <cmath>
+#include "TradePackets.h"
 
 float BotUtility::BattlegroundScoreRate = 1.0f;
 float BotUtility::DungeonBotDamageModify = 1.0f;
@@ -1759,8 +1760,9 @@ bool BotAITrade::ProcessTrade()
 	}
 	if (pTraderData->IsAccepted())
 	{
-		//WorldPacket opcode(1);
-		//me->GetSession()->HandleAcceptTrade();
+		WorldPacket opcode(CMSG_ACCEPT_TRADE);
+        WorldPackets::Trade::AcceptTrade acceptTrade(std::move(opcode));
+		me->GetSession()->HandleAcceptTradeOpcode(acceptTrade);
 	}
 	else
 	{
