@@ -24,7 +24,9 @@
 #include "LFGMgr.h"
 #include "CharacterPackets.h"
 #include "DB2Structure.h"
+#include "LFGPackets.h"
 #include "LFGPacketsCommon.h"
+#include "PetitionPackets.h"
 
 PlayerBotSession::PlayerBotSession(uint32 id, std::string& name, uint32 battlenetAccountId, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, std::string&& battlenetAccountName) :
 m_LastCastTime(CAST_SCHEDULE_TICK),
@@ -155,59 +157,52 @@ bool PlayerBotSession::PlayerIsReady()
 
 void PlayerBotSession::ProcessNoWorld(uint32 diff)
 {
-	if (PlayerLoading())
-		return;
-	Player* player = GetPlayer();
-	if (!player)
-		return;
+    if (PlayerLoading())
+        return;
+    Player* player = GetPlayer();
+    if (!player)
+        return;
 
-	if (player->IsInWorld())
-	{
-		m_NoWorldTick = 0;
-		return;
-	}
+    if (player->IsInWorld())
+    {
+        m_NoWorldTick = 0;
+        return;
+    }
 
-	if (player->IsBeingTeleported())
-	{
-        //HandleMoveWorldportAckOpcode;
-        m_NoWorldTick = 1000;
-		return;
-	}
+    if (m_NoWorldTick == 0)
+    {
+        m_NoWorldTick = 2000;
+        return;
+    }
+    m_NoWorldTick -= int32(diff);
+    if (m_NoWorldTick > 0)
+        return;
 
-	if (m_NoWorldTick == 0)
-	{
-		m_NoWorldTick = 2000;
-		return;
-	}
-
-	m_NoWorldTick -= int32(diff);
-	if (m_NoWorldTick > 0)
-		return;
-	if (BotGroupAI* pGroupAI = dynamic_cast<BotGroupAI*>(player->GetAI()))
-	{
-		if (pGroupAI->HasTeleport())
-			pGroupAI->UpdateTeleport(diff);
-		else
-			pGroupAI->SetTeleportToMaster();
-		m_NoWorldTick = 500;
-	}
-	else if (BotBGAI* pGroupAI = dynamic_cast<BotBGAI*>(player->GetAI()))
-	{
-		if (player->InBattleground())
-		{
-			PlayerBotMgr::SwitchPlayerBotAI(player, PlayerBotAIType::PBAIT_FIELD, true);
-			WorldPacket opcode(CMSG_BATTLEFIELD_LEAVE);
-			WorldPackets::Battleground::BattlefieldLeave battlefieldLeave(std::move(opcode));
+    if (BotGroupAI* pGroupAI = dynamic_cast<BotGroupAI*>(player->GetAI()))
+    {
+        if (pGroupAI->HasTeleport())
+            pGroupAI->UpdateTeleport(diff);
+        else
+            pGroupAI->SetTeleportToMaster();
+        m_NoWorldTick = 500;
+    }
+    else if (BotBGAI* pGroupAI = dynamic_cast<BotBGAI*>(player->GetAI()))
+    {
+        if (player->InBattleground())
+        {
+            PlayerBotMgr::SwitchPlayerBotAI(player, PlayerBotAIType::PBAIT_FIELD, true);
+            WorldPacket opcode(CMSG_BATTLEFIELD_LEAVE);
+            WorldPackets::Battleground::BattlefieldLeave battlefieldLeave(std::move(opcode));
             HandleBattlefieldLeaveOpcode(battlefieldLeave);
-		}
-		HandleMoveWorldportAck();
-		m_NoWorldTick = 500;
-	}
-	else// if (BotFieldAI* pGroupAI = dynamic_cast<BotFieldAI*>(player->GetAI()))
-	{
+        }
         HandleMoveWorldportAck();
-		m_NoWorldTick = 500;
-	}
+        m_NoWorldTick = 500;
+    }
+    else// if (BotFieldAI* pGroupAI = dynamic_cast<BotFieldAI*>(player->GetAI()))
+    {
+        HandleMoveWorldportAck();
+        m_NoWorldTick = 500;
+    }
 }
 
 void PlayerBotSession::CastSchedule(uint32 diff)
@@ -700,54 +695,62 @@ bool PlayerBotSession::ProcessInLFGQueue(BotGlobleSchedule& schedule)
 	if (schedule.parameter2 > 3 || schedule.parameter2 == 0)
 		return true;
 
-	//WorldPacket cmd(1);
-	//cmd << schedule.parameter1;
-	//cmd << uint16(0);
-	//cmd << uint8(schedule.parameter2);
-	//if (schedule.parameter2 >= 1)
-	//	cmd << schedule.parameter3;
-	//if (schedule.parameter2 >= 2)
-	//	cmd << schedule.parameter4;
-	//if (schedule.parameter2 >= 3)
-	//	cmd << schedule.parameter5;
-	//cmd << uint32(0);
-	//cmd << "";
-	//HandleLfgJoinOpcode(cmd);
+    WorldPacket packet(CMSG_DF_JOIN, 50);
+    packet << schedule.parameter1;
+    packet << uint16(0);
+    packet << uint8(schedule.parameter2);
+
+	if (schedule.parameter2 >= 1)
+        packet << schedule.parameter3;
+	if (schedule.parameter2 >= 2)
+        packet << schedule.parameter4;
+	if (schedule.parameter2 >= 3)
+        packet << schedule.parameter5;
+    packet << uint32(0);
+    packet << "";
+
+    WorldPackets::LFG::DFJoin joinPacket(std::move(packet));
+    HandleLfgJoinOpcode(joinPacket);
+
 	return true;
 }
 
 bool PlayerBotSession::ProcessOutLFGQueue(BotGlobleSchedule& schedule)
 {
-	//if (PlayerLoading())
-	//	return false;
-	//Player* player = GetPlayer();
-	//if (!player)
-	//{
-	//	ClearAllSchedule();
-	//	return false;
-	//}
-	//if (!player->isUsingLfg())
-	//	return true;
-	//HandleLfgLeaveOpcode(WorldPacket(1));
+	if (PlayerLoading())
+		return false;
+	Player* player = GetPlayer();
+	if (!player)
+	{
+		ClearAllSchedule();
+		return false;
+	}
+	if (!player->isUsingLfg())
+		return true;
+
+    WorldPacket packet(CMSG_DF_LEAVE, 0);
+    WorldPackets::LFG::DFLeave leavePacket(std::move(packet));
+    HandleLfgLeaveOpcode(leavePacket);
+
 	return true;
 }
 
 bool PlayerBotSession::ProcessAcceptLFGProposal(BotGlobleSchedule& schedule)
 {
-	//if (PlayerLoading())
-	//	return false;
-	//if (schedule.parameter1 == 0)
-	//	return true;
-	//Player* player = GetPlayer();
-	//if (!player)
-	//{
-	//	ClearAllSchedule();
-	//	return false;
-	//}
-	//if (!player->isUsingLfg())
-	//	return true;
+	if (PlayerLoading())
+		return false;
+	if (schedule.parameter1 == 0)
+		return true;
+	Player* player = GetPlayer();
+	if (!player)
+	{
+		ClearAllSchedule();
+		return false;
+	}
+	if (!player->isUsingLfg())
+		return true;
 
-	//sLFGMgr->UpdateProposal(schedule.parameter1, player->GetGUID(), (schedule.parameter2 != 0) ? true : false);
+	sLFGMgr->UpdateProposal(schedule.parameter1, player->GetGUID(), (schedule.parameter2 != 0) ? true : false);
 	return true;
 }
 
@@ -767,9 +770,11 @@ bool PlayerBotSession::ProcessOfferPetitionSign(BotGlobleSchedule& schedule)
 	uint64 signGUID = uint64(schedule.parameter1);
 	uint64 highID = uint64(schedule.parameter2) << 32;
 	signGUID |= highID;
-	//WorldPacket cmd(1);
-	//cmd << ObjectGuid(signGUID);
-	//cmd << uint8(1);
-	//HandlePetitionSignOpcode(cmd);
+
+    WorldPacket packet(CMSG_SIGN_PETITION, 0);
+    packet << signGUID;
+    packet << uint8(1);
+    WorldPackets::Petition::SignPetition signPacket(std::move(packet));
+    HandleSignPetition(signPacket);
 	return true;
 }

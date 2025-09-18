@@ -996,8 +996,8 @@ void BotAITeleport::Update(uint32 diff, BotBGAIMovement* pMovement)
 		//me->StopMoving();
 		//return;
 	}
-	//if (me->IsCanDelayTeleport() || me->IsHasDelayedTeleport())
-	//	return;
+	if (me->IsCanDelayTeleport() || me->IsHasDelayedTeleport())
+		return;
 	if (m_TeleportStep > 0)//m_TeleportPositon.m_positionZ != 0)
 	{
 		if (m_TeleportStep == 1)
@@ -1021,7 +1021,7 @@ void BotAITeleport::Update(uint32 diff, BotBGAIMovement* pMovement)
 		}
 		else if (m_TeleportStep == 2)
 		{
-			//me->UpdatePosition(m_TeleportPositon, true);
+			me->UpdatePosition(m_TeleportPositon, true);
 			WorldSession* pSession = me->GetSession();
             WorldPacket opcode2(CMSG_MOVE_TELEPORT_ACK);
             WorldPackets::Movement::MoveTeleportAck pakcet(std::move(opcode2));

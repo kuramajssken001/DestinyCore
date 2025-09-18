@@ -1869,9 +1869,6 @@ void World::SetInitialWorldSettings()
     sPlayerBotTalkMgr->InitializeTalkText();
     sPlayerBotTalkMgr->InitializeStory();
 
-    m_timers[WUPDATE_PLAYERBOT_MGR].SetInterval(IN_MILLISECONDS * 2);
-    m_timers[WUPDATE_FIELDBOT_MGR].SetInterval(IN_MILLISECONDS * 5);
-
     TC_LOG_INFO("server.loading", "Loading AI Way points...");
     if (!sAIWPMgr->LoadAIWaypoints())
     {
@@ -2530,6 +2527,9 @@ void World::SetInitialWorldSettings()
 
     m_timers[WUPDATE_GUILDSAVE].SetInterval(getIntConfig(CONFIG_GUILD_SAVE_INTERVAL) * MINUTE * IN_MILLISECONDS);
 
+    m_timers[WUPDATE_PLAYERBOT_MGR].SetInterval(IN_MILLISECONDS * 2);
+    m_timers[WUPDATE_FIELDBOT_MGR].SetInterval(IN_MILLISECONDS * 5);
+
     m_timers[WUPDATE_BLACKMARKET].SetInterval(10 * IN_MILLISECONDS);
 
     m_timers[WUPDATE_WORLD_QUEST].SetInterval(1 * MINUTE * IN_MILLISECONDS);
@@ -2660,6 +2660,8 @@ void World::SetInitialWorldSettings()
     }
 
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);
+
+    sPlayerBotMgr->UpAllPlayerBotSession();
 
     TC_LOG_INFO("server.worldserver", "World initialized in %u minutes %u seconds", (startupDuration / 60000), ((startupDuration % 60000) / 1000));
 
