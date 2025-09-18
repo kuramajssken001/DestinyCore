@@ -1675,8 +1675,6 @@ void PlayerBotSetting::Initialize()
 	botFlyMountEntrys.insert(32345);
 	botFlyMountEntrys.insert(46199);
 	botFlyMountEntrys.insert(75596);
-
-	TC_LOG_INFO("server.loading", "Initialize all classes trainer talent and spell and equip.");
 }
 
 bool PlayerBotSetting::BindingPlayerHomePosition(Player* player)
