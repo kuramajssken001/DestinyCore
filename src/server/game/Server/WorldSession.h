@@ -589,6 +589,7 @@ namespace WorldPackets
         class StartTimer;
         class StartElapsedTimer;
         class OpenAlliedRaceDetailsGiver;
+        class ShowTradeSkill;
     }
 
     namespace Movement
@@ -1414,6 +1415,7 @@ class TC_GAME_API WorldSession
         void HandleInitiateRolePoll(WorldPackets::Party::InitiateRolePoll& packet);
         void HandleSetEveryoneIsAssistant(WorldPackets::Party::SetEveryoneIsAssistant& packet);
         void HandleClearRaidMarker(WorldPackets::Party::ClearRaidMarker& packet);
+        void HandleShowTradeSkill(WorldPackets::Misc::ShowTradeSkill& packet);
 
         void HandleDeclinePetition(WorldPackets::Petition::DeclinePetition& packet);
         void HandleOfferPetition(WorldPackets::Petition::OfferPetition& packet);
