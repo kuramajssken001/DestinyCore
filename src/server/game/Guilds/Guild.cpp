@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -39,6 +38,7 @@
 #include "SocialMgr.h"
 #include "World.h"
 #include "WorldSession.h"
+#include "ReputationMgr.h"
 
 size_t const MAX_GUILD_BANK_TAB_TEXT_LEN = 500;
 
@@ -704,6 +704,17 @@ void Guild::Member::ResetValues(bool weekly /* = false*/)
         m_weekActivity = 0;
         m_weekReputation = 0;
     }
+}
+
+void Guild::Member::SetReputation(int32 val)
+{
+    m_totalReputation = val;
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_GUILD_MEMBER_REPUTATION);
+    stmt->setUInt32(0, m_guid.GetCounter());
+    stmt->setUInt32(1, m_guildId);
+    stmt->setUInt32(2, m_totalReputation);
+    CharacterDatabase.Execute(stmt);
 }
 
 Player* Guild::Member::FindPlayer() const
@@ -2727,6 +2738,42 @@ bool Guild::AddMember(CharacterDatabaseTransaction& trans, ObjectGuid guid, uint
         m_members[guid] = member;
     }
 
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_GUILD_MEMBER_REPUTATION);
+    stmt->setInt32(0, guid.GetCounter());
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+    if (result)
+    {
+        Field* fields = result->Fetch();
+        uint32 guild = fields[0].GetUInt32();
+        if (guild != GetId())
+        {
+            if (player)
+            {
+                int32 val = 0;
+                if (FactionEntry const* faction = sFactionStore.LookupEntry(GUILD_REPUTATION_ID))
+                {
+                    ReputationRank rank = player->GetReputationMgr().GetRank(faction);
+                    for (int32 r = REP_NEUTRAL; r < rank; ++r)
+                        val += ReputationMgr::PointsInRank[r];
+
+                    player->GetReputationMgr().SetReputation(faction, val);
+                    member->SetReputation(player->GetReputationMgr().GetReputation(faction));
+                }
+            }
+            else
+            {
+                // FIXME
+            }
+        }
+    }
+    else
+    {
+        if (player)
+            if (FactionEntry const* faction = sFactionStore.LookupEntry(GUILD_REPUTATION_ID))
+                player->GetReputationMgr().SetVisible(faction);
+        member->SetReputation(0);
+    }
+
     member->SaveToDB(trans);
 
     _UpdateAccountsNumber();
@@ -2796,6 +2843,9 @@ void Guild::DeleteMember(CharacterDatabaseTransaction& trans, ObjectGuid guid, b
 
         for (GuildPerkSpellsEntry const* entry : sGuildPerkSpellsStore)
             player->RemoveSpell(entry->SpellID, false, false);
+
+        if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(GUILD_REPUTATION_ID))
+            player->GetReputationMgr().SetReputation(factionEntry, 0);
     }
 
     Guild::_DeleteMemberFromDB(trans, guid.GetCounter());
@@ -3501,6 +3551,20 @@ bool Guild::HasAchieved(uint32 achievementId) const
 void Guild::UpdateCriteria(CriteriaTypes type, uint64 miscValue1, uint64 miscValue2, uint64 miscValue3, Unit* unit, Player* player)
 {
     m_achievementMgr.UpdateCriteria(type, miscValue1, miscValue2, miscValue3, unit, player);
+}
+
+void Guild::RewardReputation(Player* player, float val)
+{
+    if (auto member = GetMember(player->GetGUID()))
+    {
+        if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(GUILD_REPUTATION_ID))
+        {
+            // Or just multipla
+            AddPct(val, player->GetTotalAuraModifier(SPELL_AURA_MOD_REPUTATION_GAIN));
+            player->GetReputationMgr().ModifyReputation(factionEntry, val);
+            member->SetReputation(player->GetReputationMgr().GetReputation(GUILD_REPUTATION_ID));
+        }
+    }
 }
 
 void Guild::HandleNewsSetSticky(WorldSession* session, uint32 newsId, bool sticky) const

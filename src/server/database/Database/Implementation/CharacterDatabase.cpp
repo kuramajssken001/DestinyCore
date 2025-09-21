@@ -263,6 +263,9 @@ void CharacterDatabaseConnection::DoPrepareStatements()
                      "ON DUPLICATE KEY UPDATE tab0 = VALUES (tab0), tab1 = VALUES (tab1), tab2 = VALUES (tab2), tab3 = VALUES (tab3), tab4 = VALUES (tab4), tab5 = VALUES (tab5), tab6 = VALUES (tab6), tab7 = VALUES (tab7)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_INS_GUILD_MEMBER_WITHDRAW_MONEY, "INSERT INTO guild_member_withdraw (`guid`, money) VALUES (?, ?) ON DUPLICATE KEY UPDATE money = VALUES (money)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_GUILD_MEMBER_WITHDRAW, "DELETE FROM guild_member_withdraw", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_SEL_GUILD_MEMBER_REPUTATION, "SELECT guild, reputation FROM guild_reputation WHERE guid = ?", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_REP_GUILD_MEMBER_REPUTATION, "REPLACE INTO guild_reputation (guid, guild, reputation) VALUES (?,?,?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_GUILD_MEMBER_REPUTATION, "DELETE FROM guild_reputation WHERE guid = ?", CONNECTION_ASYNC);
 
     // 0: uint32, 1: uint32, 2: uint32
     PrepareStatement(CHAR_SEL_CHAR_DATA_FOR_GUILD, "SELECT name, level, class, gender, zone, account FROM characters WHERE `guid` = ?", CONNECTION_SYNCH);

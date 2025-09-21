@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYCORE_GUILD_H
-#define TRINITYCORE_GUILD_H
+#ifndef GUILD_H
+#define GUILD_H
 
 #include "AchievementMgr.h"
 #include "DatabaseEnvFwd.h"
@@ -56,6 +55,7 @@ enum GuildMisc
     GUILD_WITHDRAW_SLOT_UNLIMITED       = 0xFFFFFFFF,
     GUILD_EVENT_LOG_GUID_UNDEFINED      = 0xFFFFFFFF,
     TAB_UNDEFINED                       = 0xFF,
+    GUILD_REPUTATION_ID                 = 1168,
     GUILD_OLD_MAX_LEVEL                 = 25
 };
 
@@ -394,6 +394,8 @@ class TC_GAME_API Guild
 
                 Player* FindPlayer() const;
                 Player* FindConnectedPlayer() const;
+
+                void SetReputation(int32 val);
 
             private:
                 ObjectGuid::LowType m_guildId;
@@ -877,6 +879,8 @@ class TC_GAME_API Guild
             }
             return guids;
         }
+
+        void RewardReputation(Player* player, float rep);
 
     protected:
         ObjectGuid::LowType m_id;

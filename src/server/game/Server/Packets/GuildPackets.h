@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef GuildPackets_h__
-#define GuildPackets_h__
+#ifndef GUILDPACKETS_H
+#define GUILDPACKETS_H
 
 #include "Packet.h"
 #include "ItemPacketsCommon.h"
@@ -1100,6 +1100,16 @@ namespace WorldPackets
 
             ObjectGuid GuildGUID;
             std::string GuildName;
+        };
+
+        class GuildReputationReactionChanged final : public ServerPacket
+        {
+        public:
+            GuildReputationReactionChanged() : ServerPacket(SMSG_GUILD_REPUTATION_REACTION_CHANGED, 16) {}
+
+            WorldPacket const* Write() override;
+
+            ObjectGuid MemberGUID;
         };
     }
 }
