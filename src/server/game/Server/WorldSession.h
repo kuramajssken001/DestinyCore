@@ -204,6 +204,7 @@ namespace WorldPackets
     {
         class StartRequest;
         class ChangePlayerDifficultyResult;
+        class RequestLeaders;
         class Start;
         class Reset;
         class UpdateDeathCount;
@@ -1991,6 +1992,7 @@ class TC_GAME_API WorldSession
 
         // Challenge Modes
         void HandleChallengeModeStart(WorldPackets::ChallengeMode::StartRequest& /*start*/);
+        void HandleRequestLeaders(WorldPackets::ChallengeMode::RequestLeaders& packet);
 
         // Currency
         void HandleSetCurrencyFlags(WorldPackets::Character::SetCurrencyFlags& packet);

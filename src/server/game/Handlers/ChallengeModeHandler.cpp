@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 AshamaneProject <https://github.com/AshamaneProject>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -21,6 +21,65 @@
 #include "Log.h"
 #include "Player.h"
 #include "WorldSession.h"
+#include "ChallengeModeMgr.h"
+
+void WorldSession::HandleRequestLeaders(WorldPackets::ChallengeMode::RequestLeaders& packet)
+{
+    WorldPackets::ChallengeMode::RequestLeadersResult result;
+    result.MapID = packet.MapId;
+    result.ChallengeID = packet.ChallengeID;
+
+    result.LastGuildUpdate = time(nullptr);
+    result.LastRealmUpdate = time(nullptr);
+
+    if (auto bestGuild = sChallengeModeMgr->BestGuildChallenge(_player->GetGuildId(), packet.ChallengeID))
+    {
+        for (auto itr = bestGuild->member.begin(); itr != bestGuild->member.end(); ++itr)
+        {
+            WorldPackets::ChallengeMode::ModeAttempt guildLeaders;
+            guildLeaders.InstanceRealmAddress = GetVirtualRealmAddress();
+            guildLeaders.AttemptID = bestGuild->ID;
+            guildLeaders.CompletionTime = bestGuild->RecordTime;
+            guildLeaders.CompletionDate = bestGuild->Date;
+            guildLeaders.MedalEarned = bestGuild->ChallengeLevel;
+
+            for (auto const& v : bestGuild->member)
+            {
+                WorldPackets::ChallengeMode::ModeAttempt::Member memberData;
+                memberData.VirtualRealmAddress = GetVirtualRealmAddress();
+                memberData.NativeRealmAddress = GetVirtualRealmAddress();
+                memberData.Guid = v.guid;
+                memberData.SpecializationID = v.specId;
+                guildLeaders.Members.emplace_back(memberData);
+            }
+
+            result.GuildLeaders.emplace_back(guildLeaders);
+        }
+    }
+
+    if (ChallengeData* bestServer = sChallengeModeMgr->BestServerChallenge(packet.ChallengeID))
+    {
+        WorldPackets::ChallengeMode::ModeAttempt realmLeaders;
+        realmLeaders.InstanceRealmAddress = GetVirtualRealmAddress();
+        realmLeaders.AttemptID = bestServer->ID;
+        realmLeaders.CompletionTime = bestServer->RecordTime;
+        realmLeaders.CompletionDate = bestServer->Date;
+        realmLeaders.MedalEarned = bestServer->ChallengeLevel;
+
+        for (auto const& v : bestServer->member)
+        {
+            WorldPackets::ChallengeMode::ModeAttempt::Member memberData;
+            memberData.VirtualRealmAddress = GetVirtualRealmAddress();
+            memberData.NativeRealmAddress = GetVirtualRealmAddress();
+            memberData.Guid = v.guid;
+            memberData.SpecializationID = v.specId;
+            realmLeaders.Members.emplace_back(memberData);
+        }
+        result.RealmLeaders.push_back(realmLeaders);
+    }
+
+    SendPacket(result.Write());
+}
 
 void WorldSession::HandleChallengeModeStart(WorldPackets::ChallengeMode::StartRequest& start)
 {

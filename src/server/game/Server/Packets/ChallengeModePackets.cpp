@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 AshamaneProject <https://github.com/AshamaneProject>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -16,6 +16,26 @@
  */
 
 #include "ChallengeModePackets.h"
+#include "WowTime.hpp"
+
+ByteBuffer& operator<<(ByteBuffer& data, WorldPackets::ChallengeMode::ModeAttempt const& modeAttempt)
+{
+    data << modeAttempt.InstanceRealmAddress;
+    data << modeAttempt.AttemptID;
+    data << modeAttempt.CompletionTime;
+    data << MS::Utilities::WowTime::Encode(modeAttempt.CompletionDate);
+    data << modeAttempt.MedalEarned;
+    data << static_cast<uint32>(modeAttempt.Members.size());
+    for (auto const& map : modeAttempt.Members)
+    {
+        data << map.VirtualRealmAddress;
+        data << map.NativeRealmAddress;
+        data << map.Guid;
+        data << map.SpecializationID;
+    }
+
+    return data;
+}
 
 void WorldPackets::ChallengeMode::StartRequest::Read()
 {
@@ -43,6 +63,33 @@ WorldPacket const* WorldPackets::ChallengeMode::ChangePlayerDifficultyResult::Wr
             break;
         }
     }
+
+    return &_worldPacket;
+}
+
+void WorldPackets::ChallengeMode::RequestLeaders::Read()
+{
+    _worldPacket >> MapId;
+    _worldPacket >> ChallengeID;
+    LastGuildUpdate = _worldPacket.read<uint32>();
+    LastRealmUpdate = _worldPacket.read<uint32>();
+}
+
+WorldPacket const* WorldPackets::ChallengeMode::RequestLeadersResult::Write()
+{
+    _worldPacket << MapID;
+    _worldPacket << ChallengeID;
+    _worldPacket << MS::Utilities::WowTime::Encode(LastGuildUpdate);
+    _worldPacket << MS::Utilities::WowTime::Encode(LastRealmUpdate);
+
+    _worldPacket << static_cast<uint32>(GuildLeaders.size());
+    _worldPacket << static_cast<uint32>(RealmLeaders.size());
+
+    for (auto const& guildLeaders : GuildLeaders)
+        _worldPacket << guildLeaders;
+
+    for (auto const& realmLeaders : RealmLeaders)
+        _worldPacket << realmLeaders;
 
     return &_worldPacket;
 }

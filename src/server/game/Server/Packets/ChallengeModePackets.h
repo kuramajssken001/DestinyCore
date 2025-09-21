@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017-2018 AshamaneProject <https://github.com/AshamaneProject>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ChallengeModePackets_h__
-#define ChallengeModePackets_h__
+#ifndef CHALLENGEMODEPACKETS_H
+#define CHALLENGEMODEPACKETS_H
 
 #include "Packet.h"
 #include "WorldSession.h"
@@ -25,6 +25,64 @@ namespace WorldPackets
 {
     namespace ChallengeMode
     {
+        struct ModeAttempt
+        {
+            struct Member
+            {
+                ObjectGuid Guid;
+                uint32 VirtualRealmAddress = 0;
+                uint32 NativeRealmAddress = 0;
+                uint32 SpecializationID = 0;
+            };
+
+            uint32 InstanceRealmAddress = 0;
+            uint32 AttemptID = 0;
+            uint32 CompletionTime = 0;
+            time_t CompletionDate = time(nullptr);
+            uint32 MedalEarned = 0;
+            std::vector<Member> Members;
+        };
+
+        struct ItemReward
+        {
+            uint32 ItemID = 0;
+            uint32 ItemDisplayID = 0;
+            uint32 Quantity = 0;
+        };
+
+        struct CurrencyReward
+        {
+            CurrencyReward(uint32 ID, uint32 count) : CurrencyID(ID), Quantity(count) {}
+
+            uint32 CurrencyID = 0;
+            uint32 Quantity = 0;
+        };
+
+        struct MapChallengeModeReward
+        {
+            struct ChallengeModeReward
+            {
+                std::vector<ItemReward> ItemRewards;
+                uint32 Money = 0;
+                std::vector<CurrencyReward> CurrencyRewards;
+            };
+
+            uint32 MapId = 0;
+            std::vector<ChallengeModeReward> Rewards;
+        };
+
+        struct ChallengeModeMap
+        {
+            uint32 MapId = 0;
+            uint32 BestCompletionMilliseconds = 0;
+            uint32 LastCompletionMilliseconds = 0;
+            uint32 CompletedChallengeLevel = 0;
+            uint32 ChallengeID = 0;
+            time_t BestMedalDate = time(nullptr);
+            std::vector<uint16> BestSpecID;
+            std::array<uint32, 3> Affixes;
+        };
+
         class StartRequest final : public ClientPacket
         {
         public:
@@ -114,7 +172,35 @@ namespace WorldPackets
             uint32 Duration;
             uint32 ChallengeLevel;
         };
+
+        class RequestLeaders final : public ClientPacket
+        {
+        public:
+            RequestLeaders(WorldPacket&& packet) : ClientPacket(CMSG_CHALLENGE_MODE_REQUEST_LEADERS, std::move(packet)) {}
+
+            void Read() override;
+
+            uint32 MapId = 0;
+            uint32 ChallengeID = 0;
+            time_t LastGuildUpdate = time(nullptr);
+            time_t LastRealmUpdate = time(nullptr);
+        };
+
+        class RequestLeadersResult final : public ServerPacket
+        {
+        public:
+            RequestLeadersResult() : ServerPacket(SMSG_CHALLENGE_MODE_REQUEST_LEADERS_RESULT, 20 + 8) {}
+
+            WorldPacket const* Write() override;
+
+            uint32 MapID = 0;
+            uint32 ChallengeID = 0;
+            time_t LastGuildUpdate = time(nullptr);
+            time_t LastRealmUpdate = time(nullptr);
+            std::vector<ModeAttempt> GuildLeaders;
+            std::vector<ModeAttempt> RealmLeaders;
+        };
     }
 }
 
-#endif // ChallengeModePackets_h__
+#endif
