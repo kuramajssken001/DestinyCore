@@ -524,6 +524,34 @@ void WorldSession::HandleGuildNewsUpdateSticky(WorldPackets::Guild::GuildNewsUpd
         guild->HandleNewsSetSticky(this, packet.NewsID, packet.Sticky);
 }
 
+void WorldSession::HandleQueryRecipes(WorldPackets::Guild::QueryRecipes& /*packet*/)
+{
+    Guild* guild = _player->GetGuild();
+    if (!guild)
+        return;
+
+    Guild::KnownRecipesMap recipesMap = guild->GetGuildRecipes();
+
+    auto data = new WorldPacket(SMSG_GUILD_KNOWN_RECIPES, 2 + recipesMap.size() * (300 + 4));
+    uint32 pos = data->wpos();
+    uint32 count = 0;
+    *data << uint32(count);
+
+    for (Guild::KnownRecipesMap::const_iterator itr = recipesMap.begin(); itr != recipesMap.end(); ++itr)
+    {
+        if (itr->second.IsEmpty())
+            continue;
+
+        *data << uint32(itr->first);
+        data->append(itr->second.recipesMask, KNOW_RECIPES_MASK_SIZE);
+        ++count;
+    }
+
+    data->put<uint32>(pos, count);
+
+    _player->SendDirectMessage(data);
+}
+
 void WorldSession::HandleQueryGuildMembersForRecipe(WorldPackets::Guild::QueryGuildMembersForRecipe& packet)
 {
     if (Guild* guild = _player->GetGuild())

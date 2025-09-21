@@ -883,6 +883,11 @@ WorldPacket const* WorldPackets::Guild::PlayerSaveGuildEmblem::Write()
     return &_worldPacket;
 }
 
+void WorldPackets::Guild::QueryRecipes::Read()
+{
+    _worldPacket >> GuildGUID;
+}
+
 void WorldPackets::Guild::QueryMemberRecipes::Read()
 {
     _worldPacket >> GuildMember;
