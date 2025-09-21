@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -523,6 +522,12 @@ void WorldSession::HandleGuildNewsUpdateSticky(WorldPackets::Guild::GuildNewsUpd
 {
     if (Guild* guild = GetPlayer()->GetGuild())
         guild->HandleNewsSetSticky(this, packet.NewsID, packet.Sticky);
+}
+
+void WorldSession::HandleQueryGuildMembersForRecipe(WorldPackets::Guild::QueryGuildMembersForRecipe& packet)
+{
+    if (Guild* guild = _player->GetGuild())
+        guild->SendGuildMembersForRecipeResponse(this, packet.SkillLineID, packet.SpellID);
 }
 
 void WorldSession::HandleGuildReplaceGuildMaster(WorldPackets::Guild::GuildReplaceGuildMaster& /*replaceGuildMaster*/)

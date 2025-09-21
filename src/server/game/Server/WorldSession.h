@@ -435,6 +435,7 @@ namespace WorldPackets
         class GuildChallengeUpdateRequest;
         class SaveGuildEmblem;
         class GuildSetAchievementTracking;
+        class QueryGuildMembersForRecipe;
     }
 
     namespace GuildFinder
@@ -1457,6 +1458,7 @@ class TC_GAME_API WorldSession
         void HandleGuildRequestPartyState(WorldPackets::Guild::RequestGuildPartyState& packet);
         void HandleGuildChallengeUpdateRequest(WorldPackets::Guild::GuildChallengeUpdateRequest& packet);
         void HandleDeclineGuildInvites(WorldPackets::Guild::DeclineGuildInvites& packet);
+        void HandleQueryGuildMembersForRecipe(WorldPackets::Guild::QueryGuildMembersForRecipe& packet);
 
         void HandleGuildFinderAddRecruit(WorldPackets::GuildFinder::LFGuildAddRecruit& lfGuildAddRecruit);
         void HandleGuildFinderBrowse(WorldPackets::GuildFinder::LFGuildBrowse& lfGuildBrowse);

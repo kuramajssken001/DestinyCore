@@ -323,8 +323,23 @@ typedef std::vector <GuildBankRightsAndSlots> GuildBankRightsAndSlotsVec;
 
 typedef std::set <uint8> SlotIds;
 
+#define KNOW_RECIPES_MASK_SIZE 300
+
 class TC_GAME_API Guild
 {
+    struct KnownRecipes
+    {
+        KnownRecipes();
+        void Clear();
+        bool IsEmpty() const;
+
+        void GenerateMask(uint32 skillId, std::set<uint32> const& spells);
+        std::string GetMaskForSave() const;
+        void LoadFromString(std::string const& str);
+
+        uint8 recipesMask[KNOW_RECIPES_MASK_SIZE];
+    };
+
     public:
     Ashamane::AnyData Variables;
 
@@ -332,6 +347,29 @@ class TC_GAME_API Guild
         // Class representing guild member
         class Member
         {
+            friend class Guild;
+
+            struct RemainingValue
+            {
+                RemainingValue();
+
+                uint32 value;
+                uint32 resetTime;
+            };
+
+            struct ProfessionInfo
+            {
+                ProfessionInfo(uint32 _skillId, uint32 _skillValue, uint32 _skillRank);
+                ProfessionInfo();
+
+                uint32 skillId;
+                uint32 skillValue;
+                uint32 skillRank;
+                KnownRecipes knownRecipes;
+
+                void GenerateRecipesMask(std::set<uint32> const& spells);
+            };
+
             public:
 
                 Ashamane::AnyData Variables;
@@ -372,6 +410,7 @@ class TC_GAME_API Guild
                 uint64 GetWeekActivity() const { return m_weekActivity; }
                 uint32 GetTotalReputation() const { return m_totalReputation; }
                 uint32 GetWeekReputation() const { return m_weekReputation; }
+                ProfessionInfo const& GetProfessionInfo(uint32 index) const { return m_professionInfo[index]; }
 
                 std::set<uint32> GetTrackedCriteriaIds() const { return m_trackedCriteriaIds; }
                 void SetTrackedCriteriaIds(std::set<uint32> criteriaIds) { m_trackedCriteriaIds.swap(criteriaIds); }
@@ -423,6 +462,7 @@ class TC_GAME_API Guild
                 uint64 m_weekActivity;
                 uint32 m_totalReputation;
                 uint32 m_weekReputation;
+                ProfessionInfo m_professionInfo[MAX_GUILD_PROFESSIONS];
         };
 
         // Base class for event entries
@@ -736,6 +776,8 @@ class TC_GAME_API Guild
         typedef std::vector<BankTab*> BankTabs;
 
     public:
+        typedef std::map<uint32, KnownRecipes> KnownRecipesMap;
+
         static void SendCommandResult(WorldSession* session, GuildCommandType type, GuildCommandError errCode, std::string const& param = "");
         static void SendSaveEmblemResult(WorldSession* session, GuildEmblemError errCode);
 
@@ -809,6 +851,9 @@ class TC_GAME_API Guild
         void SendEventNewLeader(Member* newLeader, Member* oldLeader, bool isSelfPromoted = false) const;
         void SendEventPlayerLeft(Member* leaver, Member* remover = nullptr, bool isRemoved = false) const;
         void SendEventPresenceChanged(WorldSession* session, bool loggedOn, bool broadcast = false) const;
+        KnownRecipesMap const& GetGuildRecipes();
+        KnownRecipes& GetGuildRecipes(uint32 skillId);
+        void SendGuildMembersForRecipeResponse(WorldSession* session, uint32 skillId, uint32 spellId);
 
         // Load from DB
         bool LoadFromDB(Field* fields);
@@ -903,6 +948,10 @@ class TC_GAME_API Guild
         LogHolder* m_bankEventLog[GUILD_BANK_MAX_TABS + 1];
         LogHolder* m_newsLog;
         GuildAchievementMgr m_achievementMgr;
+
+        std::recursive_mutex m_guildRecipeslock;
+
+        KnownRecipesMap _guildRecipes;
 
     private:
         inline uint8 _GetRanksSize() const { return uint8(m_ranks.size()); }

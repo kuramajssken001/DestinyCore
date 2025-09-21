@@ -627,6 +627,32 @@ namespace WorldPackets
             std::string NewName;
         };
 
+        class QueryGuildMembersForRecipeReponse final : public ServerPacket
+        {
+        public:
+            QueryGuildMembersForRecipeReponse() : ServerPacket(SMSG_GUILD_MEMBERS_WITH_RECIPE, 12) {}
+
+            WorldPacket const* Write() override;
+
+            GuidList Member;
+            uint32 SpellID = 0;
+            uint32 SkillLineID = 0;
+        };
+
+        class GuildMemberRecipes final : public ServerPacket
+        {
+        public:
+            GuildMemberRecipes() : ServerPacket(SMSG_GUILD_MEMBER_RECIPES, 16 + 12 + 300) {}
+
+            WorldPacket const* Write() override;
+
+            ObjectGuid Member;
+            uint32 SkillLineID = 0;
+            uint32 SkillRank = 0;
+            uint32 SkillStep = 0;
+            std::array<uint8, KNOW_RECIPES_MASK_SIZE> SkillLineBitArray;
+        };
+
         class GuildFlaggedForRename final : public ServerPacket
         {
         public:
@@ -1079,6 +1105,19 @@ namespace WorldPackets
             WorldPacket const* Write() override;
 
             int32 Error = 0;
+        };
+
+        class QueryGuildMembersForRecipe final : public ClientPacket
+        {
+        public:
+            QueryGuildMembersForRecipe(WorldPacket&& packet) : ClientPacket(CMSG_GUILD_QUERY_MEMBERS_FOR_RECIPE, std::move(packet)) { }
+
+            void Read() override;
+
+            ObjectGuid GuildGUID;
+            uint32 SkillLineID = 0;
+            uint32 SpellID = 0;
+            uint32 UniqueBit = 0;
         };
 
         class GuildSetAchievementTracking final : public ClientPacket

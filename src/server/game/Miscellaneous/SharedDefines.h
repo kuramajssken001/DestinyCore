@@ -22,6 +22,8 @@
 #include "Define.h"
 #include "DetourNavMesh.h"
 
+const auto MAX_GUILD_PROFESSIONS = 2;
+
 enum SpellEffIndex : uint8
 {
     EFFECT_0 = 0,

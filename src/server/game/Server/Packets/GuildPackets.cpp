@@ -482,6 +482,30 @@ void WorldPackets::Guild::GuildChangeNameRequest::Read()
     NewName = _worldPacket.ReadString(nameLen);
 }
 
+
+WorldPacket const* WorldPackets::Guild::QueryGuildMembersForRecipeReponse::Write()
+{
+    _worldPacket << SkillLineID;
+    _worldPacket << SpellID;
+    _worldPacket << static_cast<uint32>(Member.size());
+    for (auto const& v : Member)
+        _worldPacket << v;
+
+    return &_worldPacket;
+}
+
+WorldPacket const* WorldPackets::Guild::GuildMemberRecipes::Write()
+{
+    _worldPacket << Member;
+    _worldPacket << SkillLineID;
+    _worldPacket << SkillRank;
+    _worldPacket << SkillStep;
+    for (auto const& v : SkillLineBitArray)
+        _worldPacket << v;
+
+    return &_worldPacket;
+}
+
 WorldPacket const* WorldPackets::Guild::GuildFlaggedForRename::Write()
 {
     _worldPacket.WriteBit(FlagSet);
@@ -857,6 +881,14 @@ WorldPacket const* WorldPackets::Guild::PlayerSaveGuildEmblem::Write()
     _worldPacket << int32(Error);
 
     return &_worldPacket;
+}
+
+void WorldPackets::Guild::QueryGuildMembersForRecipe::Read()
+{
+    _worldPacket >> GuildGUID;
+    _worldPacket >> SkillLineID;
+    _worldPacket >> SpellID;
+    _worldPacket >> UniqueBit;
 }
 
 void WorldPackets::Guild::GuildSetAchievementTracking::Read()
