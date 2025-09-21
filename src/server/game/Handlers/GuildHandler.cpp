@@ -131,6 +131,12 @@ void WorldSession::HandleGuildUpdateMotdText(WorldPackets::Guild::GuildUpdateMot
         guild->HandleSetMOTD(this, packet.MotdText);
 }
 
+void WorldSession::HandleShiftRank(WorldPackets::Guild::GuildShiftRank& packet)
+{
+    if (Guild* guild = GetPlayer()->GetGuild())
+        guild->HandleShiftRank(this, packet.RankOrder, packet.ShiftUp);
+}
+
 void WorldSession::HandleGuildSetMemberNote(WorldPackets::Guild::GuildSetMemberNote& packet)
 {
     TC_LOG_DEBUG("guild", "CMSG_GUILD_SET_NOTE [%s]: Target: %s, Note: %s, Public: %u",

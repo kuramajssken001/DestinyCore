@@ -823,6 +823,7 @@ class TC_GAME_API Guild
         void HandleSetMemberRank(WorldSession* session, ObjectGuid guid, ObjectGuid setterGuid, uint32 rank);
         void HandleAddNewRank(WorldSession* session, std::string const& name);
         void HandleRemoveRank(WorldSession* session, uint8 rankId);
+        void HandleShiftRank(WorldSession* session, uint32 id, bool up);
         void HandleMemberDepositMoney(WorldSession* session, uint64 amount, bool cashFlow = false);
         bool HandleMemberWithdrawMoney(WorldSession* session, uint64 amount, bool repair = false);
         void HandleMemberLogout(WorldSession* session);
@@ -851,6 +852,7 @@ class TC_GAME_API Guild
         void SendEventNewLeader(Member* newLeader, Member* oldLeader, bool isSelfPromoted = false) const;
         void SendEventPlayerLeft(Member* leaver, Member* remover = nullptr, bool isRemoved = false) const;
         void SendEventPresenceChanged(WorldSession* session, bool loggedOn, bool broadcast = false) const;
+        void SendGuildEventRanksUpdated();
         KnownRecipesMap const& GetGuildRecipes();
         KnownRecipes& GetGuildRecipes(uint32 skillId);
         void SendGuildMembersForRecipeResponse(WorldSession* session, uint32 skillId, uint32 spellId);

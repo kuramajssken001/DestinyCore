@@ -1944,6 +1944,26 @@ void Guild::HandleSetMemberRank(WorldSession* session, ObjectGuid targetGuid, Ob
     SendGuildRanksUpdate(setterGuid, targetGuid, rank);
 }
 
+void Guild::HandleShiftRank(WorldSession* /*session*/, uint32 id, bool up)
+{
+    uint32 nextID = up ? id - 1 : id + 1;
+
+    RankInfo* rankinfo = GetRankInfo(id);
+    RankInfo* rankinfo2 = GetRankInfo(nextID);
+
+    if (!rankinfo || !rankinfo2)
+        return;
+
+    RankInfo tmp = NULL;
+    tmp = *rankinfo2;
+    rankinfo2->SetName(rankinfo->GetName());
+    rankinfo2->SetRights(rankinfo->GetRights());
+    rankinfo->SetName(tmp.GetName());
+    rankinfo->SetRights(tmp.GetRights());
+
+    SendGuildEventRanksUpdated();
+}
+
 void Guild::HandleAddNewRank(WorldSession* session, std::string const& name)
 {
     uint8 size = _GetRanksSize();
@@ -2077,6 +2097,11 @@ void Guild::HandleMemberLogout(WorldSession* session)
 
     SendEventPresenceChanged(session, false, true);
     SaveToDB();
+}
+
+void Guild::SendGuildEventRanksUpdated()
+{
+    BroadcastPacket(WorldPackets::Guild::GuildEventRanksUpdated().Write());
 }
 
 void Guild::HandleDelete(WorldSession* session)
