@@ -854,6 +854,7 @@ class TC_GAME_API Guild
         KnownRecipesMap const& GetGuildRecipes();
         KnownRecipes& GetGuildRecipes(uint32 skillId);
         void SendGuildMembersForRecipeResponse(WorldSession* session, uint32 skillId, uint32 spellId);
+        void SendGuildMemberRecipesResponse(WorldSession* session, ObjectGuid playerGuid, uint32 skillId);
 
         // Load from DB
         bool LoadFromDB(Field* fields);

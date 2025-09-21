@@ -467,7 +467,7 @@ void OpcodeTable::Initialize()
     DEFINE_HANDLER(CMSG_GUILD_PERMISSIONS_QUERY,                            STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleGuildPermissionsQuery);
     DEFINE_HANDLER(CMSG_GUILD_PROMOTE_MEMBER,                               STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleGuildPromoteMember);
     DEFINE_HANDLER(CMSG_GUILD_QUERY_MEMBERS_FOR_RECIPE,                     STATUS_LOGGEDIN,  PROCESS_INPLACE,      &WorldSession::HandleQueryGuildMembersForRecipe);
-    DEFINE_HANDLER(CMSG_GUILD_QUERY_MEMBER_RECIPES,                         STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_NULL);
+    DEFINE_HANDLER(CMSG_GUILD_QUERY_MEMBER_RECIPES,                         STATUS_LOGGEDIN,  PROCESS_INPLACE,      &WorldSession::HandleQyeryMemberRecipes);
     DEFINE_HANDLER(CMSG_GUILD_QUERY_NEWS,                                   STATUS_LOGGEDIN,  PROCESS_INPLACE,      &WorldSession::HandleGuildQueryNews);
     DEFINE_HANDLER(CMSG_GUILD_QUERY_RECIPES,                                STATUS_UNHANDLED, PROCESS_INPLACE,      &WorldSession::Handle_NULL);
     DEFINE_HANDLER(CMSG_GUILD_REPLACE_GUILD_MASTER,                         STATUS_LOGGEDIN,  PROCESS_THREADUNSAFE, &WorldSession::HandleGuildReplaceGuildMaster);

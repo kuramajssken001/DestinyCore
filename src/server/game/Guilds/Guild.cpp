@@ -2415,6 +2415,30 @@ void Guild::SendGuildMembersForRecipeResponse(WorldSession* session, uint32 skil
     session->GetPlayer()->SendDirectMessage(response.Write());
 }
 
+void Guild::SendGuildMemberRecipesResponse(WorldSession* session, ObjectGuid playerGuid, uint32 skillId)
+{
+    Member* member = GetMember(playerGuid);
+    if (!member)
+        return;
+
+    for (uint32 i = 0; i < MAX_GUILD_PROFESSIONS; ++i)
+    {
+        Member::ProfessionInfo const& info = member->GetProfessionInfo(i);
+        if (info.skillId == skillId)
+        {
+            WorldPackets::Guild::GuildMemberRecipes packet;
+            packet.Member = playerGuid;
+            packet.SkillLineID = info.skillId;
+            packet.SkillRank = info.skillRank;
+            packet.SkillStep = info.skillValue;
+            for (uint16 x = 0; x < KNOW_RECIPES_MASK_SIZE; ++x)
+                packet.SkillLineBitArray[x] = info.knownRecipes.recipesMask[x];
+            session->GetPlayer()->SendDirectMessage(packet.Write());
+            return;
+        }
+    }
+}
+
 // Loading methods
 bool Guild::LoadFromDB(Field* fields)
 {

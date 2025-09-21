@@ -530,6 +530,15 @@ void WorldSession::HandleQueryGuildMembersForRecipe(WorldPackets::Guild::QueryGu
         guild->SendGuildMembersForRecipeResponse(this, packet.SkillLineID, packet.SpellID);
 }
 
+void WorldSession::HandleQyeryMemberRecipes(WorldPackets::Guild::QueryMemberRecipes& packet)
+{
+    Guild* guild = _player->GetGuild();
+    if (!guild || !guild->IsMember(packet.GuildMember))
+        return;
+
+    guild->SendGuildMemberRecipesResponse(this, packet.GuildMember, packet.SkillLineID);
+}
+
 void WorldSession::HandleGuildReplaceGuildMaster(WorldPackets::Guild::GuildReplaceGuildMaster& /*replaceGuildMaster*/)
 {
     if (Guild* guild = GetPlayer()->GetGuild())
