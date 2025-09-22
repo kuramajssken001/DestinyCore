@@ -506,6 +506,17 @@ WorldPacket const* WorldPackets::Guild::GuildMemberRecipes::Write()
     return &_worldPacket;
 }
 
+WorldPacket const* WorldPackets::Guild::GuildInviteDeclined::Write()
+{
+    _worldPacket.WriteBits(Name.length(), 6);
+    _worldPacket << AutoDecline;
+    _worldPacket.FlushBits();
+    _worldPacket << VirtualRealmAddress;
+    _worldPacket << Name;
+
+    return &_worldPacket;
+}
+
 WorldPacket const* WorldPackets::Guild::GuildFlaggedForRename::Write()
 {
     _worldPacket.WriteBit(FlagSet);

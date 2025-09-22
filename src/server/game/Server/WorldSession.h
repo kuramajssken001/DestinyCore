@@ -436,6 +436,7 @@ namespace WorldPackets
         class GuildChallengeUpdateRequest;
         class SaveGuildEmblem;
         class GuildSetAchievementTracking;
+        class GuildAutoDeclineInvitation;
         class QueryRecipes;
         class QueryGuildMembersForRecipe;
         class QueryMemberRecipes;
@@ -1446,6 +1447,7 @@ class TC_GAME_API WorldSession
         void HandleGuildDelete(WorldPackets::Guild::GuildDelete& packet);
         void HandleGuildReplaceGuildMaster(WorldPackets::Guild::GuildReplaceGuildMaster& replaceGuildMaster);
         void HandleGuildSetAchievementTracking(WorldPackets::Guild::GuildSetAchievementTracking& packet);
+        void HandleGuildAutoDeclineInvitation(WorldPackets::Guild::GuildAutoDeclineInvitation& packet);
         void HandleGuildGetAchievementMembers(WorldPackets::Achievement::GuildGetAchievementMembers& getAchievementMembers);
         void HandleGuildSetGuildMaster(WorldPackets::Guild::GuildSetGuildMaster& packet);
         void HandleGuildUpdateMotdText(WorldPackets::Guild::GuildUpdateMotdText& packet);

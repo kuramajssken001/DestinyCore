@@ -595,3 +595,18 @@ void WorldSession::HandleGuildGetAchievementMembers(WorldPackets::Achievement::G
     if (Guild* guild = GetPlayer()->GetGuild())
         guild->HandleGetAchievementMembers(this, uint32(getAchievementMembers.AchievementID));
 }
+
+void WorldSession::HandleGuildAutoDeclineInvitation(WorldPackets::Guild::GuildAutoDeclineInvitation& /*packet*/)
+{
+    if (Player* inviter = ObjectAccessor::FindPlayer(GetPlayer()->GetGuildInviterGuid()))
+    {
+        WorldPackets::Guild::GuildInviteDeclined packet;
+        packet.Name = GetPlayer()->GetName();
+        packet.AutoDecline = true;
+        packet.VirtualRealmAddress = GetVirtualRealmAddress();
+        inviter->SendDirectMessage(packet.Write());
+    }
+
+    GetPlayer()->SetGuildIdInvited(0);
+    GetPlayer()->SetInGuild(0);
+}

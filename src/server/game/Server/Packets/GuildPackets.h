@@ -653,6 +653,18 @@ namespace WorldPackets
             std::array<uint8, KNOW_RECIPES_MASK_SIZE> SkillLineBitArray;
         };
 
+        class GuildInviteDeclined final : public ServerPacket
+        {
+        public:
+            GuildInviteDeclined() : ServerPacket(SMSG_GUILD_INVITE_DECLINED, 8) {}
+
+            WorldPacket const* Write() override;
+
+            uint32 VirtualRealmAddress = 0;
+            std::string Name;
+            bool AutoDecline = false;
+        };
+
         class GuildFlaggedForRename final : public ServerPacket
         {
         public:
@@ -1171,6 +1183,14 @@ namespace WorldPackets
             WorldPacket const* Write() override;
 
             ObjectGuid MemberGUID;
+        };
+
+        class GuildAutoDeclineInvitation final : public ClientPacket
+        {
+        public:
+            GuildAutoDeclineInvitation(WorldPacket&& packet) : ClientPacket(CMSG_GUILD_AUTO_DECLINE_INVITATION, std::move(packet)) { }
+
+            void Read() override { }
         };
     }
 }
