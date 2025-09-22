@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
+ * This file is part of the DestinyCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -819,6 +819,11 @@ WorldPacket const* WorldPackets::Spells::ResurrectRequest::Write()
 void WorldPackets::Spells::UnlearnSkill::Read()
 {
     _worldPacket >> SkillLine;
+}
+
+void WorldPackets::Spells::UnlearnSpecialization::Read()
+{
+    _worldPacket >> SpecializationIndex;
 }
 
 void WorldPackets::Spells::SelfRes::Read()
