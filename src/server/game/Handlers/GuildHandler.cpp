@@ -203,7 +203,10 @@ void WorldSession::HandleSaveGuildEmblem(WorldPackets::Guild::SaveGuildEmblem& p
         }
 
         if (Guild* guild = GetPlayer()->GetGuild())
+        {
+            guild->UpdateCriteria(CRITERIA_TYPE_BUY_GUILD_TABARD, 1, 0, 0, nullptr, GetPlayer());
             guild->HandleSetEmblem(this, emblemInfo);
+        }
         else
             Guild::SendSaveEmblemResult(this, ERR_GUILDEMBLEM_NOGUILD); // "You are not part of a guild!";
     }
