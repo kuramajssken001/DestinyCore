@@ -2503,9 +2503,9 @@ void ScriptMgr::OnPlayerMovementUpdate(Player* player)
     FOREACH_SCRIPT(PlayerScript)->OnMovementUpdate(player);
 }
 
-void ScriptMgr::OnPlayerStartChallengeMode(Player* player, uint8 level)
+void ScriptMgr::OnPlayerStartChallengeMode(Player* player, uint8 level, uint8 affix1, uint8 affix2, uint8 affix3)
 {
-    FOREACH_SCRIPT(PlayerScript)->OnStartChallengeMode(player, level);
+    FOREACH_SCRIPT(PlayerScript)->OnStartChallengeMode(player, level, affix1, affix2, affix3);
 }
 
 // Account

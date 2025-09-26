@@ -1440,7 +1440,7 @@ void InstanceScript::StartChallengeMode(uint8 modeid, uint8 level, uint8 affix1,
 	{
         CastChallengePlayerSpell(itr->GetSource());
 		// HOOK to PLAYERSCRIPT
-        sScriptMgr->OnPlayerStartChallengeMode(itr->GetSource(), level);
+        sScriptMgr->OnPlayerStartChallengeMode(itr->GetSource(), level, affix1, affix2, affix3);
     }
 
     AddTimedDelayedOperation(10000, [this]()

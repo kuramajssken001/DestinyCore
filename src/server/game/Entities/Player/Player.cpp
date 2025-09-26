@@ -85,6 +85,7 @@
 #include "MiscPackets.h"
 #include "MotionMaster.h"
 #include "MovementPackets.h"
+#include "MoveSplineInitArgs.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -23661,6 +23662,85 @@ void Player::ContinueTaxiFlight() const
     }
 
     GetSession()->SendDoFlight(mountDisplayId, path, startNode);
+}
+
+void Player::TaxiFlightNearestNode()
+{
+    uint32 curloc = sObjectMgr->GetNearestTaxiNode(GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId(), GetTeam());
+    if (!curloc)
+        return;
+
+    TaxiNodesEntry const* to = sTaxiNodesStore.LookupEntry(curloc);
+    if (!to)
+        return;
+
+    //if(to->ContinentID!= GetMapId())
+    //    return;
+
+    uint32 mountDisplayId = sObjectMgr->GetTaxiMountDisplayId(to->ID, GetTeam(), true);
+    if (!mountDisplayId)
+        return;
+
+    RemoveAurasByType(SPELL_AURA_MOUNTED);
+
+    // Prepare to flight start now
+    // stop combat at start taxi flight if any
+    CombatStop();
+
+    StopCastingCharm();
+    StopCastingBindSight();
+    ExitVehicle();
+
+    GetSession()->SendActivateTaxiReply(ERR_TAXIOK);
+
+    if (mountDisplayId)
+        Mount(mountDisplayId);
+
+    AddUnitState(UNIT_STATE_IN_FLIGHT);
+    SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_REMOVE_CLIENT_CONTROL | UNIT_FLAG_TAXI_FLIGHT);
+    AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
+    AddUnitMovementFlag(MOVEMENTFLAG_CAN_FLY);
+    Movement::PointsArray path;
+    Position fromPos = GetPositionWithOffset({ -15.f, -15.f, 20.f });
+    path.push_back(GetPosition().GetVector3());
+    path.push_back(fromPos.GetVector3());
+    GetMotionMaster()->MoveSmoothPath(1, path, false);
+
+    Movement::PointsArray pathto;
+    Position toPos1 = Position(to->Pos.X, to->Pos.Y, to->Pos.Z, GetOrientation());
+    Position toPos = toPos1;
+    toPos.RelocateOffset({ -15.f, -15.f, 20.f });
+    pathto.push_back(toPos.GetVector3());
+    pathto.push_back(toPos1.GetVector3());
+
+    GetScheduler().Schedule(Milliseconds(4000), [this, to, toPos](TaskContext context)
+        {
+            m_taxi.ClearTaxiDestinations();
+            TeleportTo(to->ContinentID, toPos);
+        });
+    GetScheduler().Schedule(Milliseconds(5000), [this, pathto](TaskContext context)
+        {
+            AddUnitState(UNIT_STATE_IN_FLIGHT);
+            AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
+            AddUnitMovementFlag(MOVEMENTFLAG_CAN_FLY);
+            GetMotionMaster()->MoveSmoothPath(2, pathto, false);
+        });
+    GetScheduler().Schedule(Milliseconds(9000), [this](TaskContext context)
+        {
+            // remove flag to prevent send object build movement packets for flight state and crash (movement generator already not at top of stack)
+            ClearUnitState(UNIT_STATE_IN_FLIGHT);
+            Dismount();
+            RemoveUnitFlag(UnitFlags(UNIT_FLAG_REMOVE_CLIENT_CONTROL | UNIT_FLAG_TAXI_FLIGHT));
+            RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
+            RemoveUnitMovementFlag(MOVEMENTFLAG_CAN_FLY);
+            getHostileRefManager().setOnlineOfflineState(true);
+
+            StopMoving();
+            SetFallInformation(0, GetPositionZ());
+
+            RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_TAXI_BENCHMARK);
+            RestoreDisplayId();
+        });
 }
 
 void Player::InitDataForForm(bool reapplyMods)
