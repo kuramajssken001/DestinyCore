@@ -208,6 +208,9 @@ namespace WorldPackets
         class Start;
         class Reset;
         class UpdateDeathCount;
+        class RequestMapStats;
+        class GetChallengeModeRewards;
+        class ChallengeModeRewards;
     }
 
     namespace Character
@@ -2005,6 +2008,8 @@ class TC_GAME_API WorldSession
         // Challenge Modes
         void HandleChallengeModeStart(WorldPackets::ChallengeMode::StartRequest& /*start*/);
         void HandleRequestLeaders(WorldPackets::ChallengeMode::RequestLeaders& packet);
+        void HandleChallengeModeRequestMapStatsOpcode(WorldPackets::ChallengeMode::RequestMapStats& request);
+        void HandleChallengeModeRewards(WorldPackets::ChallengeMode::GetChallengeModeRewards& getRewards);
 
         // Currency
         void HandleSetCurrencyFlags(WorldPackets::Character::SetCurrencyFlags& packet);

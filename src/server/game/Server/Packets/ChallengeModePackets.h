@@ -200,6 +200,45 @@ namespace WorldPackets
             std::vector<ModeAttempt> GuildLeaders;
             std::vector<ModeAttempt> RealmLeaders;
         };
+
+        class AllMapStats final : public ServerPacket
+        {
+        public:
+            AllMapStats() : ServerPacket(SMSG_CHALLENGE_MODE_ALL_MAP_STATS, 4) {}
+
+            WorldPacket const* Write() override;
+
+            std::vector<ChallengeModeMap> ChallengeModeMaps;
+        };
+
+        class RequestMapStats final : public ClientPacket
+        {
+        public:
+            RequestMapStats(WorldPacket&& packet) : ClientPacket(CMSG_CHALLENGE_MODE_REQUEST_MAP_STATS, std::move(packet)) {}
+
+            void Read() override;
+        };
+
+        class ChallengeModeRewards final : public ServerPacket
+        {
+        public:
+            ChallengeModeRewards() : ServerPacket(SMSG_CHALLENGE_MODE_REWARDS, 4) {}
+
+            WorldPacket const* Write() override;
+
+            bool IsWeeklyRewardAvailable = true;
+            uint32 LastWeekHighestKeyCompleted = -1;
+            uint32 LastWeekMapChallengeKeyEntry = -1;
+            uint32 CurrentWeekHighestKeyCompleted = -1;
+        };
+
+        class GetChallengeModeRewards final : public ClientPacket
+        {
+        public:
+            GetChallengeModeRewards(WorldPacket&& packet) : ClientPacket(CMSG_GET_CHALLENGE_MODE_REWARDS, std::move(packet)) {}
+
+            void Read() override;
+        };
     }
 }
 
