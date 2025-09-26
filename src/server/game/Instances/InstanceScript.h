@@ -613,6 +613,8 @@ class TC_GAME_API InstanceScript : public ZoneScript
         void AddChallengeModeDoor(ObjectGuid doorGuid);
         void AddChallengeModeOrb(ObjectGuid orbGuid);
 
+        void ResetChallengeMode();
+
         std::vector<ObjectGuid> _challengeDoorGuids;
         std::vector<ObjectGuid> _challengeChestGuids;
         ObjectGuid _challengeOrbGuid;

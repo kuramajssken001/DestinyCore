@@ -1774,6 +1774,16 @@ void InstanceScript::AddChallengeModeOrb(ObjectGuid orbGuid)
     _challengeOrbGuid = orbGuid;
 }
 
+void InstanceScript::ResetChallengeMode()
+{
+    //if (_challenge)
+    //    _challenge->ResetGo(); ToDo
+
+    instance->m_respawnChallenge = time(nullptr); // For respawn all mobs
+    RepopPlayersAtGraveyard();
+    instance->SetDifficultyID(DIFFICULTY_MYTHIC);
+}
+
 bool InstanceHasScript(WorldObject const* obj, char const* scriptName)
 {
     if (InstanceMap* instance = obj->GetMap()->ToInstanceMap())

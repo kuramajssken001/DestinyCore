@@ -161,6 +161,14 @@ namespace WorldPackets
             uint8 unk = 128;
         };
 
+        class ResetChallengeMode final : public ClientPacket
+        {
+        public:
+            ResetChallengeMode(WorldPacket&& packet) : ClientPacket(CMSG_RESET_CHALLENGE_MODE, std::move(packet)) {}
+
+            void Read() override {}
+        };
+
         class NewPlayerRecord final : public ServerPacket
         {
         public:

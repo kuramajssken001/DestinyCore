@@ -211,6 +211,7 @@ namespace WorldPackets
         class RequestMapStats;
         class GetChallengeModeRewards;
         class ChallengeModeRewards;
+        class ResetChallengeMode;
     }
 
     namespace Character
@@ -2010,6 +2011,7 @@ class TC_GAME_API WorldSession
         void HandleRequestLeaders(WorldPackets::ChallengeMode::RequestLeaders& packet);
         void HandleChallengeModeRequestMapStatsOpcode(WorldPackets::ChallengeMode::RequestMapStats& request);
         void HandleChallengeModeRewards(WorldPackets::ChallengeMode::GetChallengeModeRewards& getRewards);
+        void HandleResetChallengeMode(WorldPackets::ChallengeMode::ResetChallengeMode& packet);
 
         // Currency
         void HandleSetCurrencyFlags(WorldPackets::Character::SetCurrencyFlags& packet);

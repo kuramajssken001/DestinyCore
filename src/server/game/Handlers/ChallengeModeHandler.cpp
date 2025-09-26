@@ -198,3 +198,10 @@ void WorldSession::HandleChallengeModeRewards(WorldPackets::ChallengeMode::GetCh
         result.IsWeeklyRewardAvailable = true;
     SendPacket(result.Write());
 }
+
+void WorldSession::HandleResetChallengeMode(WorldPackets::ChallengeMode::ResetChallengeMode& /*packet*/)
+{
+    if (auto const& instanceScript = _player->GetInstanceScript())
+        if (instanceScript->instance->isChallenge())
+            instanceScript->ResetChallengeMode();
+}
