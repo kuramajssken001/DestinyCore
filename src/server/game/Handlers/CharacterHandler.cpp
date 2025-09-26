@@ -1167,6 +1167,8 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder const& holder)
     // Handle Login-Achievements (should be handled after loading)
     _player->UpdateCriteria(CRITERIA_TYPE_ON_LOGIN, 1);
 
+    _player->RemoveOnLogAuras();
+
     sScriptMgr->OnPlayerLogin(pCurrChar, firstLogin);
 
     TC_METRIC_EVENT("player_events", "Login", pCurrChar->GetName());

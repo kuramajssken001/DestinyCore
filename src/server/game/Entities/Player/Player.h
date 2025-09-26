@@ -2423,6 +2423,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool HasAtLoginFlag(AtLoginFlags f) const { return (m_atLoginFlags & f) != 0; }
         void SetAtLoginFlag(AtLoginFlags f) { m_atLoginFlags |= f; }
         void RemoveAtLoginFlag(AtLoginFlags flags, bool persist = false);
+        void RemoveOnLogAuras();
 
         bool isUsingLfg() const;
         bool inRandomLfgDungeon() const;

@@ -123,7 +123,7 @@ ConditionMgr::ConditionTypeInfo const ConditionMgr::StaticConditionTypeData[COND
     { "Quest state mask",     true,  true, false },
     { "Objective Complete",   true, false, false },
     { "Map Difficulty",       true, false, false },
-    { nullptr,               false, false, false },
+    { "Aura stack amount",    true, true,  false },
     { "Object Entry or Guid", true, true,  true  },
     { "Object TypeMask",      true, false, false },
 };
@@ -518,6 +518,13 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo) const
             condMeets = object->GetMap()->GetDifficultyID() == ConditionValue1;
             break;
         }
+        case CONDITION_AURA_STACK_AMOUNT:
+        {
+            if (Unit* unit = object->ToUnit())
+                if (Aura* aura = unit->GetAura(ConditionValue1))
+                    condMeets = aura->GetStackAmount() == ConditionValue2;
+            break;
+        }
         default:
             condMeets = false;
             break;
@@ -546,6 +553,7 @@ uint32 Condition::GetSearcherTypeMaskForCondition() const
             mask |= GRID_MAP_TYPE_MASK_ALL;
             break;
         case CONDITION_AURA:
+        case CONDITION_AURA_STACK_AMOUNT:
             mask |= GRID_MAP_TYPE_MASK_CREATURE | GRID_MAP_TYPE_MASK_PLAYER;
             break;
         case CONDITION_ITEM:
@@ -2336,6 +2344,15 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond) const
                 return false;
             }
             break;
+        case CONDITION_AURA_STACK_AMOUNT:
+        {
+            if (!sSpellMgr->GetSpellInfo(cond->ConditionValue1))
+            {
+                TC_LOG_ERROR("sql.sql", "Aura (CONDITION_AURA_STACK_AMOUNT) condition has non existing spell (Id: %d), skipped", cond->ConditionValue1);
+                return false;
+            }
+            break;
+        }
         case CONDITION_INSTANCE_INFO:
         case CONDITION_AREAID:
         case CONDITION_ALIVE:

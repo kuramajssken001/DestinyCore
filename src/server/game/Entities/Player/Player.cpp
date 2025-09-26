@@ -28508,6 +28508,17 @@ void Player::RemoveAtLoginFlag(AtLoginFlags flags, bool persist /*= false*/)
     }
 }
 
+void Player::RemoveOnLogAuras()
+{
+    for (std::pair<uint32, SpellOnLogRemoveAura> spellOnLogRemoveAura : sSpellMgr->GetOnLogRemoveAuras())
+        if (HasAura(spellOnLogRemoveAura.first))
+        {
+            if (spellOnLogRemoveAura.second.RequiredAura && !HasAura(spellOnLogRemoveAura.second.RequiredAura))
+                continue;
+            RemoveAura(spellOnLogRemoveAura.first);
+        }
+}
+
 void Player::ResetMap()
 {
     // this may be called during Map::Update

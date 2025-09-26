@@ -1893,6 +1893,9 @@ void World::SetInitialWorldSettings()
     TC_LOG_INFO("server.loading", "Loading SpellInfo custom attributes...");
     sSpellMgr->LoadSpellInfoCustomAttributes();
 
+    TC_LOG_INFO("server.loading", "Loading SpellOnLogRemoveAuras data...");
+    sSpellMgr->LoadSpellOnLogRemoveAurasData();
+
     TC_LOG_INFO("server.loading", "Loading SpellInfo diminishing infos...");
     sSpellMgr->LoadSpellInfoDiminishing();
 
