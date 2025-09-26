@@ -320,6 +320,9 @@ class TC_GAME_API InstanceScript : public ZoneScript
 
         void DoModifyPlayerCurrencies(uint32 id, int32 value);
 
+        // Teleport and resurrect all players in the instance at the nearest graveyard
+        void RepopPlayersAtGraveyard();
+
         void DoNearTeleportPlayers(const Position pos, bool casting = false);
 		
 		void DoTeleportPlayers(uint32 mapId, const Position pos);

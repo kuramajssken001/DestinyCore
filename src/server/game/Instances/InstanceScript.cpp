@@ -851,6 +851,17 @@ void InstanceScript::DoModifyPlayerCurrencies(uint32 id, int32 value)
                 pPlayer->ModifyCurrency(id, value);
 }
 
+void InstanceScript::RepopPlayersAtGraveyard()
+{
+    if (!instance)
+        return;
+
+    DoOnPlayers([](Player* player)
+        {
+            player->RepopAtGraveyard();
+        });
+}
+
 void InstanceScript::DoNearTeleportPlayers(const Position pos, bool casting /*=false*/)
 {
     Map::PlayerList const &plrList = instance->GetPlayers();
