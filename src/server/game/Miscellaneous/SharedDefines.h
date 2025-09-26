@@ -3888,7 +3888,7 @@ uint32 const CREATURE_TYPEMASK_DEMON_OR_UNDEAD = (1 << (CREATURE_TYPE_DEMON-1)) 
 uint32 const CREATURE_TYPEMASK_HUMANOID_OR_UNDEAD = (1 << (CREATURE_TYPE_HUMANOID-1)) | (1 << (CREATURE_TYPE_UNDEAD-1));
 uint32 const CREATURE_TYPEMASK_MECHANICAL_OR_ELEMENTAL = (1 << (CREATURE_TYPE_MECHANICAL-1)) | (1 << (CREATURE_TYPE_ELEMENTAL-1));
 
-// CreatureFamily.dbc (6.0.2.18988)
+// CreatureFamily.dbc (7.3.5.26972)
 enum CreatureFamily
 {
     CREATURE_FAMILY_NONE                = 0,
@@ -3965,7 +3965,13 @@ enum CreatureFamily
     CREATURE_FAMILY_ABYSSAL             = 148,
     CREATURE_FAMILY_RYLAK               = 149,
     CREATURE_FAMILY_RIVERBEAST          = 150,
-    CREATURE_FAMILY_STAG                = 151
+    CREATURE_FAMILY_STAG                = 151,
+    CREATURE_FAMILY_MECHAICAL           = 154,
+    CREATURE_FAMILY_ABOMINATION         = 155,
+    CREATURE_FAMILY_SCALEHIDE           = 156,
+    CREATURE_FAMILY_OXEN                = 157,
+    CREATURE_FAMILY_FEATHERMANE         = 160,
+    CREATURE_FAMILY_VOID_STALKER        = 161
 };
 
 enum CreatureTypeFlags
