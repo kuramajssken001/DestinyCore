@@ -26679,6 +26679,9 @@ void Player::RewardPlayerAndGroupAtEvent(uint32 creature_id, WorldObject* pRewar
             // quest objectives updated only for alive group member or dead but with not released body
             if (player->IsAlive()|| !player->GetCorpse())
                 player->KilledMonsterCredit(creature_id, creature_guid);
+
+            if (Scenario* scenario = GetScenario())
+                scenario->UpdateCriteria(CRITERIA_TYPE_KILL_CREATURE, creature_id, 1, 0, pRewardSource->ToUnit(), this);
         }
     }
     else                                                    // if (!group)
