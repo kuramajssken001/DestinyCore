@@ -942,6 +942,20 @@ enum PlayerCommandStates
     CHEAT_ALL       = CHEAT_GOD | CHEAT_CASTTIME | CHEAT_COOLDOWN | CHEAT_POWER
 };
 
+enum PlayerCheckQuestStates : uint32
+{
+    CHECK_QUEST_NONE = 1,
+    CHECK_QUEST_COMPLETE = 2,
+    CHECK_QUEST_TAKEN = 8,
+    CHECK_QUEST_FAIL = 32,
+    CHECK_QUEST_REWARDED = 64,
+    CHECK_QUEST_TAKEN_AND_COMPLETE = CHECK_QUEST_TAKEN | CHECK_QUEST_COMPLETE, // 10
+    CHECK_QUEST_NOT_REWARDED = CHECK_QUEST_NONE | CHECK_QUEST_COMPLETE | CHECK_QUEST_TAKEN,// 11
+    CHECK_QUEST_COMPLETE_AND_REWARDED = CHECK_QUEST_COMPLETE | CHECK_QUEST_REWARDED,// 66
+    CHECK_QUEST_TAKEN_AND_COMPLETE_AND_REWARDED = CHECK_QUEST_REWARDED | CHECK_QUEST_COMPLETE | CHECK_QUEST_TAKEN, // 74
+    CHECK_QUEST_ALL = CHECK_QUEST_NONE | CHECK_QUEST_TAKEN_AND_COMPLETE_AND_REWARDED, // 75
+};
+
 enum PlayerLogXPReason : uint8
 {
     LOG_XP_REASON_KILL    = 0,
@@ -1556,6 +1570,7 @@ class TC_GAME_API Player : public Unit, public GridObject<Player>
         bool GiveQuestSourceItem(Quest const* quest);
         bool TakeQuestSourceItem(uint32 questId, bool msg);
         bool GetQuestRewardStatus(uint32 quest_id) const;
+        bool CheckQuestStatus(uint32 quest_id, uint32 mask) const { return  mask & (1 << GetQuestStatus(quest_id)); }
         QuestStatus GetQuestStatus(uint32 quest_id) const;
         std::string GetQuestStatusString(QuestStatus status) const;
         void SetQuestStatus(uint32 questId, QuestStatus status, bool update = true);
