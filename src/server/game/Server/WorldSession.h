@@ -212,6 +212,7 @@ namespace WorldPackets
         class GetChallengeModeRewards;
         class ChallengeModeRewards;
         class ResetChallengeMode;
+        class ResetChallengeModeCheat;
     }
 
     namespace Character
@@ -2012,6 +2013,7 @@ class TC_GAME_API WorldSession
         void HandleChallengeModeRequestMapStatsOpcode(WorldPackets::ChallengeMode::RequestMapStats& request);
         void HandleChallengeModeRewards(WorldPackets::ChallengeMode::GetChallengeModeRewards& getRewards);
         void HandleResetChallengeMode(WorldPackets::ChallengeMode::ResetChallengeMode& packet);
+        void HandleResetChallengeModeCheat(WorldPackets::ChallengeMode::ResetChallengeModeCheat& packet);
 
         // Currency
         void HandleSetCurrencyFlags(WorldPackets::Character::SetCurrencyFlags& packet);

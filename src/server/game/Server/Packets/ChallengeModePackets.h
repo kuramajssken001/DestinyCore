@@ -169,6 +169,14 @@ namespace WorldPackets
             void Read() override {}
         };
 
+        class ResetChallengeModeCheat final : public ClientPacket
+        {
+        public:
+            ResetChallengeModeCheat(WorldPacket&& packet) : ClientPacket(CMSG_RESET_CHALLENGE_MODE_CHEAT, std::move(packet)) {}
+
+            void Read() override {};
+        };
+
         class NewPlayerRecord final : public ServerPacket
         {
         public:

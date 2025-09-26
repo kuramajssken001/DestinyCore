@@ -22,6 +22,7 @@
 #include "Player.h"
 #include "WorldSession.h"
 #include "ChallengeModeMgr.h"
+#include "Warden.h"
 
 void WorldSession::HandleRequestLeaders(WorldPackets::ChallengeMode::RequestLeaders& packet)
 {
@@ -204,4 +205,17 @@ void WorldSession::HandleResetChallengeMode(WorldPackets::ChallengeMode::ResetCh
     if (auto const& instanceScript = _player->GetInstanceScript())
         if (instanceScript->instance->isChallenge())
             instanceScript->ResetChallengeMode();
+}
+
+void WorldSession::HandleResetChallengeModeCheat(WorldPackets::ChallengeMode::ResetChallengeModeCheat& packet)
+{
+    if (!_warden)
+    {
+        TC_LOG_DEBUG("challenge", "%s tried ResetChallengeModeCheat but no Warden session exists.", GetPlayerName().c_str());
+        return;
+    }
+
+    std::string action = _warden->Penalty(nullptr);
+
+    TC_LOG_DEBUG("challenge", "%s triggered ResetChallengeModeCheat. Action: %s", GetPlayerName().c_str(), action.c_str());
 }
