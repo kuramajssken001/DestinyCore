@@ -534,7 +534,7 @@ void Unit::MonsterMoveWithSpeed(float x, float y, float z, float speed, bool gen
 
 void Unit::UpdateSplineMovement(uint32 t_diff)
 {
-    if (movespline->Finalized())
+    if (!movespline || movespline->Finalized())
         return;
 
     movespline->updateState(t_diff);
@@ -544,14 +544,19 @@ void Unit::UpdateSplineMovement(uint32 t_diff)
     {
         DisableSpline();
 
-        if (IsCreature() && IsAIEnabled)
+        if (IsCreature())
         {
-            ToCreature()->AI()->OnSplineIndexReached(movespline->_Spline().last());
-            ToCreature()->AI()->OnSplineEndReached();
+            if (IsAIEnabled && ToCreature()->AI())
+            {
+                ToCreature()->AI()->OnSplineIndexReached(movespline->_Spline().last());
+                ToCreature()->AI()->OnSplineEndReached();
+            }
         }
     }
-    else if (IsAIEnabled && movespline->_lastSplineIdx() != movespline->_currentSplineIdx())
+    else if (IsCreature() && IsAIEnabled && ToCreature()->AI() && movespline->_lastSplineIdx() != movespline->_currentSplineIdx())
+    {
         ToCreature()->AI()->OnSplineIndexReached(movespline->_lastSplineIdx());
+    }
 
     m_movesplineTimer.Update(t_diff);
     if (m_movesplineTimer.Passed() || arrived)
