@@ -1262,6 +1262,40 @@ void PlayerBotMgr::SupplementPlayerBot()
 
 void PlayerBotMgr::OnRealPlayerJoinBattlegroundQueue(uint32 bgTypeId, uint32 level)
 {
+    BattlegroundTypeId _bgTypeId = BattlegroundTypeId(bgTypeId);
+    BattlegroundQueueTypeId bgQueueTypeId = BattlegroundMgr::BGQueueTypeId(BattlegroundTypeId(bgTypeId), 0);
+    BattlegroundQueue& bgQueue = sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId);
+    Battleground* bg = sBattlegroundMgr->GetBattlegroundTemplate(BattlegroundTypeId(bgTypeId));
+    if (!bg)
+        return;
+
+    uint32 needAlliancePlayerCount = 5;
+    uint32 needHordePlayerCount = 5;
+    uint32 _time = 0;
+
+    for (uint32 j = BattlegroundBracketId::BG_BRACKET_ID_FIRST; j <= BattlegroundBracketId::BG_BRACKET_ID_LAST; j++)
+    {
+        BattlegroundBracketId bracket = BattlegroundBracketId(j);
+        PVPDifficultyEntry const* bracketEntry = DB2Manager::GetBattlegroundBracketById(bg->GetMapId(), bracket);
+        if (!bracketEntry)
+            continue;
+        if (!bgQueue.ExistRealPlayer(bracketEntry))
+            continue;
+        if (needAlliancePlayerCount > 0)
+        {
+            for (uint32 k = 0; k <= needAlliancePlayerCount; k++)
+                AddNewPlayerBotToBG(TeamId::TEAM_ALLIANCE, bracketEntry->MinLevel, bracketEntry->MaxLevel, _bgTypeId);
+        }
+
+        if (needHordePlayerCount > 0)
+        {
+            for (uint32 k = 0; k <= needHordePlayerCount; k++)
+                AddNewPlayerBotToBG(TeamId::TEAM_HORDE, bracketEntry->MinLevel, bracketEntry->MaxLevel, _bgTypeId);
+        }
+
+        printf("QueryNeedPlayerCount %d %d \n", needAlliancePlayerCount, needHordePlayerCount);
+        return;
+    }
 }
 
 void PlayerBotMgr::OnRealPlayerLeaveBattlegroundQueue(uint32 bgTypeId, uint32 level)
