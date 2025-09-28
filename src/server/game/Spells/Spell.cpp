@@ -1705,6 +1705,19 @@ void Spell::SelectImplicitChainTargets(SpellEffIndex effIndex, SpellImplicitTarg
     if (Player* modOwner = m_caster->GetSpellModOwner())
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_JUMP_TARGETS, maxTargets, this);
 
+    // remove other single target auras
+    for (Aura* aura : m_caster->GetSingleCastAuras())
+    {
+        if (aura->GetId() == 80240)
+        {
+            Unit::AuraApplicationList applications;
+            aura->GetApplicationList(applications);
+            if (!applications.empty())
+                AddUnitTarget(applications.front()->GetTarget(), effMask, false);
+        }
+
+    }
+
     if (maxTargets > 1)
     {
         // mark damage multipliers as used
