@@ -1002,6 +1002,18 @@ namespace WorldPackets
             int32 SpellXSpellVisualId = 0;
             ObjectGuid TargetGUID;
         };
+
+        class AreaTriggerSequence final : public ServerPacket
+        {
+        public:
+            AreaTriggerSequence() : ServerPacket(SMSG_AREA_TRIGGER_SEQUENCE) { }
+
+            WorldPacket const* Write() override;
+
+            ObjectGuid TriggerGUID;
+            int32 SequenceAnimationID = 0;
+            bool SequenceEntered = false;
+        };
     }
 }
 

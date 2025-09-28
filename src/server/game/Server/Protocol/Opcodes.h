@@ -807,6 +807,7 @@ enum OpcodeServer : uint16
     SMSG_AREA_TRIGGER_NO_CORPSE                       = 0x2755,
     SMSG_AREA_TRIGGER_RE_PATH                         = 0x263F,
     SMSG_AREA_TRIGGER_RE_SHAPE                        = 0x263C,
+    SMSG_AREA_TRIGGER_SEQUENCE                        = 0x263D,
     SMSG_ARENA_CROWD_CONTROL_SPELLS                   = 0x264E,
     SMSG_ARENA_ERROR                                  = 0x2711,
     SMSG_ARENA_PREP_OPPONENT_SPECIALIZATIONS          = 0x2665,

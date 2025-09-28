@@ -956,3 +956,13 @@ void WorldPackets::Spells::UpdateSpellVisual::Read()
     _worldPacket >> SpellXSpellVisualId;
     _worldPacket >> TargetGUID;
 }
+
+WorldPacket const* WorldPackets::Spells::AreaTriggerSequence::Write()
+{
+    _worldPacket << TriggerGUID;
+    _worldPacket << SequenceAnimationID;
+    _worldPacket.WriteBit(SequenceEntered);
+    _worldPacket.FlushBits();
+
+    return &_worldPacket;
+}
