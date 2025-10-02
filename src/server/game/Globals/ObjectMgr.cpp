@@ -4603,6 +4603,10 @@ void ObjectMgr::LoadQuests()
                         TC_LOG_ERROR("sql.sql", "Quest %u objective %u has non existing creature entry %u, quest can't be done.",
                             qinfo->GetQuestId(), obj.ID, uint32(obj.ObjectID));
                     break;
+                case QUEST_OBJECTIVE_DEFEATBATTLEPET:
+                    if (!sBattlePetSpeciesStore.LookupEntry(obj.ObjectID))
+                        TC_LOG_ERROR("sql.sql", "Quest %u objective %u has non existing battlepet species id %d", qinfo->GetQuestId(), obj.ID, obj.ObjectID);
+                    break;
                 case QUEST_OBJECTIVE_CRITERIA_TREE:
                     if (!sCriteriaTreeStore.LookupEntry(obj.ObjectID))
                         TC_LOG_ERROR("sql.sql", "Quest %u objective %u has non existing criteria tree id %d", qinfo->GetQuestId(), obj.ID, obj.ObjectID);
